@@ -2,3 +2,8 @@ build/
 runs/
 *.log
 *.csv
+core*
+*.engine
+*.onnx
+starpu-1.4.0/
+__pycache__/

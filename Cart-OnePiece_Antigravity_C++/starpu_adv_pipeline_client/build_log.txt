@@ -1,0 +1,206 @@
+[  5%] Built target client_smoke
+[ 10%] Built target starpu_smoke
+[ 15%] Built target carla_rgb_stream_smoke
+[ 21%] Built target semantic_decode
+[ 26%] Built target carla_gt_stream_smoke
+[ 31%] Built target frame_sync
+[ 36%] Built target sync_smoke
+[ 42%] Built target preprocess
+[ 47%] Built target tensor_stats
+[ 52%] Built target preprocess_smoke
+[ 57%] Built target preprocess_unit_test
+[ 63%] Built target trt_runner
+[ 68%] Built target trt_smoke
+[ 73%] Built target postprocess
+[ 78%] Built target metrics
+[ 84%] Built target pipeline_direct
+Consolidate compiler generated dependencies of target pipeline_starpu
+[ 86%] Building CXX object CMakeFiles/pipeline_starpu.dir/src/starpu_codelets.cpp.o
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:15:5: error: use of undeclared identifier 'preprocess'; did you mean 'postprocess'?
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+    ^~~~~~~~~~
+    postprocess
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/include/postprocess.hpp:7:11: note: 'postprocess' declared here
+namespace postprocess {
+          ^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:15:42: error: use of undeclared identifier 'preprocess'; did you mean 'postprocess'?
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+                                         ^~~~~~~~~~
+                                         postprocess
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/include/postprocess.hpp:7:11: note: 'postprocess' declared here
+namespace postprocess {
+          ^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:15:17: error: no member named 'PreprocessBGRAtoNCHW_F32' in namespace 'postprocess'
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+    ~~~~~~~~~~~~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:15:54: error: no member named 'ResizeBilinear2D' in namespace 'postprocess'
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+                                         ~~~~~~~~~~~~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:23:5: error: use of undeclared identifier 'preprocess'; did you mean 'postprocess'?
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+    ^~~~~~~~~~
+    postprocess
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/include/postprocess.hpp:7:11: note: 'postprocess' declared here
+namespace postprocess {
+          ^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:23:42: error: use of undeclared identifier 'preprocess'; did you mean 'postprocess'?
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+                                         ^~~~~~~~~~
+                                         postprocess
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/include/postprocess.hpp:7:11: note: 'postprocess' declared here
+namespace postprocess {
+          ^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:23:17: error: no member named 'PreprocessBGRAtoNCHW_F32' in namespace 'postprocess'
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+    ~~~~~~~~~~~~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:23:54: error: no member named 'ResizeBilinear2D' in namespace 'postprocess'
+    preprocess::PreprocessBGRAtoNCHW_F32<preprocess::ResizeBilinear2D>(
+                                         ~~~~~~~~~~~~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:9: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+        ^~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                 ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                             ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:42: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                         ^~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                                   ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:19: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+        ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                         ~~~~~~~~~ ^~~~~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:65: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                                                ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:25: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+        ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:44: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                           ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                                              ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:19:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.std[1], args->cfg.std[2]);
+        ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:9: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+        ^~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                 ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                             ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:42: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                         ^~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:16:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                                   ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:19: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+        ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                         ~~~~~~~~~ ^~~~~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:17:65: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                                                ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:25: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+        ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:44: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                           ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:18:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                                              ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:19:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.std[1], args->cfg.std[2]);
+        ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:9: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+        ^~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                 ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                             ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:42: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                         ^~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                                   ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:19: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+        ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                         ~~~~~~~~~ ^~~~~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:65: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                                                ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:25: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+        ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:44: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                           ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                                              ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:27:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.std[1], args->cfg.std[2]);
+        ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:9: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+        ^~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                 ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                             ~~~~  ^~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:42: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                         ^~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:24:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        in_bgra, args->in_w, args->in_h, out_nchw, args->cfg.out_w,
+                                                   ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:19: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+        ~~~~~~~~~ ^~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:36: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                         ~~~~~~~~~ ^~~~~~~~~~~
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:25:65: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.out_h, args->cfg.assume_bgra, args->cfg.mean[0],
+                                                ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:25: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+        ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:44: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                           ~~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:26:62: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.mean[1], args->cfg.mean[2], args->cfg.std[0],
+                                              ~~~~~~~~~~~~~ ~^
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/src/starpu_codelets.cpp:27:24: warning: left operand of comma operator has no effect [-Wunused-value]
+        args->cfg.std[1], args->cfg.std[2]);
+        ~~~~~~~~~~~~~ ~^
+48 warnings and 8 errors generated.
+gmake[2]: *** [CMakeFiles/pipeline_starpu.dir/build.make:104: CMakeFiles/pipeline_starpu.dir/src/starpu_codelets.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:1301: CMakeFiles/pipeline_starpu.dir/all] Error 2
+gmake: *** [Makefile:101: all] Error 2
