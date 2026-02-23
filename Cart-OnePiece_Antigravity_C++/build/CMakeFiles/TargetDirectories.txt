@@ -1,0 +1,3 @@
+/home/eric/Cart-OnePiece_Antigravity_C++/build/CMakeFiles/carla_mercedes_spawner.dir
+/home/eric/Cart-OnePiece_Antigravity_C++/build/CMakeFiles/edit_cache.dir
+/home/eric/Cart-OnePiece_Antigravity_C++/build/CMakeFiles/rebuild_cache.dir

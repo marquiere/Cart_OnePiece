@@ -1,0 +1,159 @@
+/**
+ * CARLA C++ Client Example: Spawn a Mercedes Coupe
+ *
+ * Requirements:
+ * - Connect to 127.0.0.1:2000
+ * - Prefer "vehicle.mercedes.coupe"
+ * - Retry spawn on failure
+ * - Autopilot OFF
+ * - Print details
+ * - RAII Cleanup
+ */
+
+#include <iostream>
+#include <random>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <chrono>
+
+// CARLA headers
+#include <carla/client/Client.h>
+#include <carla/client/Actor.h>
+#include <carla/actors/BlueprintLibrary.h>
+#include <carla/actors/ActorBlueprint.h>
+#include <carla/client/Map.h>
+#include <carla/client/World.h>
+#include <carla/geom/Transform.h>
+#include <carla/rpc/ActorId.h>
+
+namespace cc = carla::client;
+namespace cg = carla::geom;
+namespace cr = carla::rpc;
+
+using namespace std::chrono_literals;
+
+// Helper to clean up actor on exit
+class ActorDestroyer {
+public:
+    explicit ActorDestroyer(boost::shared_ptr<cc::Actor> actor) : actor_(std::move(actor)) {}
+    
+    ~ActorDestroyer() {
+        if (actor_) {
+            try {
+                actor_->Destroy();
+                std::cout << "Actor " << actor_->GetDisplayId() << " (ID: " << actor_->GetId() << ") destroyed." << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error destroying actor: " << e.what() << std::endl;
+            }
+        }
+    }
+
+    // Prevent copying to avoid double destruction issues (though SharedPtr handles it, explicit ownership logic is safer for RAII wrapper)
+    ActorDestroyer(const ActorDestroyer&) = delete;
+    ActorDestroyer& operator=(const ActorDestroyer&) = delete;
+
+private:
+    boost::shared_ptr<cc::Actor> actor_;
+};
+
+int main(int argc, char* argv[]) {
+    try {
+        std::string host = "127.0.0.1";
+        uint16_t port = 2000;
+
+        if (argc > 1) host = argv[1];
+        if (argc > 2) port = static_cast<uint16_t>(std::stoi(argv[2]));
+
+        std::cout << "Connecting to " << host << ":" << port << "..." << std::endl;
+
+        cc::Client client(host, port);
+        client.SetTimeout(10s); // 10 seconds timeout
+
+        std::cout << "Connected!" << std::endl;
+        std::cout << "Client API version: " << client.GetClientVersion() << std::endl;
+        std::cout << "Server API version: " << client.GetServerVersion() << std::endl;
+
+        auto world = client.GetWorld();
+        auto library = world.GetBlueprintLibrary();
+
+        // 1. Select Blueprint
+        // Prefer "vehicle.mercedes.coupe"
+        auto blueprint = library->Find("vehicle.mercedes.coupe");
+        
+        if (!blueprint) {
+            std::cout << "Warning: 'vehicle.mercedes.coupe' not found. Selecting a random vehicle..." << std::endl;
+            auto vehicles = library->Filter("vehicle");
+            if (vehicles->empty()) {
+                throw std::runtime_error("No vehicle blueprints found!");
+            }
+            // Simple random selection
+             std::mt19937_64 rng((std::random_device())());
+             std::uniform_int_distribution<size_t> dist{0u, vehicles->size() - 1u};
+             blueprint = &vehicles->at(dist(rng));
+        }
+
+        std::cout << "Selected Blueprint: " << blueprint->GetId() << std::endl;
+
+        // Ensure Autopilot is OFF (it is by default for new actors, but good to be explicit if using traffic manager, 
+        // though strictly initiating the actor doesn't turn it on).
+        // The requirement is "Autopilot OFF". We will verify this after spawning.
+
+        // 2. Choose a valid spawn point and retry on failure
+        auto map = world.GetMap();
+        auto spawn_points = map->GetRecommendedSpawnPoints();
+
+        if (spawn_points.empty()) {
+            throw std::runtime_error("No spawn points available!");
+        }
+
+        boost::shared_ptr<cc::Actor> actor;
+        cg::Transform spawn_transform;
+        
+        // Retry logic
+        // We will try recommended spawn points in random order until one works.
+        std::shuffle(spawn_points.begin(), spawn_points.end(), std::mt19937(std::random_device{}()));
+        
+        for (const auto& transform : spawn_points) {
+            actor = world.TrySpawnActor(*blueprint, transform);
+            if (actor) {
+                spawn_transform = transform;
+                break;
+            }
+        }
+
+        if (!actor) {
+            throw std::runtime_error("Failed to spawn actor at any of the recommended spawn points.");
+        }
+
+        // RAII Cleanup
+        ActorDestroyer destroyer(actor);
+
+        // 3. Print details
+        std::cout << "Successfully Spawned Actor!" << std::endl;
+        std::cout << "  - Actor ID: " << actor->GetId() << std::endl;
+        std::cout << "  - Blueprint ID: " << actor->GetTypeId() << std::endl;
+        std::cout << "  - Location: X=" << spawn_transform.location.x 
+                  << ", Y=" << spawn_transform.location.y 
+                  << ", Z=" << spawn_transform.location.z << std::endl;
+        std::cout << "  - Rotation: Pitch=" << spawn_transform.rotation.pitch 
+                  << ", Yaw=" << spawn_transform.rotation.yaw 
+                  << ", Roll=" << spawn_transform.rotation.roll << std::endl;
+
+        // Confirm Autopilot is OFF
+        auto vehicle = boost::static_pointer_cast<cc::Vehicle>(actor);
+        if (vehicle) {
+             vehicle->SetAutopilot(false);
+             std::cout << "  - Autopilot: OFF (Explicitly set)" << std::endl;
+        }
+
+        std::cout << "\nPress ENTER to destroy the actor and exit..." << std::endl;
+        std::cin.get();
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}

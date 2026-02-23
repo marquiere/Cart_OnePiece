@@ -1,0 +1,114 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2015-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+# Disabled checking
+race:^active_hook_cnt$
+race:^worker_exp_start$
+race:^worker_exp_end$
+race:^worker_exp_len$
+race:^ntasks$
+race:^mc_cache_size$
+race:^mc_nb$
+race:^mc_clean_nb$
+race:^prefetch_out_of_memory$
+race:^data_requests$
+race:^prefetch_requests$
+race:^idle_requests$
+race:^data_requests_npending$
+race:^used_size$
+race:^hit_cnt$
+race:^miss_cnt$
+race:^alloc_cache_hit_cnt$
+race:^alloc_cnt$
+race:^comm_amount$
+race:^_starpu_valgrind_print_once$
+race:^_starpu_silent$
+race:^keys_initialized$
+race:^tidying$
+race:^reclaiming$
+race:^_starpu_worker_drives_memory$
+race:^starpu_memory_get_total$
+race:^starpu_unistd_opened_files$
+
+# don't care about cache hit stats
+race:^_starpu_msi_cache_hit$
+race:^_starpu_msi_cache_miss$
+
+# This is racy, but since we'll always put the same values, this is not a problem.
+race:^_starpu_codelet_check_deprecated_fields$
+
+# This is racy, but we don't care, it's only a statistic
+race:^starpu_task_nsubmitted$
+race:^starpu_task_nready$
+race:^_starpu_bus_update_profiling_info$
+race:^lws_select_victim$
+race:^select_worker_round_robin$
+
+# The config.running/pause_depth state is only protected by memory barriers
+race:^_starpu_machine_is_running$
+race:^_starpu_kill_all_workers$
+race:^starpu_pause$
+race:^_starpu_may_pause$
+race:^starpu_resume$
+race:^is_running$
+race:^_starpu_sink_deinit$
+
+# worker_is_initialized is not actually racy since deinit happens only after main set running to 0
+race:^_starpu_opencl_driver_deinit$
+race:^_starpu_cuda_driver_deinit$
+race:^_starpu_cpu_driver_deinit$
+
+# The integer access is atomic, and we use the sched mutex to avoid missing wake ups
+race:^starpu_st_fifo_taskq_empty$
+race:^push_task_eager_policy$
+
+# These are just statistics
+race:^starpu_memory_get_available$
+race:^_starpu_profiling$
+race:^_starpu_history_based_job_expected_perf$
+race:^compute_ntasks_end$
+race:^compute_expected_end$
+race:^compute_all_performance_predictions$
+
+# There is actually no race with busy_count, see comment
+race:_starpu_data_unregister
+
+# ignore other libraries' races
+called_from_lib:^libmpi.so$
+called_from_lib:^libhwloc*.so$
+
+# see valgrind/starpu.suppr
+deadlock:starpu_pthread_mutex_lock_sched
+deadlock:_starpu_sched_component_lock_worker
+deadlock:_starpu_sched_component_worker_lock_scheduling
+deadlock:simple_worker_pull_task
+
+# the assert on lock_write_owner to check for recursive write lock is inherently racy, but fine
+# for the intended purpose
+race:^_starpu_sched_ctx_lock_write$
+race:^_starpu_sched_ctx_lock_read$
+
+# only protected by memory barrier
+race:^_starpu_keys_initialized$
+
+# disable race detection on cg->ntags, see comment in code
+race:^_starpu_notify_cg$
+
+# this does not need to be safe
+race:^evictable$
+
+# don't care about data status query race, this is just a hint
+race:^starpu_data_query_status$
+race:^starpu_data_query_status2$

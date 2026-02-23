@@ -1,0 +1,108 @@
+#!/bin/bash
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2014-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+# Copyright (C) 2014-2014   Université Joseph Fourier
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+# Script for sorting paje traces
+
+set -e # fail fast
+
+inputfiles=""
+
+help_script()
+{
+cat << EOF
+Give statistical analysis of the paje trace
+
+$0 [ options ] paje.trace [paje.trace2 ...]
+
+Options:
+   -h      Show this message
+
+Examples:
+
+$0 example.trace
+
+Report bugs to <@PACKAGE_BUGREPORT@>
+EOF
+}
+
+if [ "$1" = "--version" ] ; then
+    echo "$PROGNAME (@PACKAGE_NAME@) @PACKAGE_VERSION@"
+    exit 0
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "" ] ; then
+    help_script
+    exit 0
+fi
+
+while getopts "h" opt; do
+  case $opt in
+     h)
+      help_script
+      exit 4
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG"
+      help_script
+      exit 3
+      ;;
+  esac
+done
+
+# Reading files that need to be analyzed
+shift $((OPTIND - 1))
+inputfiles=$@
+if [[ $# < 1 ]]; then
+    echo "Error!"
+    help_script
+    exit 2
+fi
+
+get_event_num() {
+    grep "^%EventDef[ 	]$2" $1 | sed -e "s/.*$2[ 	]*//"
+}
+
+#####################################
+# Transforming input files into .csv
+for file in $inputfiles; do
+    if [ ! -s $file ]
+	then
+	echo "Error: file $file does not exist!"
+	exit 5
+    fi
+    dir=$(dirname $file)
+    DefCont="$(get_event_num $file PajeDefineContainerType) "
+    DefEvent="$(get_event_num $file PajeDefineEventType) "
+    DefState="$(get_event_num $file PajeDefineStateType) "
+    DefVar="$(get_event_num $file PajeDefineVariableType) "
+    DefLink="$(get_event_num $file PajeDefineLinkType) "
+    DefEnt="$(get_event_num $file PajeDefineEntityValue) "
+    CreateCont="$(get_event_num $file PajeCreateContainer) "
+    AddVar="$(get_event_num $file PajeAddVariable) "
+    grepstr="^\\(%\\|$DefCont\\|$DefEvent\\|$DefState\\|$DefVar\\|$DefLink\\|$DefEnt\\|$CreateCont\\|$AddVar\\)"
+    grepstr=${grepstr//[ 	]/[ 	]}
+    # Sorting traces
+    grep -e "$grepstr" $file > $dir/start.trace
+    grep -e "$grepstr" -v $file > $dir/end.trace
+    sort -s -V --key=2,2 $dir/end.trace > $dir/endSorted.trace
+    cat $dir/start.trace $dir/endSorted.trace > $file
+
+    # Cleanup: delete temporary files
+    rm -f $dir/start.trace
+    rm -f $dir/end.trace
+    rm -f $dir/endSorted.trace
+done

@@ -1,0 +1,1251 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2010-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+# To set a breakpoint when starting gdb with option "-ex run",
+# here what you need to do:
+#set breakpoint pending on
+#break starpu_mpi.c:419
+
+define starpu-print-job
+  set language c
+  set $job = (struct _starpu_job *)$arg0
+
+  printf "StarPU Job (%p)\n", $job
+  if ($job != 0)
+    printf "\ttask:\t\t\t\t<%p>\n", $job->task
+    printf "\tsubmitted:\t\t\t<%d>\n", $job->submitted
+    printf "\tterminated:\t\t\t<%d>\n", $job->terminated
+    printf "\tjob_id:\t\t\t\t<%d>\n", $job->job_id
+    if $job->task && $job->task->name
+        printf "\tname:\t\t\t\t<%s>\n", $job->task->name
+    end
+  end
+end
+
+define starpu-print-task
+  set language c
+  set $task = (struct starpu_task *)$arg0
+  set $job = (struct _starpu_job *)$task->starpu_private
+  set $status=0
+
+  printf "StarPU Task (%p)\n", $task
+  if $task->name
+    printf "\tname:\t\t\t\t<%s>\n", $task->name
+  end
+  printf "\tcodelet:\t\t\t<%p>\n", $task->cl
+  if $task->cl && $task->cl->name
+    printf "\tcodelet name:\t\t\t<%s>\n", $task->cl->name
+  end
+  set $nbuffers = $task->nbuffers
+  if $task->cl && $task->cl->nbuffers != -1
+    set $nbuffers = $task->cl->nbuffers
+  end
+  printf "\tnbuffers:\t\t\t<%d>\n", $nbuffers
+  printf "\tcallback:\t\t\t<%p>\n", $task->callback_func
+  printf "\tcl_arg:\t\t\t\t<%p>\n", $task->cl_arg
+  printf "\tsynchronous:\t\t\t<%d>\n", $task->synchronous
+  printf "\texecute_on_a_specific_worker:\t<%d>\n", $task->execute_on_a_specific_worker
+  printf "\tworkerid:\t\t\t<%d>\n", $task->workerid
+  printf "\tpriority:\t\t\t<%d>\n", $task->priority
+  printf "\tdetach:\t\t\t\t<%d>\n", $task->detach
+  printf "\tdestroy:\t\t\t<%d>\n", $task->destroy
+  printf "\tregenerate:\t\t\t<%d>\n", $task->regenerate
+  printf "\tstatus:\t\t\t\t"
+  if $task->status == 0
+    printf "STARPU_TASK_INIT"
+  end
+  if $task->status == 1
+    printf "STARPU_TASK_BLOCKED"
+  end
+  if $task->status == 2
+    printf "STARPU_TASK_READY"
+  end
+  if $task->status == 3
+    printf "STARPU_TASK_RUNNING"
+  end
+  if $task->status == 4
+    printf "STARPU_TASK_FINISHED"
+  end
+  if $task->status == 5
+    printf "STARPU_TASK_BLOCKED_ON_TAG"
+  end
+  if $task->status == 6
+    printf "STARPU_TASK_BLOCKED_ON_TASK"
+  end
+  if $task->status == 7
+    printf "STARPU_TASK_BLOCKED_ON_DATA"
+  end
+  if $task->status == 8
+    printf "STARPU_TASK_STOPPED"
+  end
+  printf "\n"
+  printf "\tjob:\t\t\t\t<%p>\n", $job
+  printf "\ttag_id:\t\t\t\t<%d>\n", $task->tag_id
+  printf "\tndeps:\t\t\t\t<%u>\n", $job->job_successors->ndeps
+  printf "\tndeps_remaining:\t\t<%u>\n", $job->job_successors->ndeps - $job->job_successors->ndeps_completed
+  if _starpu_debug
+    set $n = 0
+    while $n < $job->job_successors->ndeps
+      if ! $job->job_successors->done[$n]
+        set $cg = $job->job_successors->deps[$n]
+        set $m = 0
+        printf "\t\tcg:\t\t\t<%u>\n", $cg->ndeps
+	while $m < $cg->ndeps
+	  if ! $cg->done[$m]
+	    set $depj = (struct _starpu_job *) $cg->deps[$m]
+            printf "\t\t\ttask %p\n", $depj->task
+	  end
+	  set $m = $m + 1
+	end
+      end
+      set $n = $n + 1
+    end
+  end
+  printf "\tndeps_completed:\t\t<%u>\n", $job->job_successors->ndeps_completed
+  printf "\tnsuccs:\t\t\t\t<%u>\n", $job->job_successors->nsuccs
+  printf "\tparent:\t\t\t\t<%lu>\n", $task->recursive_task_parent
+  if $job
+    starpu-print-job $job
+  end
+end
+
+define starpu-print-task-and-successor
+  set language c
+  set $t = (struct starpu_task *) ($arg0)
+  starpu-print-task $t
+  set $j = (struct _starpu_job *) $t->starpu_private
+  set $nsuccs = $j->job_successors.nsuccs
+  set $i = 0
+  while $i < $nsuccs
+    set $cg = $j->job_successors.succ[$i]
+    if ($cg->cg_type == 1)
+      # STARPU_CG_APPS
+      printf "waited for by application"
+    end
+    if ($cg->cg_type == 2)
+      # STARPU_CG_TAG
+      printf "will produce tag %x\n", $cg->succ.tag
+    end
+    if ($cg->cg_type == 4)
+      # STARPU_CG_TASK
+      printf "dep of job %p task %p\n", $cg->succ.job, $cg->succ.job->task
+      starpu-print-task $cg->succ.job->task
+    end
+    set $i = $i + 1
+  end
+end
+
+define starpu-print-tasks-treelist
+  set $list = $arg0
+  set $task = $list->_head
+  while $task != 0
+    starpu-print-task $task
+    set $task = $task->_next
+  end
+end
+
+define starpu-print-tasks-tree
+  if $arg0
+    starpu-print-tasks-tree $arg0->children[0]
+    set $stage = (struct _starpu_task_prio_list_stage *) $arg0
+    starpu-print-tasks-treelist (&($stage->list))
+    starpu-print-tasks-tree $arg0->children[1]
+  end
+end
+
+define starpu-print-tasks-list
+  if _starpu_debug
+    starpu-print-tasks-treelist &$arg0.list
+  else
+    starpu-print-tasks-tree $arg0.tree.root
+  end
+end
+
+define starpu-tasks-on-worker
+  set language c
+  set $worker=&_starpu_config->workers[$arg0]
+  starpu-print-tasks-list $worker->local_tasks
+end
+
+define starpu-tasks-on-workers
+  set language c
+  set $num=0
+  while $num<_starpu_config->topology->nworkers
+    printf "Worker %s\n", _starpu_config->workers[$num].name
+    starpu-tasks-on-worker $num
+    set $num = $num + 1
+  end
+end
+
+define starpu-workers
+  set language c
+  set $num=0
+  printf "[Id] Name                                     Arch Mask Devid Bindid Workerid Isrunning Isinitialized Status\n"
+  while $num<_starpu_config->topology->nworkers
+    set $worker=&_starpu_config->workers[$num]
+    printf "[%2d] %-40s %-4d %-4d %-5d %-6d %-8d %-9d %-13d", $num, $worker->name, $worker->arch, $worker->worker_mask, \
+          $worker->devid, $worker->bindid, $worker->workerid, $worker->worker_is_running, $worker->worker_is_initialized
+    if $worker->status == STATUS_INVALID
+      printf " INVALID"
+    end
+    if $worker->status == STATUS_UNKNOWN
+      printf " UNKNOWN"
+    end
+    if $worker->status & STATUS_INITIALIZING
+      printf " INITIALIZING"
+    end
+    if $worker->status & STATUS_EXECUTING
+      printf " EXECUTING"
+    end
+    if $worker->status & STATUS_CALLBACK
+      printf " CALLBACK"
+    end
+    if $worker->status & STATUS_SCHEDULING
+      printf " SCHEDULING"
+    end
+    if $worker->status & STATUS_WAITING
+      printf " WAITING"
+    end
+    if $worker->status & STATUS_SLEEPING
+      printf " SLEEPING"
+    end
+    printf "\n"
+    set $num = $num + 1
+  end
+end
+
+define starpu-print-tag
+  set language c
+  set $tag_struct = (struct _starpu_tag *)_gettag_struct($arg0)
+  printf "tag %d ((struct _starpu_tag *) %p)\n", $arg0, $tag_struct
+  printf "\tstate "
+  if $tag_struct->state == STARPU_INVALID_STATE
+     printf "STARPU_INVALID_STATE"
+  end
+  if $tag_struct->state == STARPU_ASSOCIATED
+     printf "STARPU_ASSOCIATED"
+  end
+  if $tag_struct->state == STARPU_BLOCKED
+     printf "STARPU_BLOCKED"
+  end
+  if $tag_struct->state == STARPU_READY
+     printf "STARPU_READY"
+  end
+  if $tag_struct->state == STARPU_DONE
+     printf "STARPU_DONE"
+  end
+  printf "\n"
+  printf "\tdeps %d\n", $tag_struct->tag_successors.ndeps
+  printf "\tcompleted %d\n", $tag_struct->tag_successors.ndeps_completed
+  printf "\tndeps_remaining:\t\t<%u>\n", $tag_struct->tag_successors->ndeps - $tag_struct->tag_successors->ndeps_completed
+  if _starpu_debug
+    set $n = 0
+    while $n < $tag_struct->tag_successors->ndeps
+      if ! $tag_struct->tag_successors->done[$n]
+        set $cg = $tag_struct->tag_successors->deps[$n]
+        set $m = 0
+        printf "\t\tcg:\t\t\t<%u>\n", $cg->ndeps
+	while $m < $cg->ndeps
+	  if ! $cg->done[$m]
+	    set $dept = (starpu_tag_t) $cg->deps[$m]
+            printf "\t\t\ttag %u\n", $dept
+	  end
+	  set $m = $m + 1
+	end
+      end
+      set $n = $n + 1
+    end
+  end
+  printf "\tndeps_completed:\t\t<%u>\n", $tag_struct->tag_successors->ndeps_completed
+  printf "\tnsuccs:\t\t\t\t<%u>\n", $tag_struct->tag_successors->nsuccs
+end
+
+define starpu-tags
+  set language c
+  printf "tags htbl %p\n", tag_htbl
+  set $tags = tag_htbl
+  while $tags
+    starpu-print-tag $tags->id
+    set $tags = (struct _starpu_tag_table *) $tags.hh.next
+  end
+end
+
+define starpu-tasks
+  set language c
+  set $num=0
+  set $nsubmitted=0
+  set $nready=0
+  while $num<_starpu_config->topology->nsched_ctxs
+  	set $nsubmitted = $nsubmitted + _starpu_config->sched_ctxs[$num]->tasks_barrier->barrier->reached_start
+  	set $nready = $nready + _starpu_config->sched_ctxs[$num]->ready_tasks_barrier->barrier->reached_start
+	set $num = $num + 1
+  end
+  printf "%d submitted tasks\n", $nsubmitted
+  printf "%d ready tasks\n", $nready
+  printf "Tasks being run:\n"
+  set $n = 0
+  while $n < _starpu_config.topology.nworkers
+    set $w = &_starpu_config.workers[$n]
+    printf "worker %d %s:\n", $n, $w->short_name
+    if $w->pipeline_length > 0
+      set $m = 0
+      while $m < $w->ntasks
+        set $t = $w->current_tasks[($w->first_task + $m) % (sizeof($w->current_tasks)/sizeof($w->current_tasks[0]))]
+        printf "  task %p\n", $t
+        set $m = $m + 1
+      end
+    end
+    set $task = $w->current_task
+    if ($task)
+      printf "  task %p\n", $task
+    end
+    set $n = $n + 1
+  end
+  if (tag_htbl)
+    printf "TODO: tags\n"
+  end
+  print "TODO: complete\n"
+end
+
+define starpu-print-all-tasks
+  set language c
+  if ! _starpu_debug
+    printf "you need to configure with --enable-debug to get starpu-print-all-tasks working\n"
+  else
+    set $l = all_jobs_list->next
+    while $l != &all_jobs_list
+      set $j = (struct _starpu_job*) (((unsigned long) $l) - ((unsigned long) &((struct _starpu_job *)0)->all_submitted))
+      printf "task %p\n", $j->task
+      starpu-print-task $j->task
+      set $l = $l->next
+    end
+  end
+end
+
+define starpu-all-tasks
+  set language c
+  if ! _starpu_debug
+    printf "you need to configure with --enable-debug to get starpu-all-tasks working\n"
+  else
+    set $l = all_jobs_list->next
+    while $l != &all_jobs_list
+      set $j = (struct _starpu_job*) (((unsigned long) $l) - ((unsigned long) &((struct _starpu_job *)0)->all_submitted))
+      set $task = $j->task
+      if $task->name
+        printf "task %p %s\n", $task, $task->name
+      else
+        printf "task %p\n", $task
+      end
+      set $l = $l->next
+    end
+  end
+end
+
+define starpu
+  printf "Here I am...\n"
+end
+
+define starpu-print-mode
+  if ($arg0 & 1)
+    printf "R"
+  end
+  if ($arg0 & 2)
+    printf "W"
+  end
+  if ($arg0 & 4)
+    printf " SCRATCH"
+  end
+  if ($arg0 & 8)
+    printf " REDUX"
+  end
+end
+
+define starpu-print-data
+  set language c
+  set $data = (starpu_data_handle_t) $arg0
+  if $data->name[0]
+    printf "Data handle %s (%p)\n", $data->name, $data
+  else
+    printf "Data handle %p\n", $data
+  end
+  if $data->ops->interfaceid == 0
+    printf "Matrix\n"
+  end
+  if $data->ops->interfaceid == 1
+    printf "Block\n"
+  end
+  if $data->ops->interfaceid == 2
+    printf "Vector\n"
+  end
+  if $data->ops->interfaceid == 3
+    printf "CSR\n"
+  end
+  if $data->ops->interfaceid == 4
+    printf "BCSR\n"
+  end
+  if $data->ops->interfaceid == 5
+    printf "Variable\n"
+  end
+  if $data->ops->interfaceid == 6
+    printf "Void\n"
+  end
+  if $data->ops->interfaceid == 7
+    printf "Multiformat\n"
+  end
+  if $data->ops->interfaceid == 8
+    printf "COO\n"
+  end
+  if $data->ops->interfaceid == 9
+    printf "Tensor\n"
+  end
+  if $data->ops->interfaceid > 9
+    printf "Interface id %d\n", $data->ops->interfaceid
+  end
+  if $data->dimensions
+    printf "Coordinates:"
+    set $n = 0
+    while $n < $data->dimensions
+      printf " %d", $data->coordinates[$n]
+      set $n = $n + 1
+    end
+    printf "\n"
+  end
+  printf "Home node %d\n", $data->home_node
+  printf "RWlock refs %d\n", $data->refcnt
+  printf "Busy count %d\n", $data->busy_count
+  printf "Initialization submitted %d\n", $data->initialized
+  printf "Current mode "
+  starpu-print-mode $data->current_mode
+  printf "\n"
+  if $data->mpi_data
+    printf "TAG %ld\n",((struct _starpu_mpi_data *) ($data->mpi_data))->node_tag.data_tag
+  end
+  if $data->current_mode & (4|8)
+    set $n = 0
+    while $n < _starpu_config.topology.nworkers
+      set $replicate = $data->per_worker[$n]
+      printf "Worker %2d %10s:", $n, _starpu_config->workers[$n]->name
+      if $replicate.state == 0
+        printf " OWNER"
+      end
+      if $replicate.state == 1
+        printf " SHARED"
+      end
+      if $replicate.state == 2
+        printf " INVALID"
+      end
+      if $replicate.initialized
+        printf " initialized"
+      end
+      printf "\n"
+      set $n = $n + 1
+    end
+  else
+    set $n = 0
+    while $n < _starpu_descr.nnodes
+      set $replicate = &$data->per_node[$n]
+      printf "Node %2d (%2d):", $n, $replicate->refcnt
+      if $replicate.state == 0
+        printf " OWNER"
+      end
+      if $replicate.state == 1
+        printf " SHARED"
+      end
+      if $replicate.state == 2
+        printf " INVALID"
+      end
+      if $replicate.initialized
+        printf " initialized"
+      end
+      printf "\n"
+      set $m = 0
+      while $m < _starpu_descr.nnodes
+        if $replicate->request[$m]
+	  printf " request %p from %d\n", $replicate->request[$m], $m
+	end
+        set $m = $m + 1
+      end
+      set $n = $n + 1
+    end
+    set $r = $data->write_invalidation_req
+    if $r
+      printf "w_req %p for %d\n", $r, $r->dst_replicate->memory_node
+    end
+  end
+  printf "Post sync tasks\n"
+  set $tasklist = $data->post_sync_tasks
+  while $tasklist != 0x0
+    starpu-print-task $tasklist->task
+    set $tasklist = $tasklist->next
+  end
+  if _starpu_debug
+    printf "Requester tasks\n"
+    set $requesterlist = $data->req_list.list._head
+    while $requesterlist != 0x0
+      printf "mode: "
+      starpu-print-mode $requesterlist->mode
+      printf "\n"
+      starpu-print-job $requesterlist->j
+      set $requesterlist = $requesterlist->_next
+    end
+    printf "Arbitered requester tasks\n"
+    set $requesterlist = $data->arbitered_req_list.list._head
+    while $requesterlist != 0x0
+      printf "mode: "
+      starpu-print-mode $requesterlist->mode
+      printf "\n"
+      starpu-print-job $requesterlist->j
+      set $requesterlist = $requesterlist->_next
+    end
+  else
+    printf "Printing requester tasks not supported yet without --enable-debug, sorry!\n"
+  end
+  if ($data->nchildren)
+    printf "%d children\n", $data->nchildren
+  end
+end
+
+define starpu-print-datas
+  set $entry = registered_handles
+  while $entry
+    starpu-print-data $entry->handle
+    printf "\n"
+    set $entry = (struct handle_entry *) $entry.hh.next
+  end
+end
+
+define starpu-print-datas-summary
+  set language c
+  set $entry = registered_handles
+
+  set $data_n = 0
+  set $pw_data_n = 0
+  set $data_n_allocated = 0
+  set $replicate_n_owners = 0
+  set $replicate_n_shared = 0
+  set $replicate_n_invalid = 0
+  set $replicate_n_initialized = 0
+  set $replicate_n_allocated = 0
+  set $pw_replicate_n_owners = 0
+  set $pw_replicate_n_shared = 0
+  set $pw_replicate_n_invalid = 0
+  set $pw_replicate_n_initialized = 0
+  set $pw_replicate_n_allocated = 0
+
+  while $entry
+    set $data = (starpu_data_handle_t) $entry->handle
+
+    if $data->current_mode & (4|8)
+      set $pw_data_n = $pw_data_n + 1
+      set $n = 0
+      while $n < _starpu_config.topology.nworkers
+        set $replicate = $data->per_worker[$n]
+        if $replicate.state == 0
+          set $pw_replicate_n_owners = $pw_replicate_n_owners + 1
+        end
+        if $replicate.state == 1
+          set $pw_replicate_n_shared = $pw_replicate_n_shared + 1
+        end
+        if $replicate.state == 2
+          set $pw_replicate_n_invalid = $pw_replicate_n_invalid + 1
+        end
+        if $replicate.initialized
+          set $pw_replicate_n_initialized = $pw_replicate_n_initialized + 1
+        end
+        if $replicate.allocated
+          set $pw_replicate_n_allocated = $pw_replicate_n_allocated + 1
+        end
+        set $n = $n + 1
+      end
+    else
+      set $data_n = $data_n + 1
+      set $n = 0
+      while $n < _starpu_descr.nnodes
+        set $replicate = &$data->per_node[$n]
+        if $replicate.state == 0
+          set $replicate_n_owners = $replicate_n_owners + 1
+        end
+        if $replicate.state == 1
+          set $replicate_n_shared = $replicate_n_shared + 1
+        end
+        if $replicate.state == 2
+          set $replicate_n_invalid = $replicate_n_invalid + 1
+        end
+        if $replicate.initialized
+          set $replicate_n_initialized = $replicate_n_initialized + 1
+        end
+        if $replicate.allocated
+          set $replicate_n_allocated = $replicate_n_allocated + 1
+	  set $data_allocated = 1
+        end
+        set $n = $n + 1
+      end
+      if $data_allocated
+        set $data_n_allocated = $data_n_allocated + 1
+      end
+    end
+    set $entry = (struct handle_entry *) $entry.hh.next
+  end
+  printf "Number of handles: %d\n", $data_n
+  printf "Number of allocated handles: %d\n", $data_n_allocated
+  printf "Number of OWNER replicates: %d\n", $replicate_n_owners
+  printf "Number of SHARED replicates: %d\n", $replicate_n_shared
+  printf "Number of INVALID replicates: %d\n", $replicate_n_invalid
+  printf "Number of initialized replicates: %d\n", $replicate_n_initialized
+  printf "Number of allocated replicates: %d\n", $replicate_n_allocated
+
+  printf "Number of per-worker handles: %d\n", $pw_data_n
+  printf "Number of OWNER per-worker replicates: %d\n", $pw_replicate_n_owners
+  printf "Number of SHARED per-worker replicates: %d\n", $pw_replicate_n_shared
+  printf "Number of INVALID per-worker replicates: %d\n", $pw_replicate_n_invalid
+  printf "Number of initialized per-worker replicates: %d\n", $pw_replicate_n_initialized
+  printf "Number of allocated per-worker replicates: %d\n", $pw_replicate_n_allocated
+end
+
+define starpu-print-replicate
+  set $repl = (struct _starpu_data_replicate*) $arg0
+  printf "Handle %p\n", $repl->handle
+  printf "Interface %p\n", $repl->data_interface
+  printf "Refcnt %u\n", $repl->refcnt
+  printf "Node %u\n", $repl->memory_node
+  if $repl->state == 0
+    printf "Owner\n"
+  end
+  if $repl->state == 1
+    printf "Shared\n"
+  end
+  if $repl->state == 2
+    printf "Invalid\n"
+  end
+  if $repl->relaxed_coherency
+    printf " relaxed_coherency"
+  end
+  if $repl->initialized
+    printf " initialized"
+  end
+  if $repl->allocated
+    printf " allocated"
+  end
+  if $repl->automatically_allocated
+    printf " automatically allocated"
+  end
+  printf "\n"
+  printf "MC %p\n", $repl->mc
+end
+
+define starpu-print-request
+  set $r = (struct _starpu_data_request *)$arg0
+  printf "Request %p\n", $r
+  printf "Origin %s\n", $r->origin
+  printf "Refcnt %d\n", $r->refcnt
+  printf "Handle %p\n", $r->handle
+  printf "src_replicate %p", $r->src_replicate
+  if $r->src_replicate
+    printf " (%d)", $r->src_replicate->memory_node
+  end
+  printf "\n"
+  printf "dst_replicate %p", $r->dst_replicate
+  if $r->dst_replicate
+    printf " (%d)", $r->dst_replicate->memory_node
+  end
+  printf "\n"
+  printf "handling_node %d\n", $r->handling_node
+  if ($r->mode & 1)
+    printf "R"
+  end
+  if ($r->mode & 2)
+    printf "W"
+  end
+  if ($r->mode & 4)
+    printf "S"
+  end
+  if ($r->mode & 8)
+    printf "X"
+  end
+  printf "\n"
+  printf "completed: %d\n", $r->completed
+  printf "prefetch: %d\n", $r->prefetch
+  printf "retval: %d\n", $r->retval
+  printf "ndeps: %d\n", $r->ndeps
+  printf "next_req_count: %d\n", $r->next_req_count
+  set $c = 0
+  while $c < $r->next_req_count
+    printf "  %p\n", $r->next_req[$c]
+    set $c = $c + 1
+  end
+  printf "comid: %u\n", $r->com_id
+  set $c = $r->callbacks
+  while $c != 0
+    printf "callback: %p %p\n", $c->callback_func, $c->callback_arg
+    set $c = $c->next
+  end
+end
+
+define starpu-print-requests-treelist
+  set $list = $arg0
+  set $request = $list->_head
+  while $request != 0
+    printf " Request %p: handle %p ", $request, $request->handle
+    starpu-print-mode $request->mode
+    printf "\n"
+    set $request = $request->_next
+  end
+end
+
+define starpu-print-requests-tree
+  if $arg0
+    starpu-print-requests-tree $arg0->children[0]
+    set $stage = (struct _starpu_data_request_prio_list_stage *) $arg0
+    starpu-print-requests-treelist (&($stage->list))
+    starpu-print-requests-tree $arg0->children[1]
+  end
+end
+
+define starpu-print-requests-list
+  if _starpu_debug
+    starpu-print-requests-treelist &$arg0.list
+  else
+    starpu-print-requests-tree $arg0.tree.root
+  end
+end
+
+define starpu-print-requests
+  set $node = 0
+  while $node < _starpu_descr.nnodes
+    printf "Node %u:\n", $node
+    set $node2 = 0
+    while $node2 < _starpu_descr.nnodes
+      starpu-print-requests-list _starpu_config.nodes[$node].data_requests[$node2][0]
+      starpu-print-requests-list _starpu_config.nodes[$node].data_requests[$node2][1]
+      set $node2 = $node2 + 1
+    end
+    set $node = $node + 1
+  end
+end
+
+define starpu-print-prequests
+  set $node = 0
+  while $node < _starpu_descr.nnodes
+    printf "Node %u:\n", $node
+    set $node2 = 0
+    while $node2 < _starpu_descr.nnodes
+      if _starpu_config.nodes[$node].data_requests_npending[$node2][0]
+        printf "%u pending requests from %u\n", _starpu_config.nodes[$node].data_requests_npending[$node2][0], $node2
+      end
+      starpu-print-requests-list _starpu_config.nodes[$node].data_requests_pending[$node2][0]
+      if _starpu_config.nodes[$node].data_requests_npending[$node2][1]
+        printf "%u pending requests to %u\n", _starpu_config.nodes[$node].data_requests_npending[$node2][1], $node2
+      end
+      starpu-print-requests-list _starpu_config.nodes[$node].data_requests_pending[$node2][1]
+      set $node2 = $node2 + 1
+    end
+    set $node = $node + 1
+  end
+end
+
+define starpu-print-arch
+  set $arch = (struct starpu_perfmodel_arch *)$arg0
+  set $device = 0
+  while $device < $arch->ndevices
+    printf "  Device type %d - devid: %d - ncores: %d\n", $arch->devices[$device].type, $arch->devices[$device].devid, $arch->devices[$device].ncores
+    set $device = $device + 1
+  end
+end
+
+define starpu-print-archs
+  set $comb = 0
+  while $comb < current_arch_comb
+    printf "Combination %d with %d devices\n", $comb, arch_combs[$comb]->ndevices
+    starpu-print-arch arch_combs[$comb]
+    set $comb = $comb + 1
+  end
+end
+
+define starpu-print-frequests
+  set $node = 0
+  while $node < _starpu_descr.nnodes
+    printf "Node %u:\n", $node
+    set $node2 = 0
+    while $node2 < _starpu_descr.nnodes
+      starpu-print-requests-list _starpu_config.nodes[$node].prefetch_requests[$node2][0]
+      starpu-print-requests-list _starpu_config.nodes[$node].prefetch_requests[$node2][1]
+      set $node2 = $node2 + 1
+    end
+    set $node = $node + 1
+  end
+end
+
+define starpu-print-irequests
+  set $node = 0
+  while $node < _starpu_descr.nnodes
+    printf "Node %u:\n", $node
+    set $node2 = 0
+    while $node2 < _starpu_descr.nnodes
+      starpu-print-requests-list _starpu_config.nodes[$node].idle_requests[$node2][0]
+      starpu-print-requests-list _starpu_config.nodes[$node].idle_requests[$node2][1]
+      set $node2 = $node2 + 1
+    end
+    set $node = $node + 1
+  end
+end
+
+define starpu-memusage
+  set scheduler-locking on
+  set $node = 0
+  while $node < _starpu_descr.nnodes
+    printf "\n\nNode %u (%d/MiB/%dMiB):\n", $node, _starpu_config.nodes[$node].used_size >> 20, _starpu_config.nodes[$node].global_size >> 20
+    set $total = 0
+    set $total_b = 0
+    set $wt = 0
+    set $wt_b = 0
+    set $home = 0
+    set $home_b = 0
+    set $ooc = 0
+    set $ooc_b = 0
+    set $prefetch = 0
+    set $prefetch_b = 0
+    set $redux = 0
+    set $redux_b = 0
+    set $relax = 0
+    set $relax_b = 0
+    set $noref = 0
+    set $noref_b = 0
+    set $normal = 0
+    set $normal_b = 0
+    set $owner = 0
+    set $owner_b = 0
+    set $shared = 0
+    set $shared_b = 0
+    set $invalid = 0
+    set $invalid_b = 0
+    set $nodataref = 0
+    set $nodataref_b = 0
+    set $nosubdataref = 0
+    set $nosubdataref_b = 0
+    set $reading = 0
+    set $reading_b = 0
+    set $writing = 0
+    set $writing_b = 0
+    set $overwriting = 0
+    set $overwriting_b = 0
+    set $mc = _starpu_config.nodes[$node].mc_list->_head
+    set pagination off
+    while $mc != 0
+      set $handle = $mc->data
+      set $replicate = &$handle->per_node[$node]
+      set $size = _starpu_data_get_size($handle)
+      set $total = $total + 1
+      if $total % 100 == 0
+        printf "\rinspected %d data...", $total
+      end
+      set $total_b = $total_b + $size
+      if $node < sizeof($handle->wt_mask) * 8 && $handle->wt_mask & (1 << $node)
+        set $wt = $wt + 1
+	set $wt_b = $wt_b + $size
+      end
+      if $node == $handle->home_node
+        set $home = $home + 1
+	set $home_b = $home_b + $size
+      end
+      if $handle->ooc
+        set $ooc = $ooc + 1
+	set $ooc_b = $ooc_b + $size
+      end
+      if $replicate->nb_tasks_prefetch
+        set $prefetch = $prefetch + 1
+	set $prefetch_b = $prefetch_b + $size
+      end
+      if $mc->relaxed_coherency == 2
+        set $redux = $redux + 1
+	set $redux_b = $redux_b + $size
+      end
+      if $mc->relaxed_coherency == 1
+        set $relax = $relax + 1
+	set $relax_b = $relax_b + $size
+        if $mc->replicate
+          if $mc->replicate->refcnt == 0
+            set $noref = $noref + 1
+	    set $noref_b = $noref_b + $size
+          end
+        end
+      end
+      if $mc->relaxed_coherency == 0
+        set $normal = $normal + 1
+	set $normal_b = $normal_b + $size
+	if $replicate->state == STARPU_OWNER
+	  set $owner = $owner + 1
+	  set $owner_b = $owner_b + $size
+	end
+	if $replicate->state == STARPU_SHARED
+	  set $shared = $shared + 1
+	  set $shared_b = $shared_b + $size
+	end
+	if $replicate->state == STARPU_INVALID
+	  set $invalid = $invalid + 1
+	  set $invalid_b = $invalid_b + $size
+	end
+        if (may_free_subtree($handle,$node))
+	  set $nosubdataref = $nosubdataref + 1
+	  set $nosubdataref_b = $nosubdataref_b + $size
+	end
+        if $replicate->refcnt == 0
+          set $nodataref = $nodataref + 1
+	  set $nodataref_b = $nodataref_b + $size
+	else
+	  set $r = 0
+	  set $w = 0
+	  set $_node = 0
+	  while $_node < _starpu_descr.nnodes
+	    set $_node = $_node + 1
+	    if $_node != $node
+	      if $handle->per_node[$_node].request[$node] != 0
+		set $r = $r + 1
+	      end
+	      if $handle->per_node[$node].request[$_node] != 0
+		set $w = $w + 1
+	      end
+	    end
+	  end
+	  if $r != 0
+	    set $reading = $reading + 1
+	    set $reading_b = $reading_b + $size
+	  end
+	  if $w != 0
+	    set $writing = $writing + 1
+	    set $writing_b = $writing_b + $size
+	  end
+	  if $replicate->request[$node] != 0
+	    set $overwriting = $overwriting + 1
+	    set $overwriting_b = $overwriting_b + $size
+	  end
+        end
+      end
+      set $mc = $mc->_next
+    end
+    set pagination on
+    printf "\r                               \r"
+    printf "  Total used: %u, %uMiB\n", $total, $total_b / 1048576
+    printf "  WT: %u, %uMiB\n", $wt, $wt_b / 1048576
+    printf "  home: %u, %uMiB\n", $home, $home_b / 1048576
+    printf "  OOC: %u, %uMiB\n", $ooc, $ooc_b / 1048576
+    printf "  prefetch: %u, %uMiB\n", $prefetch, $prefetch_b / 1048576
+    printf "  redux: %u, %uMiB\n", $redux, $redux_b / 1048576
+    printf "  relax: %u, %uMiB\n", $relax, $relax_b / 1048576
+    printf "    noref: %u, %uMiB\n", $noref, $noref_b / 1048576
+    printf "  normal: %u, %uMiB\n", $normal, $normal_b / 1048576
+    printf "    owner: %u, %uMiB\n", $owner, $owner_b / 1048576
+    printf "    shared: %u, %uMiB\n", $shared, $shared_b / 1048576
+    printf "    invalid: %u, %uMiB\n", $invalid, $invalid_b / 1048576
+    printf "    nosubdataref: %u, %uMiB\n", $nosubdataref, $nosubdataref_b / 1048576
+    printf "    nodataref: %u, %uMiB\n", $nodataref, $nodataref_b / 1048576
+    printf "    reading: %u, %uMiB\n", $reading, $reading_b / 1048576
+    printf "    writing: %u, %uMiB\n", $writing, $writing_b / 1048576
+    printf "    overwriting: %u, %uMiB\n", $overwriting, $overwriting_b / 1048576
+    printf "\n  cached: %u, %uMiB\n", _starpu_config.nodes[$node].mc_cache_nb, _starpu_config.nodes[$node].mc_cache_size / 1048576
+    set $node = $node + 1
+  end
+end
+
+define starpu-print-model
+    set $model = (struct starpu_perfmodel *)$arg0
+    printf "Model %p type %d symbol ", $model, $model->type
+    if $model->symbol
+       printf "%s", $model->symbol
+    else
+       printf "NULL"
+    end
+    printf "\n"
+end
+
+define starpu-print-registered-models
+    set $node = registered_models._head
+    while $node
+    	  starpu-print-model $node->model
+	  set $node = $node->_next
+    end
+end
+
+define starpu-sched-data
+    print _starpu_config.sched_ctxs[$arg0]->policy_data
+end
+
+define starpu-print-spaces
+    set $j = 0
+    while $j < $arg0
+      printf "  "
+      set $j = $j + 1
+    end
+end
+
+define starpu-sched-print-component
+    set $c = (struct starpu_sched_component *) $arg1
+    starpu-print-spaces $arg0
+    printf "%s %c %c (struct starpu_sched_component *) %p\n", $c->name, $c->properties & STARPU_SCHED_COMPONENT_HOMOGENEOUS ? 'o':'e', $c->properties & STARPU_SCHED_COMPONENT_SINGLE_MEMORY_NODE ? 's' : 'm', $c
+    if $c->push_task == fifo_push_task
+      set $f = &((struct _starpu_fifo_data *) $c->data)->fifo
+      starpu-print-spaces $arg0
+      printf "%d tasks start %f len %f end %f processed %d\n", $f->ntasks, $f->exp_start, $f->exp_len, $f->exp_end, $f->nprocessed
+    end
+    if $c->push_task == prio_push_task
+      set $q = &((struct _starpu_prio_data *) $c->data)->prio
+      starpu-print-spaces $arg0
+      printf "%d tasks start %f len %f end %f processed %d\n", $q->ntasks, $q->exp_start, $q->exp_len, $q->exp_end, $q->nprocessed
+    end
+    if $c->push_task == simple_worker_push_task
+      set $d = (struct _starpu_worker_component_data *) $c->data
+      set $l = $d->list
+      starpu-print-spaces $arg0
+      printf "%d tasks pipeline %f start %f len %f end %f\n", $l->ntasks, $l->pipeline_len, $l->exp_start, $l->exp_len, $l->exp_end
+    end
+end
+
+define starpu-sched-print-recur-component
+    starpu-sched-print-component $arg0 $arg1
+    set $i[$arg0] = 0
+    while $i[$arg0] < $arg1->nchildren
+      starpu-sched-print-recur-component ($arg0+1) $arg1->children[$i[$arg0]]
+      set $i[$arg0] = $i[$arg0] + 1
+    end
+end
+
+define starpu-sched-print-modular
+    set $t = (struct starpu_sched_tree *) _starpu_config.sched_ctxs[$arg0]->policy_data
+    set $i = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0 }
+    starpu-sched-print-recur-component 0 $t->root
+end
+
+define starpu-sched-print-lws
+    set $ws = (struct _starpu_work_stealing_data *) _starpu_config.sched_ctxs[$arg0]->policy_data
+    set $num = 0
+    while $num < _starpu_config->topology->nworkers
+      printf "Worker %s:", _starpu_config->workers[$num].name
+      printf " %d tasks", $ws->per_worker[$num].queue.ntasks
+      if $ws->per_worker[$num].notask
+        printf " notask"
+      end
+      if $ws->per_worker[$num].running
+        printf " running"
+      end
+      if $ws->per_worker[$num].busy
+        printf " busy"
+      end
+      printf " lastpop %d", $ws->per_worker[$num].last_pop_worker
+      printf "\n"
+      set $num = $num + 1
+    end
+end
+
+define starpu-sched-print-dmda
+    set $dt = (struct _starpu_dmda_data *) _starpu_config.sched_ctxs[$arg0]->policy_data
+    set $num = 0
+    printf "alpha %f beta %f gamma %f power %fW\n", $dt->alpha, $dt->beta, $dt->_gamma, $dt->idle_power
+    while $num < _starpu_config->topology->nworkers
+      printf "Worker %s:", _starpu_config->workers[$num].name
+      printf " %d tasks", $dt->queue_array[$num].ntasks
+      printf " start %f", $dt->queue_array[$num].exp_start
+      printf " len %f", $dt->queue_array[$num].exp_len
+      printf " end %f", $dt->queue_array[$num].exp_end
+      printf " piped %f", $dt->queue_array[$num].pipeline_len
+      printf "\n"
+      set $num = $num + 1
+    end
+end
+
+define starpu-mpi-print-request
+    set $request = (struct _starpu_mpi_req *)$arg0
+    printf "Request (struct _starpu_mpi_req *) %p data %p tag %ld to MPI node %d type ", $request, $request->data_handle, $request->data_handle && $request->data_handle->mpi_data ? ((struct _starpu_mpi_data *) ($request->data_handle->mpi_data))->node_tag.data_tag : -1, $request->node_tag.node.rank,
+    if $request->request_type == SEND_REQ
+       printf "SEND_REQ"
+    end
+    if $request->request_type == RECV_REQ
+       printf "RECV_REQ"
+    end
+    if $request->request_type == WAIT_REQ
+       printf "WAIT_REQ"
+    end
+    if $request->request_type == TEST_REQ
+       printf "TEST_REQ"
+    end
+    if $request->request_type == BARRIER_REQ
+       printf "BARRIER_REQ"
+    end
+    if $request->request_type == PROBE_REQ
+       printf "PROBE_REQ"
+    end
+    if $request->request_type == UNKNOWN_REQ
+       printf "UNKNOWN_REQ"
+    end
+    printf " submitted %d completed %d posted %d detached %d\n", $request->submitted, $request->completed, $request->posted, $request->detached
+end
+
+define starpu-mpi-print-ready-recv-requests
+    set $list = (struct _starpu_mpi_req_list) ready_recv_requests
+    if $list
+	set $request = $list.list._head
+        while $request
+            starpu-mpi-print-request $request
+	    set $request = $request->_next
+	end
+    else
+	printf "No ready recv requests\n"
+    end
+end
+
+define starpu-mpi-print-requests-list
+  set $list = $arg0
+  set $request = $list._head
+  while $request
+    starpu-mpi-print-request $request
+    set $request = $request->_next
+  end
+end
+
+define starpu-mpi-print-requests-tree
+  if $arg0
+    starpu-mpi-print-requests-tree $arg0->children[0]
+    set $stage = (struct _starpu_mpi_req_prio_list_stage *) $arg0
+    starpu-mpi-print-requests-list (&($stage->list))
+    starpu-mpi-print-requests-tree $arg0->children[1]
+  end
+end
+
+define starpu-mpi-print-ready-send-requests
+  set $prio_list = (struct _starpu_mpi_req_prio_list) ready_send_requests
+  if _starpu_debug
+    if $prio_list
+        starpu-mpi-print-requests-list $prio_list.list
+    else
+	printf "No ready send requests\n"
+    end
+  else
+    if $prio_list.empty == 0
+        starpu-mpi-print-requests-tree $prio_list.tree.root
+    else
+	printf "No ready send requests\n"
+    end
+  end
+end
+
+define starpu-mpi-print-detached-requests
+    set $list = (struct _starpu_mpi_req_list) detached_requests
+    if $list
+	set $request = $list._head
+        while $request
+            starpu-mpi-print-request $request
+	    set $request = $request->_next
+	end
+    else
+	printf "No detached requests\n"
+    end
+end
+
+define starpu-mpi-print-early-data
+  set $hash = (struct _starpu_mpi_early_data_handle_hashlist *)_starpu_mpi_early_data_handle_hashmap
+  if $hash
+     while $hash
+       printf "Communicator %p Rank %d Data_tag %d\n", $hash->node_tag->comm, $hash->node_tag->rank, $hash->node_tag->data_tag
+       set $list = (struct _starpu_mpi_early_data_handle_list *) $hash->list
+       if $list
+  	  set $data = (struct _starpu_mpi_early_data_handle *)$list->_head
+          while $data
+             starpu-mpi-print-request $data->req
+	     set $data = $data->_next
+	  end
+       end
+       set $hash = (struct _starpu_mpi_early_data_handle_hashlist *) $hash->hh.next
+     end
+  else
+     printf "No early data\n"
+  end
+end
+
+define starpu-mpi-print-early-requests
+  set $hash = (struct _starpu_mpi_early_request_hashlist *)_starpu_mpi_early_request_hash
+  if $hash
+     while $hash
+       printf "Communicator %p Rank %d Data_tag %d\n", $hash->node_tag->comm, $hash->node_tag->rank, $hash->node_tag->data_tag
+       set $list = (struct _starpu_mpi_req_list*) $hash->list
+       if $list
+  	  set $request = $list->_head
+          while $request
+             starpu-mpi-print-request $request
+	     set $request = $request->_next
+	  end
+       end
+       set $hash = (struct _starpu_mpi_early_request_hashlist *) $hash->hh.next
+     end
+  else
+     printf "No early request\n"
+  end
+end
+
+define starpu-mpi-print-sync-data
+  set $hash = (struct _starpu_mpi_sync_data_handle_hashlist *)_starpu_mpi_sync_data_handle_hashmap
+  if $hash
+     while $hash
+       printf "Communicator %p Rank %d Data_tag %d\n", $hash->node_tag->comm, $hash->node_tag->rank, $hash->node_tag->data_tag
+       set $list = (struct _starpu_mpi_req_list *) $hash->list
+       if $list
+  	  set $request = $list->_head
+          while $request
+             starpu-mpi-print-request $request
+	     set $request = $request->_next
+	  end
+       end
+       set $hash = (struct _starpu_mpi_sync_data_handle_hashlist *) $hash->hh.next
+     end
+  else
+     printf "No sync data\n"
+  end
+end
+
+document starpu
+List of StarPU-specific gdb functions:
+starpu-workers                     prints a list of the StarPU workers
+starpu-tasks-on-workers            prints a list of the tasks queued on workers
+starpu-tasks-on-worker             prints a list of the tasks queued on the given worker
+starpu-print-job                   prints a StarPU job
+starpu-print-task                  prints a StarPU task
+starpu-print-all-tasks             prints all StarPU tasks
+starpu-print-task-and-successor    prints a StarPU task and its successors
+starpu-print-data                  prints a StarPU data handle
+starpu-print-datas                 prints all StarPU data handles
+starpu-print-datas-summary         prints a summary of data handles
+starpu-print-replicate             prints a StarPU data replicate
+starpu-print-request               prints a StarPU data request
+starpu-print-prequests             prints all pending StarPU data requests
+starpu-print-requests              prints all queued StarPU data requests
+starpu-print-frequests             prints all queued StarPU prefetch data requests
+starpu-print-irequests             prints all queued StarPU idle data requests
+starpu-tasks                       prints a summary of the tasks flowing in StarPU
+starpu-all-tasks                   prints a list of all the tasks flowing in StarPU
+starpu-tags                        prints a list of the tags known to StarPU
+starpu-print-tag                   prints a given tag
+starpu-memusage                    prints the memory node usage
+starpu-print-archs                 prints all known arch combinations
+starpu-print-arch                  prints a given arch combination
+starpu-print-registered-models     prints all registered performance models
+starpu-print-model                 prints a given performance model
+starpu-sched-data                  prints the data of the given scheduler
+starpu-sched-print-modular         prints the hierarchy of modular scheduling components
+starpu-sched-print-lws             prints the state of the lws scheduler
+starpu-sched-print-dmda            prints the state of any of the dm* schedulers
+starpu-mpi-print-ready-recv-requests    prints all MPI ready recv requests
+starpu-mpi-print-ready-send-requests    prints all MPI ready send requests
+starpu-mpi-print-detached-requests prints all MPI detached requests
+starpu-mpi-print-early-data        prints all MPI early received data
+starpu-mpi-print-early-requests    prints all MPI early requests
+starpu-mpi-print-sync-data         prints all MPI sync data
+end

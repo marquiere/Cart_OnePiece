@@ -1,0 +1,98 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+#ifndef __STARPU_MPI_MPI_BACKEND_H__
+#define __STARPU_MPI_MPI_BACKEND_H__
+
+#include <common/config.h>
+#include <common/uthash.h>
+
+/** @file */
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#ifdef STARPU_USE_MPI_MPI
+
+extern starpu_mpi_tag_t _starpu_mpi_tag;
+#define _STARPU_MPI_TAG_ENVELOPE  _starpu_mpi_tag
+#define _STARPU_MPI_TAG_DATA      _starpu_mpi_tag+1
+#define _STARPU_MPI_TAG_SYNC_DATA _starpu_mpi_tag+2
+
+#ifdef STARPU_USE_MPI_FT
+#define _STARPU_MPI_TAG_CP_ACK    _starpu_mpi_tag+3
+#define _STARPU_MPI_TAG_CP_RCVRY  _starpu_mpi_tag+4
+#define _STARPU_MPI_TAG_EXT_DATA  _starpu_mpi_tag+5
+#define _STARPU_MPI_TAG_CP_INFO    _starpu_mpi_tag+6
+#endif // STARPU_USE_MPI_FT
+
+enum _starpu_envelope_mode
+{
+	_STARPU_MPI_ENVELOPE_DATA=0,
+	_STARPU_MPI_ENVELOPE_SYNC_READY=1
+};
+
+struct _starpu_mpi_envelope
+{
+	enum _starpu_envelope_mode mode;
+	starpu_ssize_t size;
+	starpu_mpi_tag_t data_tag;
+	unsigned sync;
+};
+
+struct _starpu_mpi_req_backend
+{
+	MPI_Request data_request;
+	starpu_mpi_comm internal_comm;
+
+	starpu_pthread_mutex_t req_mutex;
+	starpu_pthread_cond_t req_cond;
+	starpu_pthread_cond_t posted_cond;
+	/** In the case of a Wait/Test request, we are going to post a request
+	 * to test the completion of another request */
+	struct _starpu_mpi_req *other_request;
+
+	MPI_Request size_req;
+
+	struct _starpu_mpi_envelope* envelope;
+
+	// 1 in internal requests, i.e. that we created ourself to receive an early data
+	unsigned is_internal_req:1;
+
+	// 1 in the internal request if it can be destroyed, i.e. because we have
+	// - either finished copying the data from the early-data handle and
+	// the internal request completion will destroy it.
+	// - or the internal request completion has finished and
+	// the data copy will destroy it.
+	unsigned to_destroy:1;
+
+	// points to the internal request if data is received before posting this request
+	struct _starpu_mpi_req *internal_req;
+
+	// points to the handle in which the data is received early
+	struct _starpu_mpi_early_data_handle *early_data_handle;
+	UT_hash_handle hh;
+};
+
+#endif // STARPU_USE_MPI_MPI
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __STARPU_MPI_MPI_BACKEND_H__ */

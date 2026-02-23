@@ -1,0 +1,33 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2022-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page StarPUJavaInterface StarPU Java Interface
+
+The StarPU Java Interface provides the ability to execute Java applications on top of StarPU.
+
+The interface allows to write either StarPU-like applications
+
+\snippet java_starpu.java To be included. You should update doxygen if you see this text.
+
+or Spark applications.
+
+\snippet java_spark.java To be included. You should update doxygen if you see this text.
+
+The installation process is not yet included in the StarPU autotools mechanism. However, a file \c INSTALL.org is provided in the \c starpujni directory to explain how to proceed with the installation, and shows how to run some basic examples.
+
+\c hadoop needs to be installed before running the installation process.
+
+*/

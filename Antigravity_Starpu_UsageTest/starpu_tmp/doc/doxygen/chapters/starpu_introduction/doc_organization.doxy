@@ -1,0 +1,97 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page DocOrganization Documentation Organization
+
+The documentation chapters include
+
+<ul>
+<li> <b> \ref IntroInstallation</b>
+    <ul>
+    <li> \ref BuildingAndInstallingStarPU
+    <li> \ref ExecutionConfigurationThroughEnvironmentVariables
+    <li> \ref CompilationConfiguration
+    </ul>
+<li> <b> \ref IntroBasics </b>
+    <ul>
+    <li> \ref StarPUApplications
+    <li> \ref BasicExamples
+    <li> \ref FullSourceCodeVectorScal
+    <li> \ref TasksInStarPU
+    <li> \ref DataManagement
+    <li> \ref Scheduling
+    <li> \ref ExamplesInStarPUSources
+    </ul>
+<li> <b> \ref IntroApplications </b>
+     <ul>
+    <li> \ref StencilApplication
+     </ul>
+<li> <b> \ref IntroPerformances </b>
+    <ul>
+    <li> \ref BenchmarkingStarPU
+    <li> \ref OnlinePerformanceTools
+    <li> \ref OfflinePerformanceTools
+    </ul>
+<li> <b> \ref IntroFAQ </b>
+    <ul>
+    <li> \ref CheckListWhenPerformanceAreNotThere
+    <li> \ref FrequentlyAskedQuestions
+    </ul>
+<li> <b> \ref IntroLanguage </b>
+    <ul>
+    <li> \ref NativeFortranSupport
+    <li> \ref StarPUJavaInterface
+    <li> \ref PythonInterface
+    <li> \ref OpenMPRuntimeSupport
+    </ul>
+<li> <b> \ref IntroExtensions </b>
+    <ul>
+    <li> \ref ConfigurationAndInitialization
+    <li> \ref AdvancedTasksInStarPU
+    <li> \ref AdvancedDataManagement
+    <li> \ref AdvancedScheduling
+    <li> \ref SchedulingContexts
+    <li> \ref SchedulingContextHypervisor
+    <li> \ref HowToDefineANewSchedulingPolicy
+    <li> \ref CUDASupport
+    <li> \ref OpenCLSupport
+    <li> \ref MaxFPGASupport
+    <li> \ref OutOfCore
+    <li> \ref MPISupport
+    <li> \ref TCPIPSupport
+    <li> \ref Transactions
+    <li> \ref FaultTolerance
+    <li> \ref FFTSupport
+    <li> \ref SOCLOpenclExtensions
+    <li> \ref RecursiveTasks
+    <li> \ref ParallelWorker
+    <li> \ref InteroperabilitySupport
+    <li> \ref SimGridSupport
+    <li> \ref DebuggingTools
+    <li> \ref Helpers
+    </ul>
+<li> <b>Appendices</b>
+    <ul>
+    <li> \ref GNUFreeDocumentationLicense
+    <li> \ref ModuleDocumentation
+    <li> \ref FileDocumentation
+    <li> \ref deprecated
+    </ul>
+</ul>
+
+Make sure to have had a look at those too!
+
+*/

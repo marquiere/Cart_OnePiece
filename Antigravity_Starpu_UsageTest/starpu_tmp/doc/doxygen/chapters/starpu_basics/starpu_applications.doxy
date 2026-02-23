@@ -1,0 +1,467 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page StarPUApplications StarPU Applications, setting up Your Own Code
+
+\section SettingFlagsForCompilingLinkingAndRunningApplications Setting Flags for Compiling, Linking and Running Applications
+
+StarPU provides a <c>pkg-config</c> executable to facilitate the
+retrieval of necessary compiler and linker flags. This is useful when
+compiling and linking an application with StarPU, as certain flags or
+libraries (such as \c CUDA or \c libspe2) may be required.
+
+If StarPU is not installed in a standard location, the path of StarPU's
+library must be specified in the environment variable
+<c>PKG_CONFIG_PATH</c> to allow <c>pkg-config</c> to find it. For
+example, if StarPU is installed in
+<c>$STARPU_PATH</c>, you can set the variable \c PKG_CONFIG_PATH like
+this:
+
+\verbatim
+$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$STARPU_PATH/lib/pkgconfig
+\endverbatim
+
+The flags required to compile or link against StarPU are then
+accessible with the following commands:
+
+\verbatim
+$ pkg-config --cflags starpu-1.4  # options for the compiler
+$ pkg-config --libs starpu-1.4    # options for the linker
+\endverbatim
+
+Please note that it is still possible to use the API provided in
+StarPU version 1.0 by calling <c>pkg-config</c> with the
+<c>starpu-1.0</c> package.
+Similar packages are provided for <c>starpumpi-1.0</c> and
+<c>starpufft-1.0</c>.
+For the API provided in StarPU version 0.9, you can use
+<c>pkg-config</c> with the <c>libstarpu</c> package.
+Similar packages are provided for <c>libstarpumpi</c> and <c>libstarpufft</c>.
+
+Make sure that <c>pkg-config --libs starpu-1.4</c> produces valid output
+before going further. To achieve this, make sure that your \c
+PKG_CONFIG_PATH is correctly set to the location where \c
+starpu-1.4.pc was installed during the <c>make install</c> process.
+
+Furthermore, if you intend to link your application statically,
+remember to include the <c>--static</c> option during the linking
+process.
+
+Additionally, for runtime execution, it is necessary to set the
+\c LD_LIBRARY_PATH environment variable. This ensures that dynamic
+libraries are located and loaded correctly during runtime.
+
+\verbatim
+$ export LD_LIBRARY_PATH=$STARPU_PATH/lib:$LD_LIBRARY_PATH
+\endverbatim
+
+And finally you should set the \c PATH variable to get access to
+various StarPU tools:
+
+\verbatim
+$ export PATH=$PATH:$STARPU_PATH/bin
+\endverbatim
+
+Run the following command to ensure that StarPU is executing properly
+and successfully detecting your hardware. If any issues arise, examine the
+output of \c lstopo from the \c hwloc project and report any problems
+either to the hwloc project or to us.
+
+\verbatim
+$ starpu_machine_display
+\endverbatim
+
+A tool is provided to help set all the environment variables
+needed by StarPU. Once StarPU is installed in a specific directory,
+calling the script <c>bin/starpu_env</c> will set in your current
+environment the variables <c>STARPU_PATH</c>, <c>LD_LIBRARY_PATH</c>,
+<c>PKG_CONFIG_PATH</c>, <c>PATH</c> and <c>MANPATH</c>.
+
+\verbatim
+$ source $STARPU_PATH/bin/starpu_env
+\endverbatim
+
+\section IntegratingStarPUInABuildSystem Integrating StarPU in a Build System
+
+\subsection StarPUInMake Integrating StarPU in a Make Build System
+
+When using a Makefile, the following lines can be added to set the
+options for the compiler and the linker:
+
+\verbatim
+CFLAGS          +=      $$(pkg-config --cflags starpu-1.4)
+LDLIBS          +=      $$(pkg-config --libs starpu-1.4)
+\endverbatim
+
+If you have a \c test-starpu.c file containing for instance:
+
+\code{.c}
+#include <starpu.h>
+#include <stdio.h>
+int main(void)
+{
+    int ret;
+    ret = starpu_init(NULL);
+    if (ret != 0)
+    {
+        return 1;
+    }
+    printf("%d CPU cores\n", starpu_worker_get_count_by_type(STARPU_CPU_WORKER));
+    printf("%d CUDA GPUs\n", starpu_worker_get_count_by_type(STARPU_CUDA_WORKER));
+    printf("%d OpenCL GPUs\n", starpu_worker_get_count_by_type(STARPU_OPENCL_WORKER));
+    starpu_shutdown();
+
+    return 0;
+}
+\endcode
+
+You can build it with <code>make test-starpu</code> and run it with <code>./test-starpu</code>
+
+\subsection StarPUInCMake Integrating StarPU in a CMake Build System
+
+This section shows a minimal example integrating StarPU in an existing application's CMake build system.
+
+Let's assume we want to build an executable from the following source code using CMake:
+\code{.c}
+#include <starpu.h>
+#include <stdio.h>
+int main(void)
+{
+    int ret;
+    ret = starpu_init(NULL);
+    if (ret != 0)
+    {
+        return 1;
+    }
+    printf("%d CPU cores\n", starpu_worker_get_count_by_type(STARPU_CPU_WORKER));
+    printf("%d CUDA GPUs\n", starpu_worker_get_count_by_type(STARPU_CUDA_WORKER));
+    printf("%d OpenCL GPUs\n", starpu_worker_get_count_by_type(STARPU_OPENCL_WORKER));
+    starpu_shutdown();
+
+    return 0;
+}
+\endcode
+
+The \c CMakeLists.txt file below uses the Pkg-Config support from CMake to
+autodetect the StarPU installation and library dependences (such as
+<c>libhwloc</c>) provided that the <c>PKG_CONFIG_PATH</c> variable is set, and
+is sufficient to build a statically-linked executable.
+
+The CMake code uses the <c>IMPORTED_TARGET</c> option of <c>pkg_check_modules</c> to define a CMake target that can be used to compile and link StarPU codes:
+
+\code{File CMakeLists.txt}
+cmake_minimum_required (VERSION 3.2)
+project (hello_starpu)
+
+find_package(PkgConfig)
+pkg_check_modules(STARPU REQUIRED IMPORTED_TARGET starpu-1.4)
+
+add_executable(hello_starpu hello_starpu.c PkgConfig::STARPU)
+\endcode
+
+One can also use the following alternative.
+
+\code{File CMakeLists.txt}
+cmake_minimum_required (VERSION 3.2)
+project (hello_starpu)
+
+find_package(PkgConfig)
+pkg_check_modules(STARPU REQUIRED starpu-1.4)
+if (STARPU_FOUND)
+    include_directories (${STARPU_INCLUDE_DIRS})
+    link_directories    (${STARPU_STATIC_LIBRARY_DIRS})
+    link_libraries      (${STARPU_STATIC_LIBRARIES})
+else (STARPU_FOUND)
+    message(FATAL_ERROR "StarPU not found")
+endif()
+
+add_executable(hello_starpu hello_starpu.c)
+\endcode
+
+The following \c CMakeLists.txt implements a more complex
+strategy, still relying on Pkg-Config, but also taking into account additional
+flags. While more complete, this approach makes CMake's build types (Debug,
+Release, ...) unavailable because of the direct affectation to variable
+<c>CMAKE_C_FLAGS</c>. If both the full flags support and the build types
+support are needed, the \c CMakeLists.txt below may be altered to work with
+<c>CMAKE_C_FLAGS_RELEASE</c>, <c>CMAKE_C_FLAGS_DEBUG</c>, and others as needed.
+This example has been successfully tested with CMake 3.2, though it may work
+with earlier CMake 3.x versions.
+
+\code{File CMakeLists.txt}
+cmake_minimum_required (VERSION 3.2)
+project (hello_starpu)
+
+find_package(PkgConfig)
+pkg_check_modules(STARPU REQUIRED starpu-1.4)
+
+# This section must appear before 'add_executable'
+if (STARPU_FOUND)
+    # CFLAGS other than -I
+    foreach(CFLAG ${STARPU_CFLAGS_OTHER})
+        set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CFLAG}")
+    endforeach()
+
+    # Static LDFLAGS other than -L
+    foreach(LDFLAG ${STARPU_STATIC_LDFLAGS_OTHER})
+        set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDFLAG}")
+    endforeach()
+
+    # -L directories
+    link_directories(${STARPU_STATIC_LIBRARY_DIRS})
+else (STARPU_FOUND)
+    message(FATAL_ERROR "StarPU not found")
+endif()
+
+add_executable(hello_starpu hello_starpu.c)
+
+# This section must appear after 'add_executable'
+if (STARPU_FOUND)
+    # -I directories
+    target_include_directories(hello_starpu PRIVATE ${STARPU_INCLUDE_DIRS})
+
+    # Static -l libs
+    target_link_libraries(hello_starpu PRIVATE ${STARPU_STATIC_LIBRARIES})
+endif()
+\endcode
+
+\section RunningABasicStarPUApplication Running a Basic StarPU Application
+
+Basic examples using StarPU are built in the directory
+<c>examples/basic_examples/</c> (and installed in
+<c>$STARPU_PATH/lib/starpu/examples/</c>). You can for example run the example
+<c>vector_scal</c>.
+
+\verbatim
+$ ./examples/basic_examples/vector_scal
+BEFORE: First element was 1.000000
+AFTER: First element is 3.140000
+\endverbatim
+
+When StarPU is used for the first time, the directory
+<c>$STARPU_HOME/.starpu/</c> is created, performance models will be stored in
+this directory (\ref STARPU_HOME).
+
+Please note that buses are benchmarked when StarPU is launched for the
+first time. This may take a few minutes, or less if <c>libhwloc</c> is
+installed. This step is done only once per user and per machine.
+
+\section RunningABasicStarPUApplicationOnMicrosoft Running a Basic StarPU Application on Microsoft Visual C
+
+Batch files are provided to run StarPU applications under Microsoft
+Visual C. They are installed in <c>$STARPU_PATH/bin/msvc</c>.
+
+To execute a StarPU application, you first need to set the environment
+variable \ref STARPU_PATH.
+
+\verbatim
+c:\....> cd c:\cygwin\home\ci\starpu\
+c:\....> set STARPU_PATH=c:\cygwin\home\ci\starpu\
+c:\....> cd bin\msvc
+c:\....> starpu_open.bat starpu_simple.c
+\endverbatim
+
+The batch script will run Microsoft Visual C with a basic project file
+to run the given application.
+
+The batch script <c>starpu_clean.bat</c> can be used to delete all
+compilation generated files.
+
+The batch script <c>starpu_exec.bat</c> can be used to compile and execute a
+StarPU application from the command prompt.
+
+\verbatim
+c:\....> cd c:\cygwin\home\ci\starpu\
+c:\....> set STARPU_PATH=c:\cygwin\home\ci\starpu\
+c:\....> cd bin\msvc
+c:\....> starpu_exec.bat ..\..\..\..\examples\basic_examples\hello_world.c
+\endverbatim
+
+\verbatim
+MSVC StarPU Execution
+...
+/out:hello_world.exe
+...
+Hello world (params = {1, 2.00000})
+Callback function got argument 0000042
+c:\....>
+\endverbatim
+
+\section KernelThreadsStartedByStarPU Kernel Threads Started by StarPU
+
+StarPU automatically binds one thread per CPU core. It does not use
+SMT/hyperthreading because kernels are usually already optimized for using a
+full core, and using hyperthreading would make kernel calibration rather random.
+
+Since driving GPUs is a CPU-consuming task, StarPU dedicates one core
+per GPU.
+
+While StarPU tasks are executing, the application is not supposed to do
+computations in the threads it starts itself, tasks should be used instead.
+
+If the application needs to reserve some cores for its own computations, it
+can do so with the field starpu_conf::reserve_ncpus, get the core IDs with
+starpu_get_next_bindid(), and bind to them with starpu_bind_thread_on().
+
+Another option is for the application to pause StarPU by calling
+starpu_pause(), then to perform its own computations, and then to
+resume StarPU by calling starpu_resume() so that StarPU can execute
+tasks.
+
+If a computation library used by the application actually creates its
+own thread, it may be useful to call starpu_bind_thread_on_worker()
+before e.g. initializing the library, so that the library records which
+binding it is supposed to use. And then call starpu_bind_thread_on_main()
+again, or starpu_bind_thread_on_cpu() if a core was reserved with
+starpu_get_next_bindid().
+
+In case that computation library wants to bind threads itself, and uses
+physical numbering instead of logical numbering (as defined by hwloc),
+starpu_cpu_os_index() can be used to convert from StarPU cpuid to OS cpu index.
+
+\section EnablingOpenCL Enabling OpenCL
+
+When both CUDA and OpenCL drivers are enabled, StarPU will launch an
+OpenCL worker for NVIDIA GPUs only if CUDA is not already running on them.
+This design choice was necessary as OpenCL and CUDA can not run at the
+same time on the same NVIDIA GPU, as there is currently no interoperability
+between them.
+
+To enable OpenCL, you need either to disable CUDA when configuring StarPU:
+
+\verbatim
+$ ./configure --disable-cuda
+\endverbatim
+
+or when running applications:
+
+\verbatim
+$ STARPU_NCUDA=0 ./application
+\endverbatim
+
+OpenCL will automatically be started on any device not yet used by
+CUDA. So on a machine running 4 GPUS, it is therefore possible to
+enable CUDA on 2 devices, and OpenCL on the other 2 devices by calling:
+
+\verbatim
+$ STARPU_NCUDA=2 ./application
+\endverbatim
+
+\section Storing_Performance_Model_Files Storing Performance Model Files
+
+StarPU stores performance model files for bus benchmarking and codelet
+profiles in different directories.
+
+By default, all files are stored in <c>$STARPU_HOME/.starpu/sampling</c>.
+
+If the environment variable \ref STARPU_HOME is not defined, its
+default value is <c>$HOME</c> on Unix environments, and
+<c>$USERPROFILE</c> on Windows environments.
+
+Environment variables \ref STARPU_PERF_MODEL_DIR and \ref
+STARPU_PERF_MODEL_PATH can also be used to specify other directories
+in which to store performance files (\ref SimulatedBenchmarks).
+
+The configure option \ref with-perf-model-dir "--with-perf-model-dir"
+can also be used to define a performance model directory.
+
+When looking for performance files either for bus benchmarking or for
+codelet performances, StarPU
+<ul>
+<li>
+first looks in the directory specified by the environment variable
+\ref STARPU_PERF_MODEL_DIR
+</li>
+<li>
+then looks in the directory specified by the configure option \ref
+with-perf-model-dir "--with-perf-model-dir" <br/>
+or in $STARPU_HOME/.starpu/sampling if the option is not set
+</li>
+<li>
+then looks in the directories specified by the environment
+variable \ref STARPU_PERF_MODEL_PATH
+</li>
+<li>
+and finally looks in <c>$prefix/share/starpu/perfmodels/sampling</c>
+</li>
+</ul>
+
+If the files are not present and must be created, they will be created
+in the first defined directory from the list above.
+
+\verbatim
+rm -rf $PWD/xxx && STARPU_PERF_MODEL_DIR=$PWD/xxx ./application
+\endverbatim
+
+will use performance model files from the directory
+<c>$STARPU_HOME/.starpu/sampling</c> if they are available, otherwise will
+create these files in <c>$STARPU_PERF_MODEL_DIR</c>.
+
+To know the list of directories StarPU will search for performances
+files, one can use the tool <c>starpu_perfmodel_display</c>
+
+\verbatim
+$ starpu_perfmodel_display -d
+directory: </home/user1/.starpu/sampling/codelets/45/>
+directory: </usr/local/install/share/starpu/perfmodels/sampling/codelets/45/>
+\endverbatim
+
+\verbatim
+$ STARPU_PERF_MODEL_DIR=/tmp/xxx starpu_perfmodel_display -d
+directory: </tmp/xxx/codelets/45/>
+directory: </home/user1/.starpu/sampling/codelets/45/>
+directory: </usr/local/install/share/starpu/perfmodels/sampling/codelets/45/>
+\endverbatim
+
+When using the variable \ref STARPU_PERF_MODEL_DIR, the directory will
+be created if it does not exist when dumping new performance model
+files.
+
+When using the variable \ref STARPU_PERF_MODEL_PATH, only existing
+directories will be taken into account.
+
+\verbatim
+$ mkdir /tmp/yyy && STARPU_PERF_MODEL_DIR=/tmp/xxx STARPU_PERF_MODEL_PATH=/tmp/zzz:/tmp/yyy starpu_perfmodel_display -d
+[starpu][adrets][_perf_model_add_dir] Warning: directory </tmp/zzz> as set by variable STARPU_PERF_MODEL_PATH does not exist
+directory: </tmp/xxx/codelets/45/>
+directory: </home/user1/.starpu/sampling/codelets/45/>
+directory: </tmp/yyy/codelets/45/>
+directory: </usr/local/install/share/starpu/perfmodels/sampling/codelets/45/>
+\endverbatim
+
+Once your application has created the performance files in a given
+directory, it is thus possible to move these files in another location
+and keep using them.
+
+\verbatim
+./application
+# files are created in $HOME/.starpu/sampling
+mv $HOME/.starpu/sampling /usr/local/starpu/sampling
+STARPU_PERF_MODEL_DIR=/usr/local/starpu/sampling ./application
+\endverbatim
+
+When defined the variable \ref STARPU_PERF_MODEL_DIR will be used to
+dump perfmodel files. The application will read bus performance files
+and codelet performance files from <c>$HOME/.starpu</c> when
+available, and will write in the directory \ref STARPU_PERF_MODEL_DIR.
+
+\verbatim
+$ STARPU_PERF_MODEL_DIR=$(mktemp -d)  STARPU_SCHED=dmda STARPU_CALIBRATE=1 ./examples/cholesky/cholesky_implicit
+...
+[starpu][starpu_save_history_based_model] Going to write performance model in file </tmp/tmp.wZSizZncuU/codelets/45/chol_model_potrf.vesubie> for model <chol_model_potrf>
+\endverbatim
+
+*/

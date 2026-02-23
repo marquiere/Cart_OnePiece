@@ -1,0 +1,1456 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ * Copyright (C) 2020-2021  Federal University of Rio Grande do Sul (UFRGS)
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page OfflinePerformanceTools Offline Performance Tools
+
+To get an idea of what is happening, a lot of performance feedback is available,
+detailed in this chapter. The various information should be checked for.
+
+<ul>
+<li>
+What does the Gantt diagram look like? (see \ref CreatingAGanttDiagram)
+<ul>
+  <li> If it's mostly green (tasks running in the initial context) or context specific
+  color prevailing, then the machine is properly
+  utilized, and perhaps the codelets are just slow. Check their performance, see
+  \ref PerformanceOfCodelets.
+  </li>
+  <li> If it's mostly purple (FetchingInput), tasks keep waiting for data
+  transfers, do you perhaps have far more communication than computation? Did
+  you properly use CUDA streams to make sure communication can be
+  overlapped? Did you use data-locality aware schedulers to avoid transfers as
+  much as possible?
+  </li>
+  <li> If it's mostly red (Blocked), tasks keep waiting for dependencies,
+  do you have enough parallelism? It might be a good idea to check what the DAG
+  looks like (see \ref CreatingADAGWithGraphviz).
+  </li>
+  <li> If only some workers are completely red (Blocked), for some reason the
+  scheduler didn't assign tasks to them. Perhaps the performance model is bogus,
+  check it (see \ref PerformanceOfCodelets). Do all your codelets have a
+  performance model?  When some of them don't, the schedulers switches to a
+  greedy algorithm which thus performs badly.
+  </li>
+</ul>
+</li>
+</ul>
+
+You can also use the Temanejo task debugger (see \ref UsingTheTemanejoTaskDebugger) to
+visualize the task graph more easily.
+
+To get an overview about how StarPU tracing system works and which are its
+possible limitations, have a look on [the
+paper](https://inria.hal.science/hal-04236246) studying StarPU's tracing
+mechanisms and performance.
+
+\section GeneratingTracesWithFxT Generating Traces With FxT
+
+StarPU can use the FxT library (see
+https://savannah.nongnu.org/projects/fkt/) to generate traces
+with a limited runtime overhead.
+
+You can get a tarball from http://download.savannah.gnu.org/releases/fkt/?C=M
+
+Compiling and installing the FxT library in the <c>$FXTDIR</c> path is
+done following the standard procedure:
+
+\verbatim
+$ ./configure --prefix=$FXTDIR
+$ make
+$ make install
+\endverbatim
+
+In order to have StarPU to generate traces, StarPU needs to be configured again
+after installing FxT, and configuration show:
+
+\verbatim
+FxT trace enabled: yes
+\endverbatim
+
+If <c>configure</c> does not find FxT automatically, it can be specified by hand with
+the option \ref with-fxt "--with-fxt" :
+
+\verbatim
+$ ./configure --with-fxt=$FXTDIR
+\endverbatim
+
+Or you can simply point the <c>PKG_CONFIG_PATH</c> environment variable to
+<c>$FXTDIR/lib/pkgconfig</c>
+
+When \ref STARPU_FXT_TRACE is set to 1, a trace is generated when StarPU is terminated by calling
+starpu_shutdown(). The trace is a binary file whose name has the form
+<c>prof_file_XXX_YYY</c> where <c>XXX</c> is the username, and
+<c>YYY</c> is the MPI id of the process that used StarPU (or 0 when running a sequential program).
+One can change
+the name of the file by setting the environment variable \ref
+STARPU_FXT_SUFFIX, its contents will be used instead of <c>prof_file_XXX</c>.
+This file is saved in the
+<c>/tmp/</c> directory by default, or by the directory specified by
+the environment variable \ref STARPU_FXT_PREFIX.
+
+The additional \c configure option \ref enable-fxt-lock "--enable-fxt-lock" can
+be used to generate trace events which describes the lock's behavior during
+the execution. It is however very heavy and should not be used unless debugging
+StarPU's internal locking.
+
+Be aware that tracing StarPU applications can, in some cases, generate an
+overhead impacting application performance. There are several sources of
+performance penalty, have a look on [the
+paper](https://inria.hal.science/hal-04236246) studying them for more
+information.
+
+When the FxT trace file <c>prof_file_something</c> has been generated,
+it is possible to generate different trace formats by calling:
+
+\verbatim
+$ starpu_fxt_tool -i /tmp/prof_file_something
+\endverbatim
+
+Or alternatively, setting the environment variable \ref STARPU_GENERATE_TRACE
+to <c>1</c> before application execution will make StarPU
+automatically generate all traces at application shutdown. Note that
+if the environment variable \ref STARPU_FXT_PREFIX is set, files will
+be generated in the given directory.
+
+One can also set the environment variable \ref
+STARPU_GENERATE_TRACE_OPTIONS to specify options, see
+<c>starpu_fxt_tool --help</c>, for example:
+
+\verbatim
+$ export STARPU_GENERATE_TRACE=1
+$ export STARPU_GENERATE_TRACE_OPTIONS="-no-acquire"
+\endverbatim
+
+When running an MPI application, \ref STARPU_GENERATE_TRACE will not
+work as expected (each node will try to generate trace files, thus
+mixing outputs...), you have to collect the trace files from the MPI
+nodes, and specify them all on the command <c>starpu_fxt_tool</c>, for
+instance:
+
+\verbatim
+$ starpu_fxt_tool -i /tmp/prof_file_something*
+\endverbatim
+
+By default, the generated trace contains all information. To reduce
+the trace size, various <c>-no-foo</c> options can be passed to
+<c>starpu_fxt_tool</c>, see <c>starpu_fxt_tool --help</c> .
+
+\subsection CreatingAGanttDiagram Creating a Gantt Diagram
+
+One of the generated files is a trace in the Paje format. The file,
+located in the current directory, is named <c>paje.trace</c>. It can
+be viewed with ViTE (https://solverstack.gitlabpages.inria.fr/vite/) a trace
+visualizing open-source tool.  To open the file <c>paje.trace</c> with
+ViTE, use the following command:
+
+\verbatim
+$ vite paje.trace
+\endverbatim
+
+Once the file is opened in ViTE interface, we will see the figure as shown below:
+
+\image html vite_open.png width=60%
+\image latex vite_open.png "" width=\textwidth
+
+We can then click the "No arrows" button in task bar of ViTE interface, to better observe the Gantt diagram that illustrates the start and end dates of the different tasks or activities of a program.
+
+\image html vite_no_arrow.png width=60%
+\image latex vite_no_arrow.png "" width=\textwidth
+
+In the Gantt diagram, the bar types such as devices (CPU or GPU) are displayed
+on the left side. Each task is represented by a horizontal rectangle that spans
+the duration of the task. The rectangles are arranged along a timeline axis,
+which is shown at the top of the Gantt diagram and represents the overall
+duration of the program in milliseconds. The position of the bar along the
+timeline shows when the task begins and ends. We can see some long red bars at
+the beginning and end of the entire timeline, which represent that the unit is
+idle. There are no tasks at these moments, and workers are waiting or in a
+sleeping state.
+
+\subsubsection ZoomingInGantt Zooming in Gantt Diagram
+
+Then as shown in the following figure, press and hold the left mouse button to
+select the area you want to zoom in on. Release the button to view the selected
+area, and we can repeat the zoom action multiple times.
+
+\image html vite_zoom.png width=60%
+\image latex vite_zoom.png "" width=\textwidth
+
+This zoom result is:
+
+\image html vite_zoom_result.png width=60%
+\image latex vite_zoom_result.png "" width=\textwidth
+
+Right-clicking anywhere on the Gantt diagram restores the previous zoom view.
+
+One can press and hold the left mouse button inside the top blue bar to select
+horizontally, which will horizontally zoom in on all Gantt diagrams within the
+selected time range.
+
+\image html vite_zoom_horiz.png width=60%
+\image latex vite_zoom_horiz.png "" width=\textwidth
+
+This zoom result is:
+
+\image html vite_zoom_horiz_result.png width=60%
+\image latex vite_zoom_horiz_result.png "" width=\textwidth
+
+\subsubsection ColorsInGantt Colors in Gantt Diagram
+
+After zooming in, we can observe numerous blocks of varying colors, each block representing a task. Blocks of diverse colors signify different types of tasks. When we double-click on any block, a pop-up window will show related status about that task, such as its type and which worker (CPU/GPU) it belongs to, etc.
+
+\image html vite_task_state.png width=60%
+\image latex vite_task_state.png "" width=\textwidth
+
+The state information displayed in the pop-up window can be:
+
+\li <b>Value</b>: refers to a type of task, which can be assigned as a
+task name (instead of the default \c unknown) by filling the optional
+starpu_codelet::name, or assigning it a performance model. The name can also be
+set with the field starpu_task::name or by using \ref STARPU_NAME when calling
+starpu_task_insert()
+\li <b>Container</b>: refers to a specific worker where the computation was performed, could be CPU or CUDA
+\li <b>Type</b>: indicates the type of this block, most often "Worker State"
+\li <b>Date</b>: represents a range of dates during which the computation was performed
+\li <b>Duration</b>: represents the duration of the computation
+\li <b>Footprint</b>: provides the data footprint of the task (used as indexing base for performance models)
+\li <b>GFlop</b>: represents the number of Gflop performed during the computation, as set in starpu_task::flops.
+\li <b>Iteration</b>: refers to the iteration number of the computation, as set by starpu_iteration_push() at the beginning of submission loops and starpu_iteration_pop() at the end of submission loops
+\li <b>JobId</b>: represents a unique identifier for the specific task, as returned by starpu_task_get_job_id()
+\li <b>NumaNodes</b>: refers to the NUMA node where the data is stored, the environment variable \ref STARPU_FXT_EVENTS needs to contain \c TASK_VERBOSE_EXTRA, otherwise it will be -1
+\li <b>Params</b>: represents parameters or input/output types and sizes, possibly indicating the dimensions of the matrices, depending on how the function starpu_data_interface_ops::describe of the datatype is implemented
+\li <b>Size</b>: represents the size of the data being operated on in bytes, computed as the sum of the data sizes of each data handle manipulated by the task
+\li <b>Subiteration</b>: represents a sub-iteration number if the computation was part of a larger iteration or loop, as set by starpu_iteration_push()
+\li <b>SubmitOrder</b>: represents the order in which the task was submitted by
+the application
+\li <b>Tag</b>: represents a unique identifier for the task, which can be
+set either through starpu_task::tag_id or by using \ref STARPU_TAG or \ref
+STARPU_TAG_ONLY when calling starpu_task_insert()
+\li <b>X</b>: represents an X-coordinate index of the first data written by the task, which was set by starpu_data_set_coordinates() or
+starpu_data_set_coordinates_array() function. We can also get the coordinates of the data with starpu_data_get_coordinates_array() function
+\li <b>Y</b>: represents an Y-coordinate index of the first data written by the task, which was set by starpu_data_set_coordinates() or
+starpu_data_set_coordinates_array() function. We can also get the coordinates of the data with starpu_data_get_coordinates_array() function
+\li <b>Color</b>: represents the color RGB value associated with the task. Tasks
+are by default shown in green.  To use a different color for every type of
+task, we can specify the option <c>-c</c> to <c>starpu_fxt_tool</c> or in \ref
+STARPU_GENERATE_TRACE_OPTIONS. Tasks can also be given a specific color by
+setting the field starpu_codelet::color or the starpu_task::color. When we call
+starpu_task_insert(), we can use ::STARPU_TASK_COLOR to set the color. Colors
+are expressed with the following format \c 0xRRGGBB (e.g. \c 0xFF0000 for
+red). See <c>basic_examples/task_insert_color</c> for examples on how to assign
+colors
+
+In the shown figure, the set of color as following:
+\li Dark green represents GEMM
+\li Light green represents SYRK
+\li Blue represents TRSM
+\li Red indicates that the unit is idle, there are no tasks at the moment, it is currently waiting or in a sleeping state
+\li Magenta represents FetchingInput
+
+To modify the colors in Vite interface, select "Preferences" then "Settings" in
+the options bar, and then choose the "States" tab in the newly opened window
+to select different colors for different operations, as shown in the figure
+below. One has to click the reload button at the top left to reload the trace
+with the new colors.
+
+\image html vite_preferences.png width=60%
+\image latex vite_preferences.png "" width=\textwidth
+
+\subsubsection CurvesInGantt Curves in Gantt Diagram
+
+We can see that there is a curve below task blocks, which represents the
+corresponding <c>GFlop/s</c>. Double-clicking near the curve will display
+the current <c>GFlop/s</c> information in a pop-up window (as shown in the
+figure). If we only click on the curve, a vertical red line shows up, and we can
+read on it the <c>GFlop/s</c> values of all the curves at the same time.
+
+\image html vite_gflops.png width=60%
+\image latex vite_gflops.png "" width=\textwidth
+
+For GPUs, there are three additional curves above the task blocks that can be double-clicked to open a pop-up window to view information. Let's zoom in on the three curves during the entire execution process as illustrated in the figure:
+
+\image html vite_gpu_memory_select.png width=60%
+\image latex vite_gpu_memory_select.png "" width=\textwidth
+
+As shown in the figure below, the top curve represents the amount of GPU-managed
+memory in MBytes, while the bottom two curves represent the data transfer
+between tasks on the CPU and GPU, and between tasks on different GPUs. They
+respectively indicate the incoming and outgoing data transfer bandwidth.
+By looking at the memory curve, we can observe that the memory usage kept
+increasing at first, but due to the reutilization of the allocations by StarPU,
+the curve gradually became stable later on.
+
+\image html vite_gpu_memory.png width=60%
+\image latex vite_gpu_memory.png "" width=\textwidth
+
+\subsubsection StatesInGantt States in Gantt Diagram
+
+Above these three curves, we can see some blocks which represent driver
+copy (see the top of the figure below), i.e. a memory copy. The light green
+blocks represent the actual copies, the dark green blocks represent
+asynchronous copy submissions, and the burgundy blocks represent allocating and
+freeing. Double-clicking on a block allows us to view relevant information in
+the pop-up window.
+
+Here, a couple of issues may show up:
+
+\li If the "Allocating/Freeing" parts take a long time, it means that StarPU does
+not manage to re-use data buffers allocated in the GPU. If you have e.g. a lot
+of tiles with different sizes, it may be useful to approximate the allocation
+size, by using e.g. starpu_matrix_data_register_allocsize() with the proper nx /
+ld / ny, but an allocation size that is rounded up, so that buffers with that
+same rounded size can be shared.
+
+\li If the "Asynchronous copy submission" parts take a long time, it means that
+the CPU buffers are not pinned: you need to make sure to use starpu_malloc(), or
+starpu_memory_pin() (see \ref CUDA-specificOptimizations) so that the CPU
+buffers are pinned so that the GPU driver can efficiently process transfers
+asynchronously (in the "Actual copy" part) rather than synchronously (in the
+"Asynchronous copy submission" part).
+
+\image html vite_gpu_curves.png width=60%
+\image latex vite_gpu_curves.png "" width=\textwidth
+
+Below the GPU task blocks and <c>GFlops</c> curve (see the bottom of the figure
+above), we can see some other blocks that represent the CPU waiting for the
+GPU to complete the task. During time, CPU can do variable actions which are
+represented by blocks of different colors, such as:
+
+\li Dark green represents <c>progressing</c>, it keeps polling for task or data transfer completion
+\li Brown-yellow represents <c>scheduling</c>
+\li Burgundy represents <c>submitting task</c>
+\li Lake blue represents <c>executing</c>, it is executing the application codelet function. Here it is very short because the codelet just submits a kernel asynchronously.
+\li Dark blue represents <c>callback</c>
+\li Chestnut represents <c>overhead</c>. This state is not supposed to be long, as it represents everything that we did not classify as an operation that is supposed to be long like the operations mentioned above. If you find situations where some overhead is long, this is a bug worth reporting so we can fix it.
+
+and we can always double-click on the block to view relevant information in the pop-up window.
+
+\subsubsection TransfersInGantt Transfers in Gantt Diagram
+
+We can horizontally zoom in on a section of the Gantt diagram, and deselect the "No arrows" option. This will allow us to see a complete process of data transfer, as shown in the following figure:
+
+\image html vite_trans_arrow.png width=60%
+\image latex vite_trans_arrow.png "" width=\textwidth
+
+In the above figure, we can see a long segment of magenta color in CUDA2_0 task
+blocks. At the same time, we can see that there are numerous transfers between
+other workers during this time period. This indicates that CUDA2_0 is waiting
+for the completion of the data transfers needed by the task it wants to execute.
+
+\subsubsection SchedulerInGantt Scheduler in Gantt Diagram
+
+At the top of the entire Gantt diagram, there are three curves that represent
+the information of the scheduler. Let's zoom in on the three curves during the
+entire execution process as illustrated in the figure below:
+
+\image html vite_top_curve_select.png width=60%
+\image latex vite_top_curve_select.png "" width=\textwidth
+
+As shown in the figure below, from top to bottom, they respectively indicate the number of submitted uncompleted tasks, the number of ready tasks, and the total <c>GFlop/s</c> for this moment. By double-clicking on the curves, we can view relevant information in the pop-up window.
+
+\image html vite_top_curve.png width=60%
+\image latex vite_top_curve.png "" width=\textwidth
+
+\subsubsection MainThreadInGantt Main Thread in Gantt Diagram
+
+At the very bottom of the entire Gantt diagram, we will see a red bar, which represents the main thread waiting for tasks. In front of the red bar (see the figure below), there are some dark red bars, which represent the main thread submitting tasks.
+
+\image html vite_bottom_curve.png width=60%
+\image latex vite_bottom_curve.png "" width=\textwidth
+
+Below these red bars, we can see some white vertical lines with small circles on top, which represent events. The default events can be either task push or task pop or task wait for all. The application can inject its own events at any desired moment with the function starpu_fxt_trace_user_event() or starpu_fxt_trace_user_event_string(). Similarly, double-clicking on the white bars allows you to see relevant information in the pop-up window.
+
+\subsubsection StatisticsInGantt Statistics in Gantt Diagram
+
+To get statistics on the time spent in runtime overhead, we can use the
+statistics plugin of ViTE. In the Preferences menu, select Plugins. In "States Type",
+select "Worker State". Then click on "Reload" to update the histogram. The red
+"Idle" percentages are due to lack of parallelism, the "FetchingInput"
+percentages are due to waiting for data transfers. The brown "Overhead"
+and "Scheduling" percentages are due to the overhead of the runtime and of the
+scheduler.
+
+\image html vite_worker_state.png width=60%
+\image latex vite_worker_state.png "" width=\textwidth
+
+\subsection CreatingADAGWithGraphviz Creating a DAG With Graphviz
+
+Another generated trace file is a task graph described using the DOT
+language. The file, created in the current directory, is named
+<c>dag.dot</c> file in the current directory.
+It is possible to get a graphical output of the graph by using the
+<c>graphviz</c> library:
+
+\verbatim
+$ dot -Tpdf dag.dot -o output.pdf
+\endverbatim
+
+or visualize it directly with a program like <c>xdot</c>:
+
+\verbatim
+$ xdot dag.dot
+\endverbatim
+
+In the task graph, the color of each node is computed as follows:
+<ol>
+    <li>If the codelet defined a color (see \ref starpu_codelet::color), this color is used;</li>
+    <li>If the option <c>-c</c> of <c>starpu_fxt_tool</c> was set, all tasks having the same name will have the same color;</li>
+    <li>Otherwise, the color will represent on which worker the task was executed (green for CPUs and yellow to red for accelerators.</li>
+</ol>
+
+Moreover, the option <c>-no-acquire</c> of <c>starpu_fxt_tool</c> hides StarPU internal tasks for data acquisition from the graph. On the contrary, the option <c>-internal</c> shows more internal tasks.
+
+\subsection TraceTaskDetails Getting Task Details
+
+Another generated trace file gives details on the executed tasks. The
+file, created in the current directory, is named <c>tasks.rec</c>. This file
+is in the \c recutils format, i.e. <c>Field: value</c> lines, and empty lines are used to
+separate each task.  This can be used as a convenient input for various ad-hoc
+analysis tools. By default, it only contains information about the actual
+execution. Performance models can be obtained by running
+<c>starpu_tasks_rec_complete</c> on it:
+
+\verbatim
+$ starpu_tasks_rec_complete tasks.rec tasks2.rec
+\endverbatim
+
+which will add <c>EstimatedTime</c> lines which contain the performance
+model-estimated time (in µs) for each worker starting from 0. Since it needs
+the performance models, it needs to be run the same way as the application
+execution, or at least with <c>STARPU_HOSTNAME</c> set to the hostname of the
+machine used for execution, to get the performance models of that machine.
+
+Another possibility is to obtain the performance models as an auxiliary <c>perfmodel.rec</c> file, by using the <c>starpu_perfmodel_recdump</c> utility:
+
+\verbatim
+$ starpu_perfmodel_recdump tasks.rec -o perfmodel.rec
+\endverbatim
+
+One can also simply call starpu_task_get_name() to get the name of a task.
+
+\subsection TraceSchedTaskDetails Getting Scheduling Task Details
+
+The file, <c>sched_tasks.rec</c>, created in the current directory,
+in the \c recutils format, gives information about the tasks
+scheduling, and lists the push and pop actions of the scheduler. For
+each action, it gives the timestamp, the job priority and the job id.
+Each action is separated from the next one by empty lines. The job id associated with the task can be retrieved by calling starpu_task_get_job_id().
+
+\subsection MonitoringActivity Monitoring Activity
+
+Another generated trace file is an activity trace. The file, created
+in the current directory, is named <c>activity.data</c>. A profile of
+the application showing the activity of StarPU during the execution of
+the program can be generated:
+
+\verbatim
+$ starpu_workers_activity activity.data
+\endverbatim
+
+This will create a file named <c>activity.eps</c> in the current directory.
+This picture is composed of two parts.
+The first part shows the activity of the different workers. The green sections
+indicate which proportion of the time was spent executed kernels on the
+processing unit. The red sections indicate the proportion of time spent in
+StarPU: an important overhead may indicate that the granularity may be too
+low, and that bigger tasks may be appropriate to use the processing unit more
+efficiently. The black sections indicate that the processing unit was blocked
+because there was no task to process: this may indicate a lack of parallelism,
+which may be alleviated by creating more tasks when it is possible.
+
+The second part of the picture <c>activity.eps</c> is a graph showing the
+evolution of the number of tasks available in the system during the execution.
+Ready tasks are shown in black, and tasks that are submitted but not
+schedulable yet are shown in grey.
+
+\subsection Animation Getting Modular Schedular Animation
+
+When using modular schedulers (i.e. schedulers which use a modular architecture,
+and whose name start with "modular-"), the call to
+<c>starpu_fxt_tool</c> will also produce a <c>trace.html</c> file
+which can be viewed in a javascript-enabled web browser. It shows the
+flow of tasks between the components of the modular scheduler.
+
+\subsection TimeBetweenSendRecvDataUse Analyzing Time Between MPI Data Transfer and Use by Tasks
+
+<c>starpu_fxt_tool</c> produces a file called <c>comms.rec</c> which describes all
+MPI communications. The script <c>starpu_send_recv_data_use.py</c> uses this file
+and <c>tasks.rec</c> in order to produce two graphs: the first one shows durations
+between the reception of data and their usage by a task and the second one plots the
+same graph but with elapsed time between send and usage of a data by the sender.
+
+\image html trace_recv_use.png
+\image latex trace_recv_use.png "" width=\textwidth
+
+\image html trace_send_use.png
+\image latex trace_send_use.png "" width=\textwidth
+
+\subsection NumberEvents Number of events in trace files
+
+When launched with the option <c>-number-events</c>, <c>starpu_fxt_tool</c> will
+produce a file named <c>number_events.data</c>. This file contains the number of
+events for each event type. Events are represented with their key. To convert
+event keys to event names, you can use the <c>starpu_fxt_number_events_to_names.py</c>
+script:
+
+\verbatim
+$ starpu_fxt_number_events_to_names.py number_events.data
+\endverbatim
+
+The number of recorded events (and thus the performance overhead introduced by
+tracing) can be reduced by setting which categories of events to record with
+the environment variable \ref STARPU_FXT_EVENTS.
+
+\subsection LimitingScopeTrace Limiting The Scope Of The Trace
+
+For computing statistics, it is useful to limit the trace to a given portion of
+the time of the whole execution. This can be achieved by calling
+
+\code{.c}
+starpu_fxt_autostart_profiling(0)
+\endcode
+
+before calling starpu_init(), to
+prevent tracing from starting immediately. Then
+
+\code{.c}
+starpu_fxt_start_profiling();
+\endcode
+
+and
+
+\code{.c}
+starpu_fxt_stop_profiling();
+\endcode
+
+can be used around the portion of code to be traced. This will show up as marks
+in the trace, and states of workers will only show up for that portion.
+
+\section PerformanceOfCodelets Performance Of Codelets
+
+After calibrating performance models of codelets (see \ref
+PerformanceModelExample and \ref PerformanceModelCalibration),
+they can be examined by using the tool <c>starpu_perfmodel_display</c>:
+
+\verbatim
+$ starpu_perfmodel_display -l
+file: <malloc_pinned.hannibal>
+file: <starpu_slu_lu_model_trsm_ru.hannibal>
+file: <starpu_slu_lu_model_getrf.hannibal>
+file: <starpu_slu_lu_model_gemm.hannibal>
+file: <starpu_slu_lu_model_trsm_ll.hannibal>
+\endverbatim
+
+Here, the codelets of the example <c>lu</c> are available. We can examine the
+performance of the kernel <c>22</c> (in micro-seconds), which is history-based:
+
+\verbatim
+$ starpu_perfmodel_display -s starpu_slu_lu_model_gemm
+performance model for cpu
+# hash      size       mean          dev           n
+57618ab0    19660800   2.851069e+05  1.829369e+04  109
+performance model for cuda_0
+# hash      size       mean          dev           n
+57618ab0    19660800   1.164144e+04  1.556094e+01  315
+performance model for cuda_1
+# hash      size       mean          dev           n
+57618ab0    19660800   1.164271e+04  1.330628e+01  360
+performance model for cuda_2
+# hash      size       mean          dev           n
+57618ab0    19660800   1.166730e+04  3.390395e+02  456
+\endverbatim
+
+We can see that for the given size, over a sample of a few hundreds of
+execution, the GPUs are about 20 times faster than the CPUs (numbers are in
+us). The standard deviation is extremely low for the GPUs, and less than 10% for
+CPUs.
+
+This tool can also be used for regression-based performance models. It will then
+display the regression formula, and in the case of non-linear regression, the
+same performance log as for history-based performance models:
+
+\verbatim
+$ starpu_perfmodel_display -s non_linear_memset_regression_based
+performance model for cpu_impl_0
+	Regression : #sample = 1400
+	Linear: y = alpha size ^ beta
+		alpha = 1.335973e-03
+		beta = 8.024020e-01
+	Non-Linear: y = a size ^b + c
+		a = 5.429195e-04
+		b = 8.654899e-01
+		c = 9.009313e-01
+# hash		size		mean		stddev		n
+a3d3725e	4096           	4.763200e+00   	7.650928e-01   	100
+870a30aa	8192           	1.827970e+00   	2.037181e-01   	100
+48e988e9	16384          	2.652800e+00   	1.876459e-01   	100
+961e65d2	32768          	4.255530e+00   	3.518025e-01   	100
+...
+\endverbatim
+
+The same can also be achieved by using StarPU's library API, see
+\ref API_Performance_Model and notably the function
+starpu_perfmodel_load_symbol(). The source code of the tool
+<c>starpu_perfmodel_display</c> can be a useful example.
+
+An XML output can also be printed by using the <c>-x</c> option:
+\verbatim
+$ tools/starpu_perfmodel_display -x -s non_linear_memset_regression_based
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE StarPUPerfmodel SYSTEM "starpu-perfmodel.dtd">
+<!-- symbol non_linear_memset_regression_based -->
+<!-- All times in us -->
+<perfmodel version="45">
+  <combination>
+    <device type="CPU" id="0" ncores="1"/>
+    <implementation id="0">
+      <!-- cpu0_impl0 (Comb0) -->
+      <!-- time = a size ^b + c -->
+      <nl_regression a="5.429195e-04" b="8.654899e-01" c="9.009313e-01"/>
+      <entry footprint="a3d3725e" size="4096" flops="0.000000e+00" mean="4.763200e+00" deviation="7.650928e-01" nsample="100"/>
+      <entry footprint="870a30aa" size="8192" flops="0.000000e+00" mean="1.827970e+00" deviation="2.037181e-01" nsample="100"/>
+      <entry footprint="48e988e9" size="16384" flops="0.000000e+00" mean="2.652800e+00" deviation="1.876459e-01" nsample="100"/>
+      <entry footprint="961e65d2" size="32768" flops="0.000000e+00" mean="4.255530e+00" deviation="3.518025e-01" nsample="100"/>
+    </implementation>
+  </combination>
+</perfmodel>
+\endverbatim
+
+The tool <c>starpu_perfmodel_plot</c> can be used to draw performance
+models. It writes a <c>.gp</c> file in the current directory, to be
+run with the tool <c>gnuplot</c>, which generates the corresponding
+curve both in postscript and png format.
+
+\verbatim
+$ tools/starpu_perfmodel_plot -s non_linear_memset_regression_based
+$ gnuplot starpu_non_linear_memset_regression_based.gp
+$ gv starpu_non_linear_memset_regression_based.eps
+$ geeqie starpu_non_linear_memset_regression_based.png
+\endverbatim
+
+\image html starpu_non_linear_memset_regression_based.png
+\image latex starpu_non_linear_memset_regression_based.png "" width=\textwidth
+
+When the field starpu_task::flops is set (or \ref STARPU_FLOPS is passed to
+starpu_task_insert()), <c>starpu_perfmodel_plot</c> can directly draw a GFlops/s
+curve, by simply adding the <c>-f</c> option:
+
+\verbatim
+$ starpu_perfmodel_plot -f -s chol_model_potrf
+\endverbatim
+
+This will however disable displaying the regression model, for which we can not
+compute GFlops/s.
+
+\image html starpu_chol_model_11_type.png
+\image latex starpu_chol_model_11_type.png "" width=\textwidth
+
+When the FxT trace file <c>prof_file_something</c> has been generated, it is possible to
+get a profiling of each codelet by calling:
+
+\verbatim
+$ starpu_fxt_tool -i /tmp/prof_file_something
+$ starpu_codelet_profile distrib.data codelet_name
+\endverbatim
+
+This will create profiling data files, and a <c>distrib.data.gp</c> file in the current
+directory, which draws the distribution of codelet time over the application
+execution, according to data input size.
+
+\image html distrib_data.png
+\image latex distrib_data.png "" width=\textwidth
+
+This is also available in the tool <c>starpu_perfmodel_plot</c>, by passing it
+the fxt trace:
+
+\verbatim
+$ starpu_perfmodel_plot -s non_linear_memset_regression_based -i /tmp/prof_file_foo_0
+\endverbatim
+
+It will produce a <c>.gp</c> file which contains both the performance model
+curves, and the profiling measurements.
+
+\image html starpu_non_linear_memset_regression_based_2.png
+\image latex starpu_non_linear_memset_regression_based_2.png "" width=\textwidth
+
+If you have the statistical tool <c>R</c> installed, you can additionally use
+
+\verbatim
+$ starpu_codelet_histo_profile distrib.data
+\endverbatim
+
+Which will create one <c>.pdf</c> file per codelet and per input size, showing a
+histogram of the codelet execution time distribution.
+
+\image html distrib_data_histo.png
+\image latex distrib_data_histo.png "" width=\textwidth
+
+\section EnergyOfCodelets Energy Of Codelets
+
+A performance model of the energy of codelets can also be recorded thanks to
+the starpu_codelet::energy_model field of the starpu_codelet structure. StarPU usually cannot
+record this automatically, since the energy measurement probes are usually not
+fine-grain enough.  It is however possible to measure it by writing a program
+that submits batches of tasks, let StarPU measure the energy requirement of
+the batch, and compute an average, see \ref MeasuringEnergyandPower .
+
+The energy performance model can then be displayed in Joules with
+<c>starpu_perfmodel_display</c> just like the time performance model.  The
+<c>starpu_perfmodel_plot</c> needs an extra <c>-e</c> option to display the
+proper unit in the graph:
+
+\verbatim
+$ tools/starpu_perfmodel_plot -e -s non_linear_memset_regression_based_energy
+$ gnuplot starpu_non_linear_memset_regression_based_energy.gp
+$ gv starpu_non_linear_memset_regression_based_energy.eps
+\endverbatim
+
+\image html starpu_non_linear_memset_regression_based_energy.png
+\image latex starpu_non_linear_memset_regression_based_energy.png "" width=\textwidth
+
+The <c>-f</c> option can also be used to display the performance in terms of GFlops/s/W, i.e. the efficiency:
+
+\verbatim
+$ tools/starpu_perfmodel_plot -f -e -s non_linear_memset_regression_based_energy
+$ gnuplot starpu_gflops_non_linear_memset_regression_based_energy.gp
+$ gv starpu_gflops_non_linear_memset_regression_based_energy.eps
+\endverbatim
+
+\image html starpu_gflops_non_linear_memset_regression_based_energy.png
+\image latex starpu_gflops_non_linear_memset_regression_based_energy.png "" width=\textwidth
+
+We clearly see here that it is much more energy-efficient to stay in the L3 cache.
+
+One can combine the two time and energy performance models to draw Watts:
+
+\verbatim
+$ tools/starpu_perfmodel_plot -se non_linear_memset_regression_based non_linear_memset_regression_based_energy
+$ gnuplot starpu_power_non_linear_memset_regression_based.gp
+$ gv starpu_power_non_linear_memset_regression_based.eps
+\endverbatim
+
+\image html starpu_power_non_linear_memset_regression_based.png
+\image latex starpu_power_non_linear_memset_regression_based.png "" width=\textwidth
+
+\section DataTrace Data trace and tasks length
+
+It is possible to get statistics about tasks length and data size by using :
+\verbatim
+$ starpu_fxt_data_trace filename [codelet1 codelet2 ... codeletn]
+\endverbatim
+Where filename is the FxT trace file and codeletX the names of the codelets you
+want to profile (if no names are specified, <c>starpu_fxt_data_trace</c> will profile them all).
+This will create a file, <c>data_trace.gp</c> which
+can be executed to get a <c>.eps</c> image of these results. On the image, each point represents a
+task, and each color corresponds to a codelet.
+
+\image html data_trace.png
+\image latex data_trace.png "" width=\textwidth
+
+\section TraceStatistics Trace Statistics
+
+More than just codelet performance, it is interesting to get statistics over all
+kinds of StarPU states (allocations, data transfers, etc.). This is particularly
+useful to check what may have gone wrong in the accuracy of the SimGrid
+simulation.
+
+This requires the <c>R</c> statistical tool, with the <c>plyr</c>,
+<c>ggplot2</c> and <c>data.table</c> packages. If your system
+distribution does not have packages for these, one can fetch them from
+<c>CRAN</c>:
+
+\verbatim
+$ R
+> install.packages("plyr")
+> install.packages("ggplot2")
+> install.packages("data.table")
+> install.packages("knitr")
+\endverbatim
+
+The <c>pj_dump</c> tool from <c>pajeng</c> is also needed (see
+https://github.com/schnorr/pajeng)
+
+One can then get textual or <c>.csv</c> statistics over the trace states:
+
+\verbatim
+$ starpu_paje_state_stats -v native.trace simgrid.trace
+"Value"            "Events_native.csv" "Duration_native.csv" "Events_simgrid.csv" "Duration_simgrid.csv"
+"Callback"         220                 0.075978              220                  0
+"chol_model_potrf" 10                  565.176               10                   572.8695
+"chol_model_trsm"  45                  9184.828              45                   9170.719
+"chol_model_gemm"  165                 64712.07              165                  64299.203
+$ starpu_paje_state_stats native.trace simgrid.trace
+\endverbatim
+
+An other way to get statistics of StarPU states (without installing <c>R</c> and
+<c>pj_dump</c>) is to use the <c>starpu_trace_state_stats.py</c> script, which parses the
+generated <c>trace.rec</c> file instead of the <c>paje.trace</c> file. The output is similar
+to the previous script, but it doesn't need any dependencies.
+
+The different prefixes used in <c>trace.rec</c> are:
+
+\verbatim
+E: Event type
+N: Event name
+C: Event category
+W: Worker ID
+T: Thread ID
+S: Start time
+\endverbatim
+
+Here's an example on how to use it:
+
+\verbatim
+$ starpu_trace_state_stats.py trace.rec | column -t -s ","
+"Name"		   "Count" "Type"	"Duration"
+"Callback"          220	Runtime	0.075978
+"chol_model_potrf"  10	Task	565.176
+"chol_model_trsm"   45	Task	9184.828
+"chol_model_gemm"   165	Task	64712.07
+\endverbatim
+
+<c>starpu_trace_state_stats.py</c> can also be used to compute the different
+efficiencies. Refer to the usage description to show some examples.
+
+And one can plot histograms of execution times, of several states, for instance:
+\verbatim
+$ starpu_paje_draw_histogram -n chol_model_potrf,chol_model_trsm,chol_model_gemm native.trace simgrid.trace
+\endverbatim
+
+and see the resulting pdf file:
+
+\image html paje_draw_histogram.png
+\image latex paje_draw_histogram.png "" width=\textwidth
+
+A quick statistical report can be generated by using:
+
+\verbatim
+$ starpu_paje_summary native.trace simgrid.trace
+\endverbatim
+
+it includes gantt charts, execution summaries, as well as state duration charts
+and time distribution histograms.
+
+Other external Paje analysis tools can be used on these traces, one just needs
+to sort the traces by timestamp order (which not guaranteed to make recording
+more efficient):
+
+\verbatim
+$ starpu_paje_sort paje.trace
+\endverbatim
+
+\section PapiCounters PAPI counters
+
+Performance counter values could be obtained from the PAPI framework if
+<c>./configure</c> detected the libpapi.
+
+In Debian, the <c>libpapi-dev</c> package provides the required
+files.  Additionally, the <c>papi-tools</c> package contains a set of useful tools, for example
+<c>papi_avail</c> to see which counters are available.
+
+To be able to use Papi counters, one may need to reduce the level of the kernel
+parameter <c>kernel.perf_event_paranoid</c> to 2 or below. See
+https://www.kernel.org/doc/html/latest/admin-guide/perf-security.html for the
+security impact of this parameter.
+
+Then one has to set the \ref STARPU_PROFILING environment variable to 1 and
+specify which events to record with the \ref STARPU_PROF_PAPI_EVENTS
+environment variable. For instance:
+
+\verbatim
+export STARPU_PROFILING=1 STARPU_PROF_PAPI_EVENTS="PAPI_TOT_INS PAPI_TOT_CYC"
+\endverbatim
+
+The comma can also be used to separate events to monitor.
+
+In the current simple implementation, only CPU tasks have their events measured
+and require CPUs that support the PAPI events. It is important to note that not
+all events are available on all systems, and general PAPI recommendations
+should be followed.
+
+The counter values can be accessed using the profiling interface:
+\code{.c}
+task->profiling_info->papi_values
+\endcode
+Also, it can be accessed and/or saved with tracing when using \ref STARPU_FXT_TRACE. With the use of <c>starpu_fxt_tool</c>
+the file <c>papi.rec</c> is generated containing the following triple:
+
+\verbatim
+Task Id
+Event Id
+Value
+\endverbatim
+
+External tools like <c>rec2csv</c> can be used to convert this rec file to a <c>csv</c> file, where each
+line represents a value for an event for a task.
+
+\section TheoreticalLowerBoundOnExecutionTime Theoretical Lower Bound On Execution Time
+
+StarPU can record a trace of what tasks are needed to complete the
+application, and then, by using a linear system, provide a theoretical lower
+bound of the execution time (i.e. with an ideal scheduling).
+
+The computed bound is not really correct when not taking into account
+dependencies, but for an application which have enough parallelism, it is very
+near to the bound computed with dependencies enabled (which takes a huge lot
+more time to compute), and thus provides a good-enough estimation of the ideal
+execution time.
+
+Then there is an example to show how to use this.
+
+For kernels with history-based performance models (and provided that
+they are completely calibrated), StarPU can very easily provide a
+theoretical lower bound for the execution time of a whole set of
+tasks. See for instance <c>examples/lu/lu_example.c</c>: before
+submitting tasks, call the function starpu_bound_start(), and after
+complete execution, call starpu_bound_stop().
+starpu_bound_print_lp() or starpu_bound_print_mps() can then be used
+to output a Linear Programming problem corresponding to the schedule
+of your tasks. Or starpu_bound_print_dot() can be used to print a task dependency graph in the DOT format. Run it through <c>lp_solve</c> or any other linear
+programming solver, and that will give you a lower bound for the total
+execution time of your tasks. If StarPU was compiled with the library
+<c>glpk</c> installed, starpu_bound_compute() can be used to solve it
+immediately and get the optimized minimum, in ms. Its parameter
+<c>integer</c> allows deciding whether integer resolution should be
+computed and returned. Besides to solve it immediately and get the optimized minimum starpu_bound_print() can also print the statistics of actual execution and theoretical upper bound.
+
+The <c>deps</c> parameter tells StarPU whether to take tasks, implicit
+data, and tag dependencies into account. Tags released in a callback
+or similar are not taken into account, only tags associated with a task are.
+It must be understood that the linear programming
+problem size is quadratic with the number of tasks and thus the time to solve it
+will be very long, it could be minutes for just a few dozen tasks. You should
+probably use <c>lp_solve -timeout 1 test.pl -wmps test.mps</c> to convert the
+problem to MPS format and then use a better solver, <c>glpsol</c> might be
+better than <c>lp_solve</c> for instance (the <c>--pcost</c> option may be
+useful), but sometimes doesn't manage to converge. <c>cbc</c> might look
+slower, but it is parallel. For <c>lp_solve</c>, be sure to try at least all the
+<c>-B</c> options. For instance, we often just use <c>lp_solve -cc -B1 -Bb
+-Bg -Bp -Bf -Br -BG -Bd -Bs -BB -Bo -Bc -Bi</c> , and the <c>-gr</c> option can
+also be quite useful. The resulting schedule can be observed by using
+the tool <c>starpu_lp2paje</c>, which converts it into the Paje
+format.
+
+Data transfer time can only be taken into account when <c>deps</c> is set. Only
+data transfers inferred from implicit data dependencies between tasks are taken
+into account. Other data transfers are assumed to be completely overlapped.
+
+Setting <c>deps</c> to 0 will only take into account the actual computations
+on processing units. However, it still properly takes into account the varying
+performances of kernels and processing units, which is quite more accurate than
+just comparing StarPU performances with the fastest of the kernels being used.
+
+The <c>prio</c> parameter tells StarPU whether to simulate taking into account
+the priorities as the StarPU scheduler would, i.e. schedule prioritized
+tasks before less prioritized tasks, to check to which extend this results
+to a less optimal solution. This increases even more computation time.
+
+\section starvz Trace visualization with StarVZ
+
+Creating views with StarVZ (see: https://github.com/schnorr/starvz) is
+made up of two steps. The initial stage consists of a pre-processing
+of the traces generated by the application, while the second one
+consists of the analysis itself and is carried out with R packages'
+aid. StarVZ is available at CRAN
+(https://cran.r-project.org/package=starvz) and depends on \c pj_dump
+(from \c pajeng) and \c rec2csv (from \c recutils).
+
+To download and install StarVZ, it is necessary to have \c R,
+\c pajeng, and \c recutils:
+
+\verbatim
+# For pj_dump and rec2csv
+apt install -y pajeng recutils
+
+# For R
+apt install -y r-base libxml2-dev libssl-dev libcurl4-openssl-dev libgit2-dev libboost-dev
+\endverbatim
+
+To install the StarVZ, the following command can be used:
+
+\verbatim
+echo "install.packages('starvz', repos = 'https://cloud.r-project.org')" | R --vanilla
+\endverbatim
+
+To generate traces from an application, it is necessary to set \ref STARPU_GENERATE_TRACE
+and build StarPU with FxT. Then, StarVZ can be used on a folder with
+StarPU FxT traces to produce a default view:
+
+\verbatim
+export PATH=$(Rscript -e 'cat(system.file("tools/", package = "starvz"), sep="\n")'):$PATH
+
+starvz /foo/path-to-fxt-files
+\endverbatim
+
+An example of default view:
+
+\image html starvz_visu.png
+\image latex starvz_visu.png "" width=\textwidth
+
+One can also use existing trace files (\c paje.trace, \c tasks.rec,
+\c data.rec, \c papi.rec and \c dag.dot) skipping the StarVZ internal call to
+starpu_fxt_tool with:
+\verbatim
+starvz --use-paje-trace /foo/path-to-trace-files
+\endverbatim
+
+Alternatively, each StarVZ step can be executed separately. Step 1 can
+be used on a folder with:
+\verbatim
+starvz -1 /foo/path-to-fxt-files
+\endverbatim
+
+Then the second step can be
+executed directly in R. StarVZ enables a set of different plots that
+can be configured on a .yaml file. A default file is provided
+(<c>default.yaml</c>); also, the options can be changed directly in
+R.
+
+\verbatim
+library(starvz)
+library(dplyr)
+
+dtrace <- starvz_read("./", selective = FALSE)
+
+# show idleness ratio
+dtrace$config$st$idleness = TRUE
+
+# show ABE bound
+dtrace$config$st$abe$active = TRUE
+
+# find the last task with dplyr
+dtrace$config$st$tasks$list = dtrace$Application %>% filter(End == max(End)) %>% .$JobId
+# show last task dependencies
+dtrace$config$st$tasks$active = TRUE
+dtrace$config$st$tasks$levels = 50
+
+plot <- starvz_plot(dtrace)
+\endverbatim
+
+An example of visualization follows:
+
+\image html starvz_visu_r.png
+\image latex starvz_visu_r.png "" width=\textwidth
+
+\section EclipsePlugin StarPU Eclipse Plugin
+
+The StarPU Eclipse Plugin provides the ability to generate the
+different traces directly from the Eclipse IDE.
+
+\subsection EclipseInstallation Eclipse Installation
+
+Download the Eclipse installer from
+https://www.eclipse.org/downloads/packages/installer. When you run the
+installer, click on <em>Eclipse IDE for Java Developers</em> to start
+the installation process.
+
+\image html eclipse_installer.png
+\image latex eclipse_installer.png "" width=10cm
+
+To be able to develop C/C++ applications, you need to install the CDT
+plugin. To do so, go to the <em>Help</em> dropdown menu at the top of the
+Eclipse window, choose <em>Install New Software ...</em>. In the new
+window, enter the URL
+http://download.eclipse.org/tools/cdt/releases/9.10
+into the box <em>Work with</em> and press the return key.
+
+\image html eclipse_install_cdt.png
+\image latex eclipse_install_cdt.png "" width=10cm
+
+You need then to select <em>CDT Main Features</em>, then click the
+button <em>Next</em> twice, accept the terms of the license, and click
+the button <em>Finish</em>. Eclipse will ask you to restart.
+
+To be able to compile the plugin, you need to install the plugin
+development environment (PDE). To do so, go to the menu
+<em>Help</em>, choose <em>Eclipse Marketplace...</em>. In the new
+window, enter <em>PDE</em> into the box <em>Find</em> and press the
+return key.
+
+\image html eclipse_install_pde.png
+\image latex eclipse_install_pde.png "" width=10cm
+
+You can then click on the button <em>Install</em> of the <em>Eclipse
+PDE latest</em>. You may need to confirm the installation, then accept
+the terms of the license, and finally restart the Eclipse IDE.
+
+The installation is now done.
+
+\subsection PluginInstallation StarPU Eclipse Plugin Compilation and Installation
+
+StarPU can now be compiled and installed with its Eclipse plugin. To
+do so, you first need to configure StarPU with the option \ref
+enable-eclipse-plugin "--enable-eclipse-plugin". The Eclipse IDE
+executable \c eclipse must be in your \c PATH.
+
+\verbatim
+export PATH=$HOME/usr/local/eclipse/java-2021-03/eclipse:$PATH
+mkdir build
+cd build
+../configure --prefix=$HOME/usr/local/starpu --enable-eclipse-plugin
+make
+make install
+\endverbatim
+
+The StarPU Eclipse plugin is installed in the directory \c dropins.
+
+\verbatim
+$ ls $HOME/usr/local/eclipse/java-2021-03/eclipse/dropins
+StarPU_1.0.0.202105272056.jar
+\endverbatim
+
+In the next section, we will show you how to use the plugin.
+
+\subsection PluginInstruction StarPU Eclipse Plugin Instruction
+
+Once StarPU has been configured and installed with its Eclipse plugin, you first
+need to set up your environment for StarPU.
+
+\verbatim
+cd $HOME/usr/local/starpu
+source ./bin/starpu_env
+\endverbatim
+
+To generate traces from the application, it is necessary to set \ref
+STARPU_FXT_TRACE to 1.
+
+\verbatim
+export STARPU_FXT_TRACE=1
+\endverbatim
+
+The eclipse workspace together with an example is available in \c
+lib/starpu/eclipse-plugin.
+
+\verbatim
+cd ./lib/starpu/eclipse-plugin
+eclipse -data workspace
+\endverbatim
+
+You can then open the file \c hello/hello.c, and build the application
+by pressing \c Ctrl-B.
+
+\image html eclipse_hello_build.png
+\image latex eclipse_hello_build.png "" width=\textwidth
+
+The application can now be executed.
+
+\image html eclipse_hello_run.png
+\image latex eclipse_hello_run.png "" width=\textwidth
+
+After executing the C/C++ StarPU application, one can use the StarPU
+plugin to generate and visualise the task graph of the application.
+The StarPU plugin eclipse is either available through the icons in the
+upper toolbar, or from the dropdown menu \c StarPU.
+
+\image html eclipse_hello_plugin.png
+\image latex eclipse_hello_plugin.png "" width=\textwidth
+
+To start, one first need to run the StarPU FxT tool, either through
+the \c FxT icon of the toolbar, or from the menu \c StarPU / <c>StarPU
+FxT Tool</c>. This will call the tool \c starpu_fxt_tool to generate
+traces for your application execution.
+
+A message dialog box is displayed to confirm the generation of the
+different traces.
+
+\image html eclipse_hello_fxt.png
+\image latex eclipse_hello_fxt.png "" width=\textwidth
+
+One of the generated files is a Paje trace which can be viewed with
+ViTE, a trace explorer. To open and visualise the file \c paje.trace with
+ViTE, one can select the second command of the StarPU menu, which is
+named <c>Generate Paje Trace</c>, or click on the second icon named
+<c>Trace</c> in the toolbar.
+
+\image html eclipse_hello_paje_trace.png
+\image latex eclipse_hello_paje_trace.png "" width=\textwidth
+
+\image html eclipse_hello_vite.png
+\image latex eclipse_hello_vite.png "" width=\textwidth
+
+Another generated trace file is a task graph described using the DOT
+language. It is possible to get a graphical output of the graph by
+calling the <c>graphviz library</c>. To do this, one can click on the
+third command of StarPU menu. A task graph of the application in
+the \c png format is then generated.
+
+\image html eclipse_hello_graph.png
+\image latex eclipse_hello_graph.png "" width=\textwidth
+
+In StarPU eclipse plugin, one can display the graph task directly from
+eclipse, or through a web browser. To do this, there is another
+command named <c> Generate SVG graph</c> in the StarPU menu or HGraph
+in the toolbar of eclipse.
+
+From the HTML file, you can see the graph task, and by clicking on a
+task name, it will open the C file in which the task submission was
+called (if you have an editor which understands the syntax \c
+href="file.c#123").
+
+\image html eclipse_hello_svg_graph.png
+\image latex eclipse_hello_svg_graph.png "" width=\textwidth
+
+\image html eclipse_hello_hgraph.png
+\image latex eclipse_hello_hgraph.png "" width=\textwidth
+
+\section MemoryFeedback Memory Feedback
+
+It is possible to enable memory statistics. To do so, you need to pass
+the option \ref enable-memory-stats "--enable-memory-stats" when running <c>configure</c>. It is then
+possible to call the function starpu_data_display_memory_stats() to
+display statistics about the current data handles registered within StarPU.
+
+Moreover, statistics will be displayed at the end of the execution on
+data handles which have not been cleared out. This can be disabled by
+setting the environment variable \ref STARPU_MEMORY_STATS to <c>0</c>.
+
+For example, by adding a call to the function
+starpu_data_display_memory_stats() in the fblock example before
+unpartitioning the data, one will get something
+similar to:
+
+\verbatim
+$ STARPU_MEMORY_STATS=1 ./examples/filters/fblock
+...
+#---------------------
+Memory stats :
+#-------
+Data on Node #2
+#-----
+Data : 0x5562074e8670
+Size : 144
+
+#--
+Data access stats
+/!\ Work Underway
+Node #0
+	Direct access : 0
+	Loaded (Owner) : 0
+	Loaded (Shared) : 0
+	Invalidated (was Owner) : 1
+
+Node #2
+	Direct access : 0
+	Loaded (Owner) : 1
+	Loaded (Shared) : 0
+	Invalidated (was Owner) : 0
+
+#-------
+Data on Node #3
+#-----
+Data : 0x5562074e9338
+Size : 96
+
+#--
+Data access stats
+/!\ Work Underway
+Node #0
+	Direct access : 0
+	Loaded (Owner) : 0
+	Loaded (Shared) : 0
+	Invalidated (was Owner) : 1
+
+Node #3
+	Direct access : 0
+	Loaded (Owner) : 1
+	Loaded (Shared) : 0
+	Invalidated (was Owner) : 0
+
+#---------------------
+...
+\endverbatim
+
+\section DataStatistics Data Statistics
+
+Different data statistics can be displayed at the end of the execution
+of the application. To enable them, you need to define the environment
+variable \ref STARPU_ENABLE_STATS. When calling
+starpu_shutdown() various statistics will be displayed,
+execution, MSI cache statistics, allocation cache statistics, and data
+transfer statistics. The display can be disabled by setting the
+environment variable \ref STARPU_STATS to <c>0</c>. If the environment variable
+\ref STARPU_BUS_STATS is defined, you can call starpu_profiling_bus_helper_display_summary()
+to display statistics about the bus. If the environment variable
+\ref STARPU_WORKER_STATS is defined, you can call starpu_profiling_worker_helper_display_summary()
+to display statistics about the workers. You can also call starpu_display_stats() which call both starpu_profiling_bus_helper_display_summary() and starpu_profiling_worker_helper_display_summary() at the same time.
+
+\verbatim
+$ ./examples/cholesky/cholesky_tag
+Computation took (in ms)
+518.16
+Synthetic GFlops : 44.21
+#---------------------
+MSI cache stats :
+TOTAL MSI stats	hit 1622 (66.23 %)	miss 827 (33.77 %)
+...
+\endverbatim
+
+\verbatim
+$ STARPU_STATS=0 ./examples/cholesky/cholesky_tag
+Computation took (in ms)
+518.16
+Synthetic GFlop/s : 44.21
+\endverbatim
+
+// TODO: data transfer stats are similar to the ones displayed when
+// setting STARPU_BUS_STATS
+
+\section TraceMpi Tracing MPI applications
+
+When an MPI execution is traced, especially if the execution is on several
+nodes, clock synchronization issues can appear. One may notice them mainly on
+communications (they are received before they are sent, for instance).
+
+Each processor can call the function starpu_profiling_set_id() to set
+the ID used for the profiling trace filename. This function can be useful
+when executing an MPI program on several nodes, as it enables each processor
+to set a unique ID that helps to differentiate its trace file from the files
+generated by other processors. By doing this, it becomes easier to analyze and compare
+the profiling results of each processor separately, which is particularly helpful for large-scale parallel applications.
+
+By default, StarPU does two MPI barriers with all MPI processes: one at the
+beginning of the application execution and one at the end. Then, \c
+starpu_fxt_tool considers all processes leave the barriers at the exact same
+time, which makes two points for time synchronization between MPI processes.
+
+However, a simple MPI barrier can be not precise enough, because the assumption
+_all processes leave the barriers at the exact same time_ is in reality false.
+To have a more precise barrier, one may use the [mpi_sync_clocks
+library](https://gitlab.inria.fr/pm2/pm2/-/tree/master/mpi_sync_clocks)
+(automatically provided when StarPU is built with NewMadeleine, but it can also
+be used with other MPI libraries). It provides a *synchronized* barrier, which
+aims at actually releasing all processes at the exact same time.
+Unfortunately, the gained precision costs some time (several seconds per
+barrier), that is why one can disable this precise synchronization with the
+environment variable \ref STARPU_MPI_TRACE_SYNC_CLOCKS set to \c 0, and use the
+faster MPI barrier instead.
+
+\section VerboseTraces Verbose Traces
+
+Traces can also be inspected by hand by using the tool <c>fxt_print</c>, for instance:
+
+\verbatim
+$ fxt_print -o -f /tmp/prof_file_something
+\endverbatim
+
+Timings are in nanoseconds (while timings as seen in ViTE are in milliseconds).
+
+\section APEX Tracing and profiling with APEX
+
+This section shows how to trace and profile StarPU applications using
+APEX. Automatic Performance Environment for Exascale
+([APEX](https://github.com/UO-OACISS/apex)) is a performance
+measurement tool. It supports multiple performance profiling
+interfaces, including
+[TaskStubs](https://github.com/UO-OACISS/taskstubs).
+
+[TaskStubs](https://github.com/UO-OACISS/taskstubs) is a performance
+profiling interface designed for task-based models. It is supported in
+StarPU: when TaskStubs is enabled, StarPU calls TaskStubs routines.
+Any profiling tool supporting TaskStubs can be interfaced with StarPU.
+
+\subsection UsingAPEX Using APEX
+
+Compile APEX with \c CMake and install it somewhere:
+
+\verbatim
+git clone https://github.com/UO-OACISS/apex.git
+mkdir apex/build
+cd apex/build
+cmake .. -DMAKE_INSTALL_PREFIX=$PWD/../install
+\endverbatim
+
+It will fail if you do not have \c OTF2 on your computer. You will
+need to call
+
+\verbatim
+cmake .. -DAPEX_BUILD_OTF2=ON -DAPEX_BUILD_BFD=ON -DCMAKE_INSTALL_PREFIX=$PWD/../install
+\endverbatim
+
+Compile and set your environment variables accordingly.
+
+\verbatim
+make
+make install
+export PATH=$PWD/../install/bin:$PATH
+export LD_LIBRARY_PATH=$PWD/../install/lib:$LD_LIBRARY_PATH
+\endverbatim
+
+Compile TaskStubs with \c CMake and install it somewhere:
+
+\verbatim
+git clone https://github.com/UO-OACISS/taskstubs.git
+mkdir taskstubs/build
+cd taskstubs/build
+cmake .. -DCMAKE_INSTALL_PREFIX=$PWD/../install
+\endverbatim
+
+Compile and set your environment variables accordingly.
+
+\verbatim
+make
+make install
+export PATH=$PWD/../install/bin:$PATH
+export LD_LIBRARY_PATH=$PWD/../install/lib:$LD_LIBRARY_PATH
+export PKG_CONFIG_PATH=$PWD/../install/share/pkgconfig:$PKG_CONFIG_PATH
+\endverbatim
+
+You then need to configure StarPU with the option \ref
+enable-taskstubs "--enable-taskstubs". If TaskStubs is available and
+detected with \c pkg-config, it will be automatically found.
+Otherwise, you can use the configure options \c --with-taskstubs-dir
+...
+
+If all works well, you should see the following line at the end of the
+\c configure script call
+
+\verbatim
+TaskStubs enabled: yes
+\endverbatim
+
+\subsection Running Running
+
+APEX can produce Perfetto, (Google) Trace Event or OTF2 traces. To get a Trace Event output:
+
+\verbatim
+apex_exec --apex:gtrace  ./examples/cholesky/.libs/cholesky_implicit
+\endverbatim
+
+This will generate a `trace_events.0.json.gz` file with one line for each system thread. To get a line for each task instead:
+
+\verbatim
+apex_exec --apex:gtrace-tasks  ./examples/cholesky/.libs/cholesky_implicit
+\endverbatim
+
+APEX can also output a graph in dot format: with `--apex:taskgraph`. For more information on other output formats, use `apex_exec --help`.
+
+\image html taskgraph.0.png width=60%
+\image latex taskgraph.0.png "" width=\textwidth
+
+\subsection Tracevisualization Trace visualization
+
+Traces generated by APEX can be visualized by any trace visualization tool. For instance, the Perfetto web-based tool can use Trace Event tools, either with system tasks or with threads on each line. Perfetto provides information for each task, including the events that happened before it, and arrows for task parent-child dependencies.
+
+\image html traces_threads.png width=60%
+\image latex traces_threads.png "" width=\textwidth
+
+With a line per task, we can see additional events of the task's life cycle: the little arrowheads on each line show the memoent when the task was created and when it was destroyed.
+
+\image html traces_tasks.png width=60%
+\image latex traces_tasks.png "" width=\textwidth
+
+*/

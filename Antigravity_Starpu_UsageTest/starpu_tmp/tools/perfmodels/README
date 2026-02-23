@@ -1,0 +1,54 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2014-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+This directory contains performance models for given architectures and
+examples.
+
+The architecture 'mirage' is composed of:
+- 2 Intel Xeon X5650 @2.67GHz, thus 12 CPU cores
+  - MKL 11.1.3
+- 3 NVidia GF100 Tesla M2070, thus 3 GPUs
+  - CUDA 6.0
+  - Magma 1.6.0
+
+The architecture 'attila' is composed of:
+- 2 Intel Xeon X5650 @2.67GHz, thus 12 CPU cores
+  - OpenBlas 0.2.12-1
+- 3 NVidia GF100 Tesla C2050, thus 3 GPUs
+  - CUDA 6.0
+
+The architecture 'idgraf' is composed of:
+- 2 Intel Xeon X5650 @2.67GHz, thus 12 CPU cores
+  - MKL 11.1.0
+- 8 NVIDIA GF100 Tesla C2050, thus 8 GPUs
+  - CUDA 6.0
+
+The architecture 'sirocco' is composed of:
+- 2 Intel Xeon E5-2680 @2.50GHz, thus 24 CPU cores
+  - MKL 11.2
+- 4 NVIDIA GK110BGL Tesla K40m, thus 4 GPUs
+  - CUDA 6.5
+
+To use performance models stored in this directory, one needs to set
+the environment variable 'STARPU_PERF_MODEL_DIR' to the location of
+the directory, e.g.:
+
+export STARPU_PERF_MODEL_DIR=.../tools/perfmodels/sampling
+
+and then select the desired architecture:
+
+export STARPU_HOSTNAME=mirage
+

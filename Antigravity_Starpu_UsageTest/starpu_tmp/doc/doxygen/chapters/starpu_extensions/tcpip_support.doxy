@@ -1,0 +1,53 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page TCPIPSupport TCP/IP Support
+
+\section TCPIPServerclient TCP/IP Server Client Support
+
+StarPU provides a transparent way to execute applications across many
+nodes. The Server Client support permits to use remote cores without
+dealing with data distribution. This support can be activated with
+the \c configure option \ref enable-tcpip-server-client
+"--enable-tcpip-server-client".
+
+The existing kernels for CPU devices can be used as such. They only have to be
+exposed through the name of the function in the \ref starpu_codelet::cpu_funcs_name field.
+Functions have to be globally-visible (i.e. not static) for StarPU to
+be able to look them up, and <c>-rdynamic</c> must be passed to gcc (or
+<c>-export-dynamic</c> to ld) so that symbols of the main program are visible.
+
+By default, one core is dedicated on the server node to manage the
+entire set of clients.
+
+Choosing the number of cores on each client device is done by setting
+the environment variable \ref STARPU_TCPIP_SC_NTHREADS "STARPU_TCPIP_SC_NTHREADS=\<number\>"
+with <c>\<number\></c> being the requested number of cores. By default,
+all the client's cores are used.
+
+The server should be given the number of clients that are expected to be run with
+the \ref STARPU_TCPIP_SC_CLIENTS environment variable.
+
+The clients should then be started with the same \ref
+STARPU_TCPIP_SC_CLIENTS environment variable. They should additionally
+be given the IP address of the server with the \ref STARPU_TCPIP_SC_SERVER environment
+variable.
+
+For simple local checks, one can use the <c>starpu_tcpipexec</c> tool, which just
+starts the application several times. Setting the number of client nodes is done
+by changing the <c>-np</c> parameter.
+
+*/

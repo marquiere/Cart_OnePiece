@@ -1,0 +1,90 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page Files Files
+
+\file starpu_config.h
+
+\file starpu.h
+\file starpu_bitmap.h
+\file starpu_bound.h
+\file starpu_cublas.h
+\file starpu_cublas_v2.h
+\file starpu_cuda.h
+\file starpu_cublasLt.h
+\file starpu_cusolver.h
+\file starpu_cusparse.h
+\file starpu_data_filters.h
+\file starpu_data.h
+\file starpu_data_interfaces.h
+\file starpu_deprecated_api.h
+\file starpu_disk.h
+\file starpu_driver.h
+\file starpu_expert.h
+\file starpu_fxt.h
+\file starpu_hash.h
+\file starpu_helper.h
+\file starpu_hip.h
+\file starpu_hipblas.h
+\file starpu_hipsolver.h
+\file starpu_max_fpga.h
+\file starpu_mod.f90
+\file starpu_opencl.h
+\file starpu_openmp.h
+\file starpu_parallel_worker.h
+\file starpu_perfmodel.h
+\file starpu_perf_monitoring.h
+\file starpu_perf_steering.h
+\file starpu_profiling.h
+\file starpu_profiling_tool.h
+\file starpu_rand.h
+\file starpu_sched_component.h
+\file starpu_sched_ctx.h
+\file starpu_sched_ctx_hypervisor.h
+\file starpu_scheduler.h
+\file starpu_simgrid_wrap.h
+\file starpu_sink.h
+\file starpu_stdlib.h
+\file starpu_task_bundle.h
+\file starpu_task_dep.h
+\file starpu_task.h
+\file starpu_task_list.h
+\file starpu_task_util.h
+\file starpu_thread.h
+\file starpu_thread_util.h
+\file starpu_tree.h
+\file starpu_util.h
+\file starpu_worker.h
+\file fstarpu_mod.f90
+
+\file starpu_heteroprio.h
+\file starpu_scheduler_toolbox.h
+
+\file starpu_mpi_ft.h
+\file starpu_mpi.h
+\file starpu_mpi_lb.h
+
+\file sc_hypervisor_config.h
+\file sc_hypervisor.h
+\file sc_hypervisor_lp.h
+\file sc_hypervisor_monitoring.h
+\file sc_hypervisor_policy.h
+
+\file starpufft.h
+
+\file starpurm.h
+
+*/

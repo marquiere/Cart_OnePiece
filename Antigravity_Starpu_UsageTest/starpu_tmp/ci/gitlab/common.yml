@@ -1,0 +1,47 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2009-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+
+default:
+  interruptible: true
+  timeout: 1h
+variables:
+  RUNNER_SCRIPT_TIMEOUT: 58m
+  RUNNER_AFTER_SCRIPT_TIMEOUT: 2m
+
+#workflow:
+#  auto_cancel:
+#    on_new_commit: interruptible
+#    on_job_failure: all
+
+.extended_check_master_manual_branch:
+  interruptible: false
+  rules:
+    - if: ($CI_PIPELINE_SCHEDULE_DESCRIPTION != null && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $STARPU_MASTER_EXTENDED_CHECK == "yes")
+      when: always
+    - if: ($CI_PIPELINE_SCHEDULE_DESCRIPTION == null && $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH && ($CI_PIPELINE_SOURCE == 'merge_request_event' || ($CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null)))
+      when: manual
+
+.benchmarks_master:
+  stage: daily
+  rules:
+    - if: ($CI_PIPELINE_SCHEDULE_DESCRIPTION != null && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $STARPU_RUN_BENCHMARKS == "yes")
+      when: always
+
+.master_branch:
+  rules:
+    - if: ($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_COMMIT_MESSAGE =~ /^Merge branch/)
+      when: never
+    - if: ($CI_PIPELINE_SCHEDULE_DESCRIPTION == null && (($CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH || $CI_PIPELINE_SOURCE == 'merge_request_event') || ($CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS == null)))
+      when: on_success

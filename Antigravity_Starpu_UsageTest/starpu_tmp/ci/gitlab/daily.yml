@@ -1,0 +1,76 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2021-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+
+coverity:
+  extends: .benchmarks_master
+  tags:
+    - starpu
+    - linux
+    - coverity
+  script:
+    - ./ci/scripts/coverity.sh
+
+.benchmarks_artifacts:
+  before_script:
+    - if test -e artifacts ; then mv artifacts artifacts2 ; fi
+  artifacts:
+    when: always
+    paths:
+      - artifacts
+
+benchmarks:
+  extends: [.benchmarks_master, .benchmarks_artifacts]
+  tags: ['starpu', 'node_nogpu']
+  script:
+    - ./ci/scripts/run_profile.sh benchmarks
+  after_script:
+    - ./ci/scripts/clean_profile.sh benchmarks
+
+benchmarks_update:
+  extends: .benchmarks_master
+  dependencies:
+    - benchmarks
+  needs:
+    - benchmarks
+  tags: ['starpu', 'node_nogpu']
+  script:
+    - ./ci/scripts/bench.sh ./artifacts
+
+coverage:
+  extends: [.benchmarks_master, .benchmarks_artifacts]
+  timeout: 2h
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 118m
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 2m
+  tags: ['starpu', 'node_gpu']
+  script:
+    - ./ci/scripts/run_profile.sh coverage
+  after_script:
+    - ./ci/scripts/clean_profile.sh coverage
+
+coverage_update:
+  extends: .benchmarks_master
+  timeout: 2h
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 118m
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 2m
+  dependencies:
+    - coverage
+  needs:
+    - coverage
+  tags: ['starpu', 'node_gpu']
+  script:
+    - ./ci/scripts/upload.sh ./artifacts
+

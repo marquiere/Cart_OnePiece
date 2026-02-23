@@ -1,0 +1,1 @@
+/usr/bin/clang -fPIC -L/opt/hwloc-2.13.0rc1/lib -L/usr/local/lib -lstarpu-1.4 -lpthread -lpapi -lhwloc -shared -Wl,-soname,libstarpu_sched_rr_workers.so -o libstarpu_sched_rr_workers.so CMakeFiles/starpu_sched_rr_workers.dir/rr_workers_sched.c.o 

@@ -1,0 +1,4 @@
+pi/SobolQRNG/sobol_primitives.o: pi/SobolQRNG/sobol_primitives.c \
+  pi/SobolQRNG/sobol_primitives.h
+
+pi/SobolQRNG/sobol_primitives.h:

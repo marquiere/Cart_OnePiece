@@ -1,0 +1,533 @@
+/**
+ * CARLA C++ Client Example: Spawn a Mercedes Coupe
+ *
+ * Requirements:
+ * - Connect to 127.0.0.1:2000
+ * - Prefer "vehicle.mercedes.coupe"
+ * - Retry spawn on failure
+ * - Autopilot OFF
+ * - Print details
+ * - RAII Cleanup
+ */
+
+#include <iostream>
+#include <random>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+#include <fstream>
+#include <vector>
+#include <map>
+#include <mutex>
+#include <set>
+#include <queue>
+#include <thread>
+#include <condition_variable>
+#include <functional>
+#include <atomic>
+
+// CARLA headers
+#include <carla/client/Client.h>
+#include <carla/client/Actor.h>
+#include <carla/actors/BlueprintLibrary.h>
+#include <carla/actors/ActorBlueprint.h>
+#include <carla/client/Map.h>
+#include <carla/client/World.h>
+#include <carla/geom/Transform.h>
+#include <carla/client/Sensor.h>
+#include <carla/sensor/data/Image.h>
+#include <carla/sensor/data/DVSEventArray.h>
+#include <carla/image/CityScapesPalette.h>
+#include <carla/rpc/ActorId.h>
+#include <cmath>
+
+namespace cc = carla::client;
+namespace cg = carla::geom;
+namespace csd = carla::sensor::data;
+namespace cr = carla::rpc;
+
+using namespace std::chrono_literals;
+
+// Helper to clean up actor on exit
+class ActorDestroyer {
+public:
+    explicit ActorDestroyer(boost::shared_ptr<cc::Actor> actor) : actor_(std::move(actor)) {}
+    
+    ~ActorDestroyer() {
+        if (actor_) {
+            try {
+                actor_->Destroy();
+                std::cout << "Actor " << actor_->GetDisplayId() << " (ID: " << actor_->GetId() << ") destroyed." << std::endl;
+            } catch (const std::exception& e) {
+                std::cerr << "Error destroying actor: " << e.what() << std::endl;
+            }
+        }
+    }
+
+    // Prevent copying to avoid double destruction issues (though SharedPtr handles it, explicit ownership logic is safer for RAII wrapper)
+    ActorDestroyer(const ActorDestroyer&) = delete;
+    ActorDestroyer& operator=(const ActorDestroyer&) = delete;
+
+private:
+    boost::shared_ptr<cc::Actor> actor_;
+};
+
+// Thread-safe Bounded Queue
+template <typename T>
+class BoundedQueue {
+    std::queue<T> queue_;
+    std::mutex mutex_;
+    std::condition_variable not_empty_;
+    size_t capacity_;
+    std::atomic<bool> stopped_{false};
+public:
+    BoundedQueue(size_t capacity) : capacity_(capacity) {}
+    
+    bool try_push(T item) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (queue_.size() >= capacity_) return false;
+        queue_.push(std::move(item));
+        not_empty_.notify_one();
+        return true;
+    }
+    
+    bool pop(T& item) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        not_empty_.wait(lock, [this]{ return !queue_.empty() || stopped_; });
+        if (queue_.empty()) return false;
+        item = std::move(queue_.front());
+        queue_.pop();
+        return true;
+    }
+    
+    void stop() {
+        stopped_ = true;
+        not_empty_.notify_all();
+    }
+    
+    size_t size() {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return queue_.size();
+    }
+};
+
+int main(int argc, char* argv[]) {
+    try {
+        std::string host = "127.0.0.1";
+        uint16_t port = 2000;
+
+        if (argc > 1) host = argv[1];
+        if (argc > 2) port = static_cast<uint16_t>(std::stoi(argv[2]));
+
+        std::cout << "Connecting to " << host << ":" << port << "..." << std::endl;
+
+        cc::Client client(host, port);
+        client.SetTimeout(20s); // Increased to 20 seconds to handle load
+
+        std::cout << "Connected!" << std::endl;
+        std::cout << "Client API version: " << client.GetClientVersion() << std::endl;
+        std::cout << "Server API version: " << client.GetServerVersion() << std::endl;
+
+        auto world = client.GetWorld();
+        auto library = world.GetBlueprintLibrary();
+
+        // 1. Select Blueprint
+        // Prefer "vehicle.mercedes.coupe"
+        auto blueprint = library->Find("vehicle.mercedes.coupe");
+        
+        if (!blueprint) {
+            std::cout << "Warning: 'vehicle.mercedes.coupe' not found. Selecting a random vehicle..." << std::endl;
+            auto vehicles = library->Filter("vehicle");
+            if (vehicles->empty()) {
+                throw std::runtime_error("No vehicle blueprints found!");
+            }
+            // Simple random selection
+             std::mt19937_64 rng((std::random_device())());
+             std::uniform_int_distribution<size_t> dist{0u, vehicles->size() - 1u};
+             blueprint = &vehicles->at(dist(rng));
+        }
+
+        // Create a mutable copy of the blueprint to allow modification
+        carla::actors::ActorBlueprint mutable_blueprint = *blueprint;
+
+        // Set color to Yellow (255,255,0)
+        if (mutable_blueprint.ContainsAttribute("color")) {
+            mutable_blueprint.SetAttribute("color", "255,255,0");
+        } else {
+            std::cout << "Warning: Blueprint does not support color attribute." << std::endl;
+        }
+
+        std::cout << "Selected Blueprint: " << mutable_blueprint.GetId() << std::endl;
+
+        // Ensure Autopilot is OFF (it is by default for new actors, but good to be explicit if using traffic manager, 
+        // though strictly initiating the actor doesn't turn it on).
+        // The requirement is "Autopilot OFF". We will verify this after spawning.
+
+        // 2. Choose a valid spawn point and retry on failure
+        auto map = world.GetMap();
+        auto spawn_points = map->GetRecommendedSpawnPoints();
+
+        if (spawn_points.empty()) {
+            throw std::runtime_error("No spawn points available!");
+        }
+
+        boost::shared_ptr<cc::Actor> actor;
+        cg::Transform spawn_transform;
+        
+        // Retry logic
+        // We will try recommended spawn points in random order until one works.
+        std::shuffle(spawn_points.begin(), spawn_points.end(), std::mt19937(std::random_device{}()));
+        
+        for (const auto& transform : spawn_points) {
+            actor = world.TrySpawnActor(mutable_blueprint, transform);
+            if (actor) {
+                spawn_transform = transform;
+                break;
+            }
+        }
+
+        if (!actor) {
+            throw std::runtime_error("Failed to spawn actor at any of the recommended spawn points.");
+        }
+
+        // RAII Cleanup
+        ActorDestroyer destroyer(actor);
+
+        // 3. Print details
+        std::cout << "Successfully Spawned Actor!" << std::endl;
+        std::cout << "  - Actor ID: " << actor->GetId() << std::endl;
+        std::cout << "  - Blueprint ID: " << actor->GetTypeId() << std::endl;
+        std::cout << "  - Location: X=" << spawn_transform.location.x 
+                  << ", Y=" << spawn_transform.location.y 
+                  << ", Z=" << spawn_transform.location.z << std::endl;
+        std::cout << "  - Rotation: Pitch=" << spawn_transform.rotation.pitch 
+                  << ", Yaw=" << spawn_transform.rotation.yaw 
+                  << ", Roll=" << spawn_transform.rotation.roll << std::endl;
+
+        // Confirm Autopilot is ON
+        auto vehicle = boost::static_pointer_cast<cc::Vehicle>(actor);
+        if (vehicle) {
+             [[maybe_unused]] auto tm = client.GetInstanceTM(8000);
+             vehicle->SetAutopilot(true, 8000);
+             vehicle->SetAutopilot(true, 8000);
+             std::cout << "  - Autopilot: ON (Port 8000)" << std::endl;
+        }
+
+        // Dataset output directories
+        const std::string base_dir = "output/dataset/yellow/";
+        const std::vector<std::string> sensors = {"rgb", "depth", "semantic", "instance", "optflow", "dvs"};
+        for (const auto& s : sensors) system(("mkdir -p " + base_dir + s).c_str());
+
+        // --- Asynchronous Writing Setup ---
+        
+
+
+        // Queue for file writing tasks
+        BoundedQueue<std::function<void()>> write_queue(200); // Max 200 frames buffered
+        std::atomic<uint64_t> dropped_frames{0};
+        
+        // Manifest state (managed by writer thread)
+        struct FrameEntry {
+            std::map<std::string, std::string> paths;
+        };
+        std::map<uint64_t, FrameEntry> manifest_buffer;
+        std::ofstream manifest_file(base_dir + "manifest.csv", std::ios::app);
+        
+        // Writer Thread
+        std::thread writer_thread([&]() {
+            std::function<void()> task;
+            while (write_queue.pop(task)) {
+                task();
+            }
+        });
+
+        // Helper to spawn and listen (Asynchronous)
+        auto spawn_sensor = [&](const std::string& type_id, const std::string& name, auto callback) {
+            auto bp_ptr = library->Find(type_id);
+            if (!bp_ptr) throw std::runtime_error("Blueprint not found: " + type_id);
+            
+            // Create mutable copy
+            carla::actors::ActorBlueprint bp = *bp_ptr;
+            
+            // Standardize image resolution and rate
+             if (bp.ContainsAttribute("image_size_x")) {
+                 bp.SetAttribute("image_size_x", "640");
+                 bp.SetAttribute("image_size_y", "480");
+             }
+             if (bp.ContainsAttribute("sensor_tick")) {
+                 bp.SetAttribute("sensor_tick", "0.1"); // Reduced to 10Hz for stability
+             }
+
+            cg::Transform tf(cg::Location(1.5f, 0.0f, 1.2f));
+            // Use outer 'actor' (the vehicle) as parent
+            auto sensor_actor = world.SpawnActor(bp, tf, actor.get());
+            auto sensor = boost::static_pointer_cast<cc::Sensor>(sensor_actor);
+            
+            sensor->Listen([&, name, callback](auto data) {
+                if (!data) return;
+                
+                // LIGHTWEIGHT capture on listener thread
+                auto frame_id = data->GetFrame();
+                auto now_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                
+                // Enqueue Writing Task (String formatting moved here)
+                auto task = [=, &manifest_buffer, &manifest_file]() {
+                    // This runs on WRITER THREAD
+                    std::stringstream ss_time;
+                    ss_time << std::put_time(std::localtime(&now_t), "%Y%m%d_%H%M%S");
+                    
+                    std::stringstream ss_id;
+                    ss_id << std::setw(6) << std::setfill('0') << frame_id;
+                    std::string base_id = ss_id.str() + "_" + ss_time.str();
+                    std::string filename = name + "_" + base_id;
+
+                    std::string full_path = callback(data, base_dir + name + "/" + filename);
+                    
+                    // Manifest Update (Thread-safe implicitly as only writer thread touches this)
+                    auto& entry = manifest_buffer[frame_id];
+                    entry.paths[name] = full_path;
+
+                    // If all sensors present (6 modalities), write and remove
+                    if (entry.paths.size() == 6) {
+                        manifest_file << base_id;
+                        for (const auto& s : sensors) manifest_file << "," << entry.paths[s];
+                        manifest_file << "\n" << std::flush;
+                        manifest_buffer.erase(frame_id);
+                    }
+                };
+                
+                if (!write_queue.try_push(task)) {
+                    dropped_frames++;
+                }
+            });
+            
+            return sensor; // Keep alive
+        };
+
+        // Keep sensors alive
+        std::vector<boost::shared_ptr<cc::Sensor>> active_sensors;
+        std::vector<boost::shared_ptr<cc::Actor>> actors_to_destroy;
+
+        bool recording = true;
+        if (argc > 3 && std::string(argv[3]) == "--no-record") {
+             recording = false;
+             std::cout << "Recording DISABLED by --no-record flag." << std::endl;
+        }
+
+        if (recording) {
+            // 1. RGB
+            active_sensors.push_back(spawn_sensor("sensor.camera.rgb", "rgb", [](auto data, auto path) {
+                auto image = boost::static_pointer_cast<csd::Image>(data);
+                path += ".ppm";
+                std::ofstream file(path, std::ios::binary);
+                file << "P6\n" << image->GetWidth() << " " << image->GetHeight() << "\n255\n";
+                // Iterate over pixels (BGRA) and write RGB
+                auto buffer = image->begin();
+                for (auto& pixel : *image) {
+                    char rgb[3] = { (char)pixel.r, (char)pixel.g, (char)pixel.b };
+                    file.write(rgb, 3);
+                }
+                return path;
+            }));
+
+            // 2. Depth
+            active_sensors.push_back(spawn_sensor("sensor.camera.depth", "depth", [](auto data, auto path) {
+                auto image = boost::static_pointer_cast<csd::Image>(data);
+                path += ".ppm";
+                std::ofstream file(path, std::ios::binary);
+                file << "P6\n" << image->GetWidth() << " " << image->GetHeight() << "\n255\n";
+                for (auto& pixel : *image) {
+                    char rgb[3] = { (char)pixel.r, (char)pixel.g, (char)pixel.b };
+                    file.write(rgb, 3);
+                }
+                return path;
+            }));
+
+            // 3. Semantic
+            active_sensors.push_back(spawn_sensor("sensor.camera.semantic_segmentation", "semantic", [](auto data, auto path) {
+                auto image = boost::static_pointer_cast<csd::Image>(data);
+                path += ".ppm";
+                std::ofstream file(path, std::ios::binary);
+                file << "P6\n" << image->GetWidth() << " " << image->GetHeight() << "\n255\n";
+                for (auto& pixel : *image) {
+                    auto color = carla::image::CityScapesPalette::GetColor(pixel.r);
+                    char rgb[3] = { (char)color[0], (char)color[1], (char)color[2] };
+                    file.write(rgb, 3);
+                }
+                return path;
+            }));
+
+            // 4. Instance
+            active_sensors.push_back(spawn_sensor("sensor.camera.instance_segmentation", "instance", [](auto data, auto path) {
+                auto image = boost::static_pointer_cast<csd::Image>(data);
+                path += ".ppm";
+                std::ofstream file(path, std::ios::binary);
+                file << "P6\n" << image->GetWidth() << " " << image->GetHeight() << "\n255\n";
+                for (auto& pixel : *image) {
+                    char rgb[3] = { (char)pixel.r, (char)pixel.g, (char)pixel.b };
+                    file.write(rgb, 3);
+                }
+                return path;
+            }));
+
+            // 5. Optical Flow
+            active_sensors.push_back(spawn_sensor("sensor.camera.optical_flow", "optflow", [](auto data, auto path) {
+                auto image = boost::static_pointer_cast<csd::OpticalFlowImage>(data);
+                path += ".ppm";
+                std::ofstream file(path, std::ios::binary);
+                file << "P6\n" << image->GetWidth() << " " << image->GetHeight() << "\n255\n";
+                
+                for (auto& pixel : *image) {
+                    float vx = pixel.x; 
+                    float vy = pixel.y; 
+                    float magnitude = std::sqrt(vx*vx + vy*vy);
+                    float angle = std::atan2(vy, vx);
+                    float hue = (angle + M_PI) * 180.0f / M_PI;
+                    float s = 1.0f;
+                    float v = std::min(1.0f, std::log(1.0f + magnitude * 10.0f)); 
+                    
+                    float c = v * s;
+                    float x = c * (1.0f - std::abs(std::fmod(hue / 60.0f, 2.0f) - 1.0f));
+                    float m = v - c;
+                    
+                    float r_prime = 0, g_prime = 0, b_prime = 0;
+                    if (0 <= hue && hue < 60) { r_prime = c; g_prime = x; b_prime = 0; }
+                    else if (60 <= hue && hue < 120) { r_prime = x; g_prime = c; b_prime = 0; }
+                    else if (120 <= hue && hue < 180) { r_prime = 0; g_prime = c; b_prime = x; }
+                    else if (180 <= hue && hue < 240) { r_prime = 0; g_prime = x; b_prime = c; }
+                    else if (240 <= hue && hue < 300) { r_prime = x; g_prime = 0; b_prime = c; }
+                    else if (300 <= hue && hue < 360) { r_prime = c; g_prime = 0; b_prime = x; }
+                    
+                    char rgb[3] = { 
+                        (char)((r_prime + m) * 255), 
+                        (char)((g_prime + m) * 255), 
+                        (char)((b_prime + m) * 255) 
+                    };
+                    file.write(rgb, 3);
+                }
+                return path;
+            }));
+
+            // 6. DVS
+            active_sensors.push_back(spawn_sensor("sensor.camera.dvs", "dvs", [](auto data, auto path) {
+                auto events = boost::static_pointer_cast<csd::DVSEventArray>(data);
+                path += ".jsonl";
+                std::ofstream file(path);
+                for (const auto& e : *events) {
+                    file << "{\"t\":" << e.t << ",\"x\":" << e.x << ",\"y\":" << e.y << ",\"pol\":" << e.pol << "}\n";
+                }
+                return path;
+            }));
+            
+            std::cout << "  - Dataset Recording: ON (6 Modalities, 10Hz) -> " << base_dir << std::endl;
+        }
+        
+        // Add sensors to cleanup list
+        for (auto& s : active_sensors) {
+            actors_to_destroy.push_back(boost::static_pointer_cast<cc::Actor>(s));
+        }
+        
+        // Custom destructor for list of actors
+        class ListDestroyer {
+            std::vector<boost::shared_ptr<cc::Actor>> list;
+        public:
+            ListDestroyer(std::vector<boost::shared_ptr<cc::Actor>> l) : list(l) {}
+            ~ListDestroyer() { for(auto& a : list) if(a) a->Destroy(); }
+        } sensor_destroyer(actors_to_destroy);
+
+        std::cout << "\nPress ENTER to destroy the actor and exit..." << std::endl;
+        
+        // Non-blocking wait loop with stats
+        std::atomic<bool> running{true};
+        std::thread input_thread([&]() {
+            std::cin.get();
+            running = false;
+        });
+
+        // Loop to update spectator and print stats
+        int tick_counter = 0;
+        auto spectator = world.GetSpectator();
+        
+        // Timeout handling for verification
+        int time_limit_sec = 0;
+        if (argc > 3) {
+            // Check for --time-limit after --no-record or as 3rd/4th arg
+            for (int i = 1; i < argc; ++i) {
+                 if (std::string(argv[i]) == "--time-limit" && i + 1 < argc) {
+                     time_limit_sec = std::stoi(argv[i+1]);
+                     std::cout << "Auto-exit set for " << time_limit_sec << " seconds." << std::endl;
+                 }
+            }
+        }
+        auto start_time = std::chrono::steady_clock::now();
+
+        while(running) {
+             std::this_thread::sleep_for(std::chrono::milliseconds(50)); // ~20 FPS loop
+             if (!running) break;
+             
+             if (time_limit_sec > 0) {
+                 auto now = std::chrono::steady_clock::now();
+                 auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start_time).count();
+                 if (elapsed >= time_limit_sec) {
+                     std::cout << "Time limit reached. Exiting..." << std::endl;
+                     // Trigger exit logic
+                     running = false;
+                     // We need to unblock cin?
+                     // std::cin.get() handles this poorly in standard C++.
+                     // But since we detach the input thread or rely on exit(0) - no cleanliness unless we control main.
+                     // The input thread sets running = false.
+                     // We set running = false here.
+                     // We break the loop. 
+                     // Then we clean up and return 0.
+                     // The input thread might be blocked on cin.get().
+                     // If we return from main, the program exits? 
+                     // std::thread destructor calls std::terminate if joinable.
+                     // We detach it on exit path. It is safe.
+                     break;
+                 }
+             }
+             
+             // Update Spectator to Front Camera View
+             if (actor) {
+                 // Camera relative: x=1.5, z=1.2
+                 auto trans = actor->GetTransform();
+                 
+                 // Calculate global position (manual rotation)
+                 double yaw = trans.rotation.yaw * M_PI / 180.0;
+                 double pitch = trans.rotation.pitch * M_PI / 180.0;
+                 
+                 // Simple offset in horizontal plane + z
+                 // Ideally use rotation matrix, but simplified:
+                 // x' = x + cos(yaw)*1.5
+                 // y' = y + sin(yaw)*1.5
+                 // z' = z + 1.2
+                 
+                 trans.location.x += std::cos(yaw) * 1.5;
+                 trans.location.y += std::sin(yaw) * 1.5;
+                 trans.location.z += 1.2;
+                 
+                 spectator->SetTransform(trans);
+             }
+
+             if (++tick_counter % 200 == 0) { // Every ~10s (200 * 50ms)
+                std::cout << "Stats - Queue: " << write_queue.size() 
+                          << "/200 | Dropped: " << dropped_frames << std::endl;
+             }
+        }
+        
+        if (input_thread.joinable()) input_thread.detach(); 
+
+        // Stop writer thread
+        write_queue.stop();
+        if (writer_thread.joinable()) writer_thread.join();
+
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
+}

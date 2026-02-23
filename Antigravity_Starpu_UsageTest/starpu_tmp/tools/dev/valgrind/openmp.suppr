@@ -1,0 +1,215 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2017-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:realloc
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:pci_device_get_device_name
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:pci_device_get_device_name
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:pci_device_get_device_name
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:strdup
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   obj:/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1
+   fun:hwloc_look_pci
+   fun:hwloc_discover
+   fun:hwloc_topology_load
+   fun:_starpu_init_topology
+   fun:_starpu_topology_get_nhwcpu
+   fun:check_bus_config_file
+   fun:_starpu_load_bus_performance_files
+   fun:starpu_initialize
+   fun:starpu_init
+   fun:omp_initial_thread_setup
+   fun:omp_initial_region_setup
+   fun:starpu_omp_init
+   fun:omp_constructor
+   fun:__libc_csu_init
+   fun:(below main)
+}
+
+{
+   ignore GOMP barrier race
+   Helgrind:Race
+   ...
+   fun:gomp_barrier_wait
+   ...
+}
+
+{
+   ignore GOMP barrier race
+   Helgrind:Race
+   ...
+   fun:gomp_barrier_wait_start
+   ...
+}
+
+{
+   ignore GOMP barrier race
+   Helgrind:Race
+   ...
+   fun:gomp_barrier_wait_end
+   ...
+}
+
+{
+   ignore GOMP barrier race
+   Helgrind:Race
+   ...
+   fun:gomp_barrier_wait_final
+   ...
+}

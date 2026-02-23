@@ -1,0 +1,231 @@
+==============================================
+Running: /home/eric/starpu/build/examples/mult/sgemm
+Scheduler: rr_workers
+CPUs configured: 3
+CUDAs configured: 1
+Output Directory: /tmp/starpu_basic_examples/20260221_182822_sgemm
+==============================================
+[starpu][eric-ZBOX-ECM73070C-53060C][starpu_initialize] Warning: FxT is enabled, which slows down a bit, limits scalability and makes worker initialization sequential
+[starpu][eric-ZBOX-ECM73070C-53060C][starpu_initialize] Warning: STARPU_ENABLE_STATS is enabled, which slows down a bit
+[RR_WORKERS] Init with 0 workers
+[RR_WORKERS] Lazy init in pop found 4 workers (CPU:3, CUDA:1)
+# x     y       z       ms      GFlop/s
+[starpu][eric-ZBOX-ECM73070C-53060C][_starpu_profile_get_user_keymask] Unknown event type '1'
+[RR_WORKERS] push_task_rr called for task 0x6405d6555e60
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d6555e60
+[RR_WORKERS] push_task_rr called for task 0x6405d6558990
+[RR_WORKERS] push_task_rr called for task 0x6405d6559ee0
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d6558990
+[RR_WORKERS] push_task_rr called for task 0x6405d655b460
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d6559ee0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d655b460
+[RR_WORKERS] push_task_rr called for task 0x6405d655c9e0
+[RR_WORKERS] push_task_rr called for task 0x6405d655df60
+[RR_WORKERS] push_task_rr called for task 0x6405d655f4e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6560a60
+[RR_WORKERS] push_task_rr called for task 0x6405d6561fe0
+[RR_WORKERS] push_task_rr called for task 0x6405d6563560
+[RR_WORKERS] push_task_rr called for task 0x6405d6564ae0
+[RR_WORKERS] push_task_rr called for task 0x6405d6566060
+[RR_WORKERS] push_task_rr called for task 0x6405d65675e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6568b60
+[RR_WORKERS] push_task_rr called for task 0x6405d656a0e0
+[RR_WORKERS] push_task_rr called for task 0x6405d656b660
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d655c9e0
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d655df60
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d655f4e0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6560a60
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6561fe0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6563560
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6564ae0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6566060
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65675e0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6568b60
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656a0e0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656b660
+[RR_WORKERS] push_task_rr called for task 0x6405d65627c0
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d65627c0
+[RR_WORKERS] push_task_rr called for task 0x6405d6565120
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d6565120
+[RR_WORKERS] push_task_rr called for task 0x6405d65669f0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65669f0
+[RR_WORKERS] push_task_rr called for task 0x6405d6567f70
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d6567f70
+[RR_WORKERS] push_task_rr called for task 0x6405d6564180
+[RR_WORKERS] push_task_rr called for task 0x6405d656ad00
+[RR_WORKERS] push_task_rr called for task 0x6405d656c280
+[RR_WORKERS] push_task_rr called for task 0x6405d6569780
+[RR_WORKERS] push_task_rr called for task 0x6405d656dac0
+[RR_WORKERS] push_task_rr called for task 0x6405d656f010
+[RR_WORKERS] push_task_rr called for task 0x6405d6570560
+[RR_WORKERS] push_task_rr called for task 0x6405d6571ab0
+[RR_WORKERS] push_task_rr called for task 0x6405d6573000
+[RR_WORKERS] push_task_rr called for task 0x6405d6574550
+[RR_WORKERS] push_task_rr called for task 0x6405d6575aa0
+[RR_WORKERS] push_task_rr called for task 0x6405d6576ff0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6564180
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656ad00
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656c280
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6569780
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656dac0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656f010
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6570560
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6571ab0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6573000
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6574550
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6575aa0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6576ff0
+[RR_WORKERS] push_task_rr called for task 0x6405d6565ee0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6565ee0
+[RR_WORKERS] push_task_rr called for task 0x6405d6562090
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d6562090
+[RR_WORKERS] push_task_rr called for task 0x6405d6564fa0
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d6564fa0
+[RR_WORKERS] push_task_rr called for task 0x6405d6569b60
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d6569b60
+[RR_WORKERS] push_task_rr called for task 0x6405d6567050
+[RR_WORKERS] push_task_rr called for task 0x6405d656a720
+[RR_WORKERS] push_task_rr called for task 0x6405d656cde0
+[RR_WORKERS] push_task_rr called for task 0x6405d656e330
+[RR_WORKERS] push_task_rr called for task 0x6405d656f880
+[RR_WORKERS] push_task_rr called for task 0x6405d6570dd0
+[RR_WORKERS] push_task_rr called for task 0x6405d6572320
+[RR_WORKERS] push_task_rr called for task 0x6405d6573870
+[RR_WORKERS] push_task_rr called for task 0x6405d6574dc0
+[RR_WORKERS] push_task_rr called for task 0x6405d6576310
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6567050
+[RR_WORKERS] push_task_rr called for task 0x6405d6577860
+[RR_WORKERS] push_task_rr called for task 0x6405d6578fc0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656a720
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656cde0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656e330
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656f880
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6570dd0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6572320
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6573870
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6574dc0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6576310
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6577860
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6578fc0
+[RR_WORKERS] push_task_rr called for task 0x6405d656be70
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d656be70
+[RR_WORKERS] push_task_rr called for task 0x6405d65627c0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65627c0
+[RR_WORKERS] push_task_rr called for task 0x6405d6562210
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d6562210
+[RR_WORKERS] push_task_rr called for task 0x6405d656b130
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d656b130
+[RR_WORKERS] push_task_rr called for task 0x6405d6566dd0
+[RR_WORKERS] push_task_rr called for task 0x6405d656a4c0
+[RR_WORKERS] push_task_rr called for task 0x6405d6568400
+[RR_WORKERS] push_task_rr called for task 0x6405d656e0d0
+[RR_WORKERS] push_task_rr called for task 0x6405d656f620
+[RR_WORKERS] push_task_rr called for task 0x6405d6570b70
+[RR_WORKERS] push_task_rr called for task 0x6405d65720c0
+[RR_WORKERS] push_task_rr called for task 0x6405d6573610
+[RR_WORKERS] push_task_rr called for task 0x6405d6574b60
+[RR_WORKERS] push_task_rr called for task 0x6405d65760e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6577660
+[RR_WORKERS] push_task_rr called for task 0x6405d6578be0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6566dd0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656a4c0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6568400
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656e0d0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656f620
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6570b70
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65720c0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6573610
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6574b60
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65760e0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6577660
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6578be0
+[RR_WORKERS] push_task_rr called for task 0x6405d656be70
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656be70
+[RR_WORKERS] push_task_rr called for task 0x6405d6565380
+[RR_WORKERS] push_task_rr called for task 0x6405d65633e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6564560
+[RR_WORKERS] pop_task_rr: worker 1 popped task 0x6405d6565380
+[RR_WORKERS] pop_task_rr: worker 2 popped task 0x6405d65633e0
+[RR_WORKERS] pop_task_rr: worker 3 popped task 0x6405d6564560
+[RR_WORKERS] push_task_rr called for task 0x6405d65689e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6567460
+[RR_WORKERS] push_task_rr called for task 0x6405d6577a40
+[RR_WORKERS] push_task_rr called for task 0x6405d6578fc0
+[RR_WORKERS] push_task_rr called for task 0x6405d65764c0
+[RR_WORKERS] push_task_rr called for task 0x6405d656d340
+[RR_WORKERS] push_task_rr called for task 0x6405d656e890
+[RR_WORKERS] push_task_rr called for task 0x6405d656fde0
+[RR_WORKERS] push_task_rr called for task 0x6405d6571330
+[RR_WORKERS] push_task_rr called for task 0x6405d6572880
+[RR_WORKERS] push_task_rr called for task 0x6405d6573dd0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65689e0
+[RR_WORKERS] push_task_rr called for task 0x6405d6575320
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6567460
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6577a40
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6578fc0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d65764c0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656d340
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656e890
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d656fde0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6571330
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6572880
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6573dd0
+[RR_WORKERS] pop_task_rr: worker 0 popped task 0x6405d6575320
+1024    1024    1024    59      36.2
+#---------------------
+MSI cache stats :
+TOTAL MSI stats hit 264 (75.21 %)       miss 87 (24.79 %)
+memory node NUMA 0
+        hit : 103 (62.42 %)
+        miss : 62 (37.58 %)
+memory node CUDA 0
+        hit : 161 (86.56 %)
+        miss : 25 (13.44 %)
+#---------------------
+#---------------------
+Allocation cache stats:
+memory node CUDA 0
+        total alloc : 40
+        cached alloc: 0 (0.00 %)
+#---------------------
+#---------------------
+Data transfer stats:
+        NUMA 0 -> CUDA 0        0.0078 GB       24.2180 MB/s    (transfers : 8 - avg 1.0000 MB)
+        CUDA 0 -> NUMA 0        0.0151 GB       46.9212 MB/s    (transfers : 62 - avg 0.2500 MB)
+Total transfers: 0.0229 GB
+#---------------------
+#---------------------
+Worker stats:
+CUDA 0.0 (NVIDIA GeForce RTX 3060 10.5 GiB 01:00.0)
+        64 task(s)
+        time split: total 330.37 ms = executing: 65.22 ms + callback: 0.36 ms + waiting: 5.46 ms + sleeping: 258.94 ms + scheduling: 0.04 ms + overhead 0.35 ms
+        all time: executing: 65.22 ms callback: 0.36 ms waiting: 6.09 ms sleeping: 259.12 ms scheduling: 259.52 ms
+        25.188627 GFlop/s
+CPU 0
+        6 task(s)
+        time split: total 330.38 ms = executing: 264.80 ms + callback: 0.06 ms + waiting: 0.01 ms + sleeping: 65.39 ms + scheduling: 0.03 ms + overhead 0.10 ms
+        all time: executing: 264.80 ms callback: 0.06 ms waiting: 0.01 ms sleeping: 65.39 ms scheduling: 9.28 ms
+        2.437481 GFlop/s
+CPU 1
+        6 task(s)
+        time split: total 330.40 ms = executing: 272.35 ms + callback: 0.04 ms + waiting: 0.00 ms + sleeping: 57.92 ms + scheduling: 0.02 ms + overhead 0.07 ms
+        all time: executing: 272.35 ms callback: 0.04 ms waiting: 0.00 ms sleeping: 57.92 ms scheduling: 8.47 ms
+        2.437368 GFlop/s
+CPU 2
+        6 task(s)
+        time split: total 330.41 ms = executing: 292.64 ms + callback: 0.04 ms + waiting: 0.01 ms + sleeping: 37.64 ms + scheduling: 0.00 ms + overhead 0.08 ms
+        all time: executing: 292.64 ms callback: 0.04 ms waiting: 0.01 ms sleeping: 37.64 ms scheduling: 5.85 ms
+        2.437270 GFlop/s
+Global time split: total 1321.57 ms = executing: 895.01 ms (67.72%) + callback: 0.51 ms (0.04%) + waiting: 5.47 ms (0.41%) + sleeping: 419.89 ms (31.77%) + scheduling: 0.09 ms (0.01%) + overhead 0.60 ms (0.05%)
+#---------------------
+[RR_WORKERS] Deinit stats: push_task=80, pop_task=80, null_pop_task=548192, rejected_turns=187146
+==============================================
+Execution finished. Converting raw FxT trace...
+Generating StarVZ visualization...
+-> INFO: Patching tasks.rec to satisfy StarVZ.
+-> WARNING: StarVZ failed because the trace contains no worker state events (common for some examples).
+   Consider using a larger workload or checking if the example supports profiling.
+-> WARNING: StarVZ failed to generate PDF. See log: /tmp/starpu_basic_examples/20260221_182822_sgemm/starvz.log
+All artifacts saved securely in: /tmp/starpu_basic_examples/20260221_182822_sgemm
+==============================================
+bash: history: : cannot create: No such file or directory

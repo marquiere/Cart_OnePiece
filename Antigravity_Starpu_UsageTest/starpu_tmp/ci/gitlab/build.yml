@@ -1,0 +1,124 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2009-2026   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+
+preliminary_checks:
+  extends: .master_branch
+  stage: pre
+  tags: ['starpu', 'linux']
+  script:
+    - ./ci/scripts/check_header.sh
+
+# to download all the artifacts https://gitlab.inria.fr/starpu/starpu/-/jobs/artifacts/master/download?job=build
+# https://gitlab.inria.fr/starpu/starpu/-/jobs/artifacts/master/raw/starpu-1.3.99.tar.gz?job=build
+# https://gitlab.inria.fr/starpu/starpu/-/jobs/artifacts/master/raw/starpu.pdf?job=build
+# https://docs.gitlab.com/ee/ci/pipelines/job_artifacts.html#downloading-artifacts
+build:
+  extends: .master_branch
+  stage: build
+  image: registry.gitlab.inria.fr/starpu/starpu-docker/ci-debian12
+  tags: ['ci.inria.fr', 'linux', 'large']
+  dependencies:
+    - preliminary_checks
+  script:
+    - ./ci/scripts/build.sh
+  artifacts:
+    paths:
+      - starpu*.tar.gz
+      - starpu*.pdf
+      - html
+
+.check_template:
+  extends: .master_branch
+  stage: check
+  needs: [build]
+  dependencies:
+    - build
+  script:
+    - ./ci/scripts/check.sh
+  before_script:
+    - if test -e artifacts ; then mv artifacts artifacts2 ; fi
+  artifacts:
+    when: always
+    paths:
+      - artifacts
+
+check_ci:
+  extends: .check_template
+  parallel:
+    matrix:
+      - NODE: [centos72amd64]
+  tags:
+    - ${NODE}
+
+check_macos:
+  extends: .check_template
+  tags: [macosx]
+  timeout: 2h
+  variables:
+    RUNNER_SCRIPT_TIMEOUT: 118m
+    RUNNER_AFTER_SCRIPT_TIMEOUT: 2m
+
+check_gpu:
+  extends: .check_template
+  tags: ['starpu', 'node_gpu']
+  script:
+    - ./ci/scripts/check.sh
+
+check:
+  extends: .check_template
+  parallel:
+    matrix:
+      - NODE: [debian12, debian10, ubuntu1604, ubuntu1804, ubuntu2004]
+  image: registry.gitlab.inria.fr/starpu/starpu-docker/ci-${NODE}
+  tags: ['ci.inria.fr', 'linux', 'large']
+
+check_recursive_tasks:
+  extends: .check_template
+  image: registry.gitlab.inria.fr/starpu/starpu-docker/ci-debian12
+  tags: ['ci.inria.fr', 'linux', 'large']
+  script:
+    - ./ci/scripts/recursive_tasks.sh
+
+check_mpi:
+  extends: .check_template
+  image: registry.gitlab.inria.fr/starpu/starpu-docker/ci-ubuntu1804
+  tags: ['ci.inria.fr', 'linux', 'large']
+  parallel:
+    matrix:
+      - SCRIPT: [./ci/scripts/mpich.sh, ./ci/scripts/mpich_struct.sh, ./ci/scripts/mpi_ulfm.sh]
+  script:
+    - ${SCRIPT}
+
+check_simgrid:
+  extends: .check_template
+  image: registry.gitlab.inria.fr/starpu/starpu-docker/ci-debian10
+  tags: ['ci.inria.fr', 'linux', 'large']
+  script:
+    - ./ci/scripts/simgrid.sh
+
+.deploy_template:
+  extends: .master_branch
+  stage: deploy
+  needs: [check]
+  dependencies:
+    - check
+
+deploy_chameleon:
+  extends: .deploy_template
+  image: registry.gitlab.inria.fr/solverstack/chameleon
+  tags: ['ci.inria.fr', 'linux', 'large']
+  script:
+    - ./ci/scripts/chameleon.sh
+

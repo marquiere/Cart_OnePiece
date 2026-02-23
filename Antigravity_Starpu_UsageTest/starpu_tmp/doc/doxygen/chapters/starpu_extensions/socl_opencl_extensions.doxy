@@ -1,0 +1,90 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page SOCLOpenclExtensions SOCL OpenCL Extensions
+
+SOCL is an OpenCL implementation based on StarPU. It gives unified access to
+every available OpenCL device: applications can now share entities such as
+Events, Contexts or Command Queues between several OpenCL implementations.
+
+In addition, command queues that are created without specifying a device provide
+automatic scheduling of the submitted commands on OpenCL devices contained in
+the context to which the command queue is attached.
+
+Setting the <c>CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE</c> flag on a command
+queue also allows StarPU to reorder kernels queued on the queue, otherwise they
+would be serialized, and several command queues would be necessary to see kernels
+dispatched to the various OpenCL devices.
+
+Note: this is still an area under development and subject to change.
+
+When compiling StarPU, SOCL will be enabled if a valid OpenCL
+implementation is found on your system. To be able to run the SOCL
+test suite, the environment variable \ref SOCL_OCL_LIB_OPENCL needs to
+be defined to the location of the file <c>libOpenCL.so</c> of the OCL
+ICD implementation. You should for example add the following line in
+your file <c>.bashrc</c>
+
+\verbatim
+export SOCL_OCL_LIB_OPENCL=/usr/lib/x86_64-linux-gnu/libOpenCL.so
+\endverbatim
+
+You can then run the test suite in the directory <c>socl/examples</c>.
+
+\verbatim
+$ make check
+...
+PASS: basic/basic
+PASS: testmap/testmap
+PASS: clinfo/clinfo
+PASS: matmul/matmul
+PASS: mansched/mansched
+==================
+All 5 tests passed
+==================
+\endverbatim
+
+The environment variable \ref OCL_ICD_VENDORS has to point to the directory
+where the socl.icd ICD file is installed. When compiling StarPU, the files
+are in the directory <c>socl/vendors</c>. With an installed version of
+StarPU, the files are installed in the directory
+<c>$prefix/share/starpu/opencl/vendors</c>.
+
+To run the tests by hand, you have to call, for example,
+
+\verbatim
+$ LD_PRELOAD=$SOCL_OCL_LIB_OPENCL OCL_ICD_VENDORS=socl/vendors/ socl/examples/clinfo/clinfo
+Number of platforms:	2
+  Platform Profile:	FULL_PROFILE
+  Platform Version:	OpenCL 1.1 CUDA 4.2.1
+  Platform Name:	NVIDIA CUDA
+  Platform Vendor:	NVIDIA Corporation
+  Platform Extensions:	cl_khr_byte_addressable_store cl_khr_icd cl_khr_gl_sharing cl_nv_compiler_options cl_nv_device_attribute_query cl_nv_pragma_unroll
+
+  Platform Profile:	FULL_PROFILE
+  Platform Version:	OpenCL 1.0 SOCL Edition (0.1.0)
+  Platform Name:	SOCL Platform
+  Platform Vendor:	Inria
+  Platform Extensions:	cl_khr_icd
+....
+$
+\endverbatim
+
+To enable the use of CPU cores via OpenCL, one can set the \ref STARPU_OPENCL_ON_CPUS
+environment variable to 1 and \ref STARPU_NCPUS to 0 (to avoid using CPUs both via
+the OpenCL driver and the normal CPU driver).
+
+*/

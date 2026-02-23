@@ -1,0 +1,356 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page TasksInStarPU Tasks In StarPU
+
+\section TaskGranularity Task Granularity
+
+Similar to other runtimes, StarPU introduces some overhead in managing tasks. This overhead, while not always negligible, is mitigated by its intelligent scheduling and data management capabilities. The typical order of magnitude for this overhead is a few microseconds, which is significantly less than the inherent CUDA overhead. To ensure that this overhead remains insignificant, the work assigned to a task should be substantial enough.
+
+Ideally, the length of tasks should be relatively large to effectively offset this overhead. It is advisable to consider offline performance feedback, which provides insight into task length. Monitoring task lengths becomes critical when you are experiencing suboptimal performance.
+
+To gauge the scalability potential based on task size, you can run the <c>tests/microbenchs/tasks_size_overhead.sh</c> script. It provides a visual representation of the speedup achievable with independent tasks of very small size.
+
+This benchmark is installed in <c>$STARPU_PATH/lib/starpu/examples/</c>. It gives an idea of how long a task should be (in µs) for StarPU overhead to be low enough to maintain efficiency. The script generates a graph showing the speedup trends for tasks of different sizes, correlated with the number of CPUs used.
+
+For example, in the figure below, for 128 µs tasks (the red line), StarPU overhead is low enough to guarantee a good speedup if the number of CPUs is not more than 36. But with the same number of CPUs, 64 µs tasks (the black line) cannot have a proper speedup. The number of CPUs must be reduced to about 17 to maintain efficiency.
+
+\image html tasks_size_overhead.png
+\image latex tasks_size_overhead.png "" width=\textwidth
+
+To determine the task size used by your application, it is possible to use <c>starpu_fxt_data_trace</c> as explained in \ref DataTrace.
+
+The choice of a scheduler in StarPU also plays an important role. Different schedulers have different effects on the overall execution. For example, the \c dmda scheduler may require additional time to make decisions, while the \c eager scheduler tends to be more immediate in its decisions.
+
+To evaluate the impact of scheduler selection on your target machine, you can once again use the \c tasks_size_overhead.sh script. This script provides valuable insight into how different schedulers affect performance in relation to task size.
+
+\section TaskSubmission Task Submission
+
+To allow StarPU to effectively perform online optimizations, it is recommended to submit tasks asynchronously whenever possible. The goal is to maximize the level of asynchronous submission, allowing StarPU to have more flexibility in optimizing the scheduling process. Ideally, all tasks should be submitted asynchronously, and the use of functions like starpu_task_wait_for_all() or starpu_data_unregister() should be limited to waiting for task completion.
+
+StarPU will then be able to rework the whole schedule, overlap computation with communication, manage local accelerator memory usage, etc. A simple example can be found in <c>examples/basic_examples/variable.c</c>
+
+\section TaskPriorities Task Priorities
+
+StarPU's default behavior is to consider tasks in the order in which they are submitted by the application. However, in scenarios where the application programmer has knowledge about certain tasks that should be prioritized due to their impact on performance (such as tasks whose output is critical to subsequent tasks), the starpu_task::priority field can be used to convey this information to StarPU's scheduling process.
+
+An example can be found in <c>examples/heat/dw_factolu_tag.c</c>.
+
+\section SettingManyDataHandlesForATask Setting Many Data Handles For a Task
+
+The maximum number of data that a task can manage is set by the macro \ref STARPU_NMAXBUFS. This macro has a default value that can be changed using the \c configure option \ref enable-maxbuffers "--enable-maxbuffers".
+
+However, if you have specific cases where you need tasks to manage more data than the maximum allowed, you can use the starpu_task::dyn_handles field when defining a task, along with the starpu_codelet::dyn_modes field when defining the corresponding codelet.
+
+This dynamic handle mechanism allows tasks to handle additional data beyond the usual limit imposed by \ref STARPU_NMAXBUFS.
+
+\code{.c}
+enum starpu_data_access_mode modes[STARPU_NMAXBUFS+1] =
+{
+	STARPU_R, STARPU_R, ...
+};
+
+struct starpu_codelet dummy_big_cl =
+{
+	.cuda_funcs = { dummy_big_kernel },
+	.opencl_funcs = { dummy_big_kernel },
+	.cpu_funcs = { dummy_big_kernel },
+	.cpu_funcs_name = { "dummy_big_kernel" },
+	.nbuffers = STARPU_NMAXBUFS+1,
+	.dyn_modes = modes
+};
+
+task = starpu_task_create();
+task->cl = &dummy_big_cl;
+task->dyn_handles = malloc(task->cl->nbuffers * sizeof(starpu_data_handle_t));
+for(i=0 ; i<task->cl->nbuffers ; i++)
+{
+	task->dyn_handles[i] = handle;
+}
+starpu_task_submit(task);
+\endcode
+
+\code{.c}
+starpu_data_handle_t *handles = malloc(dummy_big_cl.nbuffers * sizeof(starpu_data_handle_t));
+for(i=0 ; i<dummy_big_cl.nbuffers ; i++)
+{
+	handles[i] = handle;
+}
+starpu_task_insert(&dummy_big_cl,
+         	  STARPU_VALUE, &dummy_big_cl.nbuffers, sizeof(dummy_big_cl.nbuffers),
+		  STARPU_DATA_ARRAY, handles, dummy_big_cl.nbuffers,
+		  0);
+\endcode
+
+The whole code for this complex data interface is available in <c>examples/basic_examples/dynamic_handles.c</c>.
+
+\section SettingVariableDataHandlesForATask Setting a Variable Number Of Data Handles For a Task
+
+Normally, the number of data handles given to a task is set with starpu_codelet::nbuffers. However, this field can be set to \ref STARPU_VARIABLE_NBUFFERS, in which case starpu_task::nbuffers must be set, and starpu_task::modes (or starpu_task::dyn_modes,
+see \ref SettingManyDataHandlesForATask) should be used to specify the modes for the handles. Examples in <c>examples/basic_examples/dynamic_handles.c</c> show how to implement this.
+
+\section InsertTaskUtility Insert Task Utility
+
+StarPU provides the wrapper function starpu_task_insert() to ease
+the creation and submission of tasks.
+
+Here is the implementation of a codelet:
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int *x0 = (int *)STARPU_VARIABLE_GET_PTR(descr[0]);
+        float *x1 = (float *)STARPU_VARIABLE_GET_PTR(descr[1]);
+        int ifactor;
+        float ffactor;
+
+        starpu_codelet_unpack_args(_args, &ifactor, &ffactor);
+        *x0 = *x0 * ifactor;
+        *x1 = *x1 * ffactor;
+}
+
+struct starpu_codelet mycodelet =
+{
+        .cpu_funcs = { func_cpu },
+        .cpu_funcs_name = { "func_cpu" },
+        .nbuffers = 2,
+        .modes = { STARPU_RW, STARPU_RW }
+};
+\endcode
+
+And the call to starpu_task_insert():
+
+\code{.c}
+starpu_task_insert(&mycodelet,
+                   STARPU_VALUE, &ifactor, sizeof(ifactor),
+                   STARPU_VALUE, &ffactor, sizeof(ffactor),
+                   STARPU_RW, data_handles[0],
+		   STARPU_RW, data_handles[1],
+                   0);
+\endcode
+
+The call to starpu_task_insert() is equivalent to the following
+code:
+
+\code{.c}
+struct starpu_task *task = starpu_task_create();
+task->cl = &mycodelet;
+task->handles[0] = data_handles[0];
+task->handles[1] = data_handles[1];
+char *arg_buffer;
+size_t arg_buffer_size;
+starpu_codelet_pack_args(&arg_buffer, &arg_buffer_size,
+                    STARPU_VALUE, &ifactor, sizeof(ifactor),
+                    STARPU_VALUE, &ffactor, sizeof(ffactor),
+                    0);
+task->cl_arg = arg_buffer;
+task->cl_arg_size = arg_buffer_size;
+int ret = starpu_task_submit(task);
+\endcode
+
+In the example file <c>tests/main/insert_task_value.c</c>, we use these two ways to create and submit tasks.
+
+Instead of calling starpu_codelet_pack_args(), one can also call starpu_codelet_pack_arg_init(), then starpu_codelet_pack_arg() for each data, then starpu_codelet_pack_arg_fini() as follow:
+
+\code{.c}
+struct starpu_task *task = starpu_task_create();
+task->cl = &mycodelet;
+task->handles[0] = data_handles[0];
+task->handles[1] = data_handles[1];
+
+struct starpu_codelet_pack_arg_data state;
+starpu_codelet_pack_arg_init(&state);
+starpu_codelet_pack_arg(&state, &ifactor, sizeof(ifactor));
+starpu_codelet_pack_arg(&state, &ffactor, sizeof(ffactor));
+starpu_codelet_pack_arg_fini(&state, &task->cl_arg, &task->cl_arg_size);
+
+int ret = starpu_task_submit(task);
+\endcode
+
+A full code example is in file <c>tests/main/pack.c</c>.
+
+Here a similar call using ::STARPU_DATA_ARRAY.
+
+\code{.c}
+starpu_task_insert(&mycodelet,
+                   STARPU_DATA_ARRAY, data_handles, 2,
+                   STARPU_VALUE, &ifactor, sizeof(ifactor),
+                   STARPU_VALUE, &ffactor, sizeof(ffactor),
+                   0);
+\endcode
+
+If some part of the task insertion depends on the value of some computation,
+the macro ::STARPU_DATA_ACQUIRE_CB can be very convenient. For
+instance, assuming that the index variable <c>i</c> was registered as handle
+<c>A_handle[i]</c>:
+
+\code{.c}
+/* Compute which portion we will work on, e.g. pivot */
+starpu_task_insert(&which_index, STARPU_W, i_handle, 0);
+
+/* And submit the corresponding task */
+STARPU_DATA_ACQUIRE_CB(i_handle, STARPU_R,
+                       starpu_task_insert(&work, STARPU_RW, A_handle[i], 0));
+\endcode
+
+The macro ::STARPU_DATA_ACQUIRE_CB submits an asynchronous request for
+acquiring data <c>i</c> for the main application, and will execute the code
+given as the third parameter when it is acquired. In other words, as soon as the
+value of <c>i</c> computed by the codelet <c>which_index</c> can be read, the
+portion of code passed as the third parameter of ::STARPU_DATA_ACQUIRE_CB will
+be executed, and is allowed to read from <c>i</c> to use it e.g. as an
+index. Note that this macro is only available when compiling StarPU with
+the compiler <c>gcc</c>. In the example file <c>tests/datawizard/acquire_cb_insert.c</c>, this macro is used.
+
+StarPU also provides a utility function starpu_codelet_unpack_args() to retrieve the ::STARPU_VALUE arguments passed to the task. There is several ways of calling starpu_codelet_unpack_args(). The full code examples are available in the file <c>tests/main/insert_task_value.c</c>.
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int ifactor;
+        float ffactor;
+
+        starpu_codelet_unpack_args(_args, &ifactor, &ffactor);
+}
+\endcode
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int ifactor;
+        float ffactor;
+
+        starpu_codelet_unpack_args(_args, &ifactor, 0);
+        starpu_codelet_unpack_args(_args, &ifactor, &ffactor);
+}
+\endcode
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int ifactor;
+        float ffactor;
+	char buffer[100];
+
+        starpu_codelet_unpack_args_and_copyleft(_args, buffer, 100, &ifactor, 0);
+        starpu_codelet_unpack_args(buffer, &ffactor);
+}
+\endcode
+
+Instead of calling starpu_codelet_unpack_args(), one can also call starpu_codelet_unpack_arg_init(), then starpu_codelet_pack_arg() or starpu_codelet_dup_arg() or starpu_codelet_pick_arg() for each data, then starpu_codelet_unpack_arg_fini() as follow:
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int ifactor;
+        float ffactor;
+
+        size_t size = sizeof(int) + 2*sizeof(size_t) + sizeof(int) + sizeof(float);
+        struct starpu_codelet_pack_arg_data state;
+        starpu_codelet_unpack_arg_init(&state, _args, size);
+        starpu_codelet_unpack_arg(&state, (void**)&ifactor, sizeof(ifactor));
+        starpu_codelet_unpack_arg(&state, (void**)&ffactor, sizeof(ffactor));
+        starpu_codelet_unpack_arg_fini(&state);
+}
+\endcode
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int *ifactor;
+        float *ffactor;
+        size_t size;
+
+        size_t psize = sizeof(int) + 2*sizeof(size_t) + sizeof(int) + sizeof(float);
+        struct starpu_codelet_pack_arg_data state;
+        starpu_codelet_unpack_arg_init(&state, _args, psize);
+        starpu_codelet_dup_arg(&state, (void**)&ifactor, &size);
+        assert(size == sizeof(*ifactor));
+        starpu_codelet_dup_arg(&state, (void**)&ffactor, &size);
+        assert(size == sizeof(*ffactor));
+        starpu_codelet_unpack_arg_fini(&state);
+}
+\endcode
+
+\code{.c}
+void func_cpu(void *descr[], void *_args)
+{
+        int *ifactor;
+        float *ffactor;
+        size_t size;
+
+        size_t psize = sizeof(int) + 2*sizeof(size_t) + sizeof(int) + sizeof(float);
+        struct starpu_codelet_pack_arg_data state;
+        starpu_codelet_unpack_arg_init(&state, _args, psize);
+        starpu_codelet_pick_arg(&state, (void**)&ifactor, &size);
+        assert(size == sizeof(*ifactor));
+        starpu_codelet_pick_arg(&state, (void**)&ffactor, &size);
+        assert(size == sizeof(*ffactor));
+        starpu_codelet_unpack_arg_fini(&state);
+}
+\endcode
+
+During unpacking one can also call starpu_codelet_unpack_discard_arg() to skip saving the argument in pointer.
+
+A full code example is in file <c>tests/main/pack.c</c>.
+
+\section OtherTaskUtility Other Task Utility Functions
+
+Here a list of other functions to help with task management.
+
+<ul>
+<li>
+The function starpu_task_dup() creates a duplicate of an existing task. The new task is identical to the original task in terms of its parameters, dependencies, and execution characteristics.
+</li>
+<li>
+The function starpu_task_set() is used to set the parameters of a task before it is executed, while starpu_task_build() is used to create a task with the specified parameters.
+</li>
+</ul>
+
+StarPU provides several functions to help insert data into a task.
+The function starpu_task_insert_data_make_room() is used to allocate
+memory space for a data structure that is required for inserting data
+into a task. This function is called before inserting any data handles
+into a task, and ensures that enough memory is available for the data
+to be stored.
+Once memory is allocated, the data handle can be inserted into the
+task using the following functions
+
+<ul>
+<li>
+starpu_task_insert_data_process_arg() processes a scalar
+argument of a task and inserts it into the task's data structure. This
+function also performs any necessary data allocation and transfer
+operations.
+</li>
+<li>
+starpu_task_insert_data_process_array_arg() processes an array
+argument of a task and inserts it into the task's data structure. This
+function handles the allocation and transfer of the array data, as
+well as setting up the appropriate metadata to describe the array.
+</li>
+<li>
+starpu_task_insert_data_process_mode_array_arg() processes a mode
+array argument of a task and inserts it into the task's data
+structure. This function handles the allocation and transfer of the
+mode array data, as well as setting up the appropriate metadata to
+describe the mode array. Additionally, this function also computes the
+necessary sizes and strides for the data associated with the mode
+array argument.
+</li>
+</ul>
+
+*/

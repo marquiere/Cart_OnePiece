@@ -1,0 +1,60 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \intropage{IntroBasics, --------- StarPU Basics ---------}
+
+\webforeword
+
+This part presents the basic knowledge of StarPU. It should be read to understand how StarPU works and how to execute a basic StarPU application.
+
+<ul>
+<li>
+Chapter \ref StarPUApplications shows how to create and run your
+own StarPU applications.
+</li>
+<li>
+Chapter \ref BasicExamples shows how to implement simple programs that
+submit tasks to StarPU.
+</li>
+<li>
+Chapter \ref FullSourceCodeVectorScal gives the full source code for
+a vector scaling application.
+</li>
+</ul>
+
+The next chapters cover the most important and core concepts in
+StarPU:
+<ul>
+<li>
+Chapter \ref TasksInStarPU explains the basic information on tasks
+management.
+</li>
+<li>
+Chapter \ref DataManagement shows how to manage the data layout of
+your application data by using the different data interfaces provided
+by StarPU.
+</li>
+<li>
+Chapter \ref Scheduling explains the scheduling policies provided by
+StarPU.
+</li>
+</ul>
+
+Some examples applications are provided from the StarPU sources for
+you to try. Chapter \ref ExamplesInStarPUSources lists these
+applications.
+
+*/

@@ -1,0 +1,278 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ * Copyright (C) 2020-2022  Federal University of Rio Grande do Sul (UFRGS)
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*
+ * NOTE: XXX: also update simgrid versions in 101_building.doxy !!
+ */
+
+/*! \page SimGridSupport SimGrid Support
+
+StarPU can use SimGrid in order to simulate execution on an arbitrary
+platform.
+
+The principle is to first run the application natively on the platform that one
+wants to laterlater simulate, and let StarPU record performance models. One
+then recompiles StarPU and the application in simgrid mode, where everything
+is executed the same, except the execution of the codelet function, and the
+data transfers, which are replaced by virtual sleeps based on the performance
+models. This thus allows to use the performance model for tasks and data
+transfers, while executing natively all the rest (the task scheduler and the
+application, notably).
+
+This was tested with SimGrid from 3.11 to 3.16, and 3.18 to
+3.36. SimGrid version 3.25 needs to be configured with -Denable_msg=ON .
+Other versions may have compatibility issues. 3.17 notably does not build at
+all. MPI simulation does not work with version 3.22.
+
+If you have installed SimGrid by hand, make sure to set \c PKG_CONFIG_PATH to
+the path where \c simgrid.pc was installed:
+
+\verbatim
+$ export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/where/simgrid/installed/lib/ppkgconfig/simgrid.pc
+\endverbatim
+
+\section Preparing Preparing Your Application For Simulation
+
+There are a few technical details which need to be handled for an application to
+be simulated through SimGrid.
+
+If the application uses <c>gettimeofday()</c> to make its
+performance measurements, the real time will be used, which will be bogus. To
+get the simulated time, it has to use starpu_timing_now() which returns the
+virtual timestamp in us. A basic example is available in <c>tests/main/empty_task.c</c>.
+
+For some technical reason, the application's .c file which contains \c main() has
+to be recompiled with \c starpu_simgrid_wrap.h, which in the SimGrid case will <c># define main()</c>
+into <c>starpu_main()</c>, and it is \c libstarpu which will provide the real \c main() and
+will call the application's \c main(). Including \c starpu.h will already
+include \c starpu_simgrid_wrap.h, so usually you would not need to include
+\c starpu_simgrid_wrap.h explicitly, but if for some reason including the whole
+\c starpu.h header is not possible, you can include \c starpu_simgrid_wrap.h
+explicitly.
+
+To be able to test with crazy data sizes, one may want to only allocate
+application data if the macro \c STARPU_SIMGRID is not defined.  Passing a <c>NULL</c> pointer to
+\c starpu_data_register functions is fine, data will never be read/written to by
+StarPU in SimGrid mode anyway.
+
+To be able to run the application with e.g. CUDA simulation on a system which
+does not have CUDA installed, one can fill the starpu_codelet::cuda_funcs with \c (void*)1, to
+express that there is a CUDA implementation, even if one does not actually
+provide it. StarPU will not actually run it in SimGrid mode anyway by default
+(unless the ::STARPU_CODELET_SIMGRID_EXECUTE or ::STARPU_CODELET_SIMGRID_EXECUTE_AND_INJECT
+flags are set in the codelet)
+
+\snippet simgrid.c To be included. You should update doxygen if you see this text.
+
+The full example is available in <c>examples/cholesky/cholesky_kernels.c</c>.
+
+\section Calibration Calibration
+
+The idea is to first compile StarPU normally, and run the application,
+to automatically benchmark the bus and the codelets.
+
+\verbatim
+$ ./configure && make
+$ STARPU_SCHED=dmda ./examples/matvecmult/matvecmult
+[starpu][_starpu_load_history_based_model] Warning: model matvecmult
+   is not calibrated, forcing calibration for this run. Use the
+   STARPU_CALIBRATE environment variable to control this.
+$ ...
+$ STARPU_SCHED=dmda ./examples/matvecmult/matvecmult
+TEST PASSED
+\endverbatim
+
+Note that we force to use the scheduler <c>dmda</c> to generate
+performance models for the application. The application may need to be
+run several times before the model is calibrated.
+
+\section Simulation Simulation
+
+Then, recompile StarPU, passing \ref enable-simgrid "--enable-simgrid"
+to <c>configure</c>. Make sure to keep all the other <c>configure</c> options
+the same, and notably options such as <c>--enable-maxcudadev</c>.
+
+\verbatim
+$ ./configure --enable-simgrid
+\endverbatim
+
+To specify the location of SimGrid, you can either set the environment
+variables \c SIMGRID_CFLAGS and \c SIMGRID_LIBS, or use the \c configure
+options \ref with-simgrid-dir "--with-simgrid-dir",
+\ref with-simgrid-include-dir "--with-simgrid-include-dir" and
+\ref with-simgrid-lib-dir "--with-simgrid-lib-dir", for example
+
+\verbatim
+$ ./configure --with-simgrid-dir=/opt/local/simgrid
+\endverbatim
+
+You can then re-run the application.
+
+\verbatim
+$ make
+$ STARPU_SCHED=dmda ./examples/matvecmult/matvecmult
+TEST FAILED !!!
+\endverbatim
+
+It is normal that the test fails: since the computation is not actually done
+(that is the whole point of SimGrid), the result is wrong, of course.
+
+If the performance model is not calibrated enough, the following error
+message will be displayed
+
+\verbatim
+$ STARPU_SCHED=dmda ./examples/matvecmult/matvecmult
+[starpu][_starpu_load_history_based_model] Warning: model matvecmult
+    is not calibrated, forcing calibration for this run. Use the
+    STARPU_CALIBRATE environment variable to control this.
+[starpu][_starpu_simgrid_execute_job][assert failure] Codelet
+    matvecmult does not have a perfmodel, or is not calibrated enough
+\endverbatim
+
+The number of devices can be chosen as usual with \ref STARPU_NCPU,
+\ref STARPU_NCUDA, and \ref STARPU_NOPENCL, and the amount of GPU memory
+with \ref STARPU_LIMIT_CUDA_MEM, \ref STARPU_LIMIT_CUDA_devid_MEM,
+\ref STARPU_LIMIT_OPENCL_MEM, and \ref STARPU_LIMIT_OPENCL_devid_MEM.
+
+\section SimulationOnAnotherMachine Simulation On Another Machine
+
+The SimGrid support even permits to perform simulations on another machine, your
+desktop, typically. To achieve this, one still needs to perform the Calibration
+step on the actual machine to be simulated, then copy them to your desktop
+machine (the <c>$STARPU_HOME/.starpu</c> directory). One can then perform the
+Simulation step on the desktop machine, by setting the environment
+variable \ref STARPU_HOSTNAME to the name of the actual machine, to
+make StarPU use the performance models of the simulated machine even
+on the desktop machine. To use multiple performance models in different ranks,
+in case of smpi executions in a heterogeneous platform, it is possible to use the
+option <c>-hostfile-platform</c> in <c>starpu_smpirun</c>, that will define
+\ref STARPU_MPI_HOSTNAMES with the hostnames of your hostfile.
+
+If the desktop machine does not have CUDA or OpenCL, StarPU is still able to
+use SimGrid to simulate execution with CUDA/OpenCL devices, but the application
+source code will probably disable the CUDA and OpenCL codelets in that
+case. Since during SimGrid execution, the functions of the codelet are actually
+not called by default, one can use dummy functions such as the following to
+still permit CUDA or OpenCL execution.
+
+\section SimulationExamples Simulation Examples
+
+StarPU ships a few performance models for a couple of systems: \c attila,
+\c mirage, \c idgraf, and \c sirocco. See Section \ref SimulatedBenchmarks for the details.
+
+\section FakeSimulations Simulations On Fake Machines
+
+It is possible to build fake machines which do not exist, by modifying the
+platform file in <c>$STARPU_HOME/.starpu/sampling/bus/machine.platform.xml</c>
+by hand: one can add more CPUs, add GPUs (but the performance model file has to
+be extended as well), change the available GPU memory size, PCI memory bandwidth, etc.
+
+\section TweakingSimulation Tweaking Simulation
+
+The simulation can be tweaked, to be able to tune it between a very accurate
+simulation and a very simple simulation (which is thus close to scheduling
+theory results), see the \ref STARPU_SIMGRID_TRANSFER_COST, \ref STARPU_SIMGRID_CUDA_MALLOC_COST,
+\ref STARPU_SIMGRID_CUDA_QUEUE_COST, \ref STARPU_SIMGRID_TASK_SUBMIT_COST, \ref STARPU_SIMGRID_TASK_PUSH_COST,
+\ref STARPU_SIMGRID_FETCHING_INPUT_COST and \ref STARPU_SIMGRID_SCHED_COST environment variables.
+
+\section SimulationMPIApplications MPI Applications
+
+StarPU-MPI applications can also be run in SimGrid mode. smpi currently requires
+that StarPU be build statically only, so <c>--disable-shared</c> needs to be
+passed to <c>./configure</c>.
+
+The application needs to be compiled with \c smpicc, and run using the
+<c>starpu_smpirun</c> script, for instance:
+
+\verbatim
+$ STARPU_SCHED=dmda starpu_smpirun -platform cluster.xml -hostfile hostfile ./mpi/tests/pingpong
+\endverbatim
+
+Where \c cluster.xml is a SimGrid-MPI platform description, and \c hostfile the
+list of MPI nodes to be used. Examples of such files are available in \c tools/perfmodels. In homogeneous MPI clusters: for each MPI node, it
+will just replicate the architecture referred by
+\ref STARPU_HOSTNAME. To use multiple performance models in different ranks,
+in case of a heterogeneous platform, it is possible to use the
+option <c>-hostfile-platform</c> in <c>starpu_smpirun</c>, that will define
+\ref STARPU_MPI_HOSTNAMES with the hostnames of your hostfile.
+
+To use FxT traces, libfxt itself also needs to be built statically, <b>and</b>
+with dynamic linking flags, i.e. with
+
+\verbatim
+CFLAGS=-fPIC ./configure --enable-static
+\endverbatim
+
+\section SimulationDebuggingApplications Debugging Applications
+
+By default, SimGrid uses its own implementation of threads, which prevents \c gdb
+from being able to inspect stacks of all threads.  To be able to fully debug an
+application running with SimGrid, pass the <c>--cfg=contexts/factory:thread</c>
+option to the application, to make SimGrid use system threads, which \c gdb will be
+able to manipulate as usual.
+
+It is also worth noting SimGrid 3.21's new parameter
+<c>--cfg=simix/breakpoint</c> which allows putting a breakpoint at a precise
+(deterministic!) timing of the execution. If for instance in an execution
+trace we see that something odd is happening at time 19000ms, we can use
+<c>--cfg=simix/breakpoint:19.000</c> and \c SIGTRAP will be raised at that point,
+which will thus interrupt execution within \c gdb, allowing to inspect e.g.
+scheduler state, etc.
+
+\section SimulationMemoryUsage Memory Usage
+
+Since kernels are not actually run and data transfers are not actually
+performed, the data memory does not actually need to be allocated.  This allows
+for instance to simulate the execution of applications processing very big data
+on a small laptop.
+
+The application can for instance pass <c>1</c> (or whatever bogus pointer)
+to StarPU data registration functions, instead of allocating data. This will
+however require the application to take care of not trying to access the data,
+and will not work in MPI mode, which performs transfers.
+
+Another way is to pass the \ref STARPU_MALLOC_SIMULATION_FOLDED flag to the
+starpu_malloc_flags() function.
+An example is available in <c>examples/mult/xgemm.c </c>
+This will make it allocate a memory area which
+one can read/write, but optimized so that this does not actually consume
+memory. Of course, the values read from such area will be bogus, but this allows
+the application to keep e.g. data load, store, initialization as it is, and also
+work in MPI mode. A more aggressive alternative is to pass also the
+\ref STARPU_MALLOC_SIMULATION_UNIQUE flag (alongside with
+\ref STARPU_MALLOC_SIMULATION_FOLDED) to the starpu_malloc_flags() function.
+An example is available in <c>examples/cholesky/cholesky_tag.c </c>.
+This will make StarPU reuse the pointers for allocations of the same size
+without calling the folded allocation again, thus decreasing some pressure on
+memory management.
+
+Note however that notably Linux kernels refuse obvious memory overcommitting by
+default, so a single allocation can typically not be bigger than the amount of
+physical memory, see https://www.kernel.org/doc/Documentation/vm/overcommit-accounting
+This prevents for instance from allocating a single huge matrix. Allocating a
+huge matrix in several tiles is not a problem, however. <c>sysctl
+vm.overcommit_memory=1</c> can also be used to allow such overcommit.
+
+Note however that this folding is done by remapping the same file several times,
+and Linux kernels will also refuse to create too many memory areas. <c>sysctl
+vm.max_map_count</c> can be used to check and change the default (65535). By
+default, StarPU uses a 1MiB file, so it hopefully fits in the CPU cache. However,
+this limits the amount of such folded memory to a bit below 64GiB. The
+\ref STARPU_MALLOC_SIMULATION_FOLD environment variable can be used to increase the
+size of the file.
+
+*/

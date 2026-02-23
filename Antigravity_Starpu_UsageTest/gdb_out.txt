@@ -1,0 +1,124 @@
+Registered pretty printers for UE4 classes
+Reading symbols from ./tools/starpu_adv_pipeline/build/starpu_adv_pipeline...
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffad7ff000 (LWP 78632)]
+[New Thread 0x7fffacd6b000 (LWP 78633)]
+[RR_WORKERS] Init with 0 workers
+[New Thread 0x7fff867ff000 (LWP 78636)]
+[New Thread 0x7fff85ffe000 (LWP 78637)]
+[New Thread 0x7fff857fd000 (LWP 78638)]
+[New Thread 0x7fff84ffc000 (LWP 78639)]
+[New Thread 0x7fff77fff000 (LWP 78641)]
+[New Thread 0x7fff777fe000 (LWP 78642)]
+[New Thread 0x7fff75ddc000 (LWP 78646)]
+
+Thread 1 "starpu_adv_pipe" received signal SIGINT, Interrupt.
+__futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x0, op=393, expected=0, futex_word=0x7ffff7e001f8 <_starpu_config+222168>) at ./nptl/futex-internal.c:57
+57	./nptl/futex-internal.c: No such file or directory.
+
+Thread 10 (Thread 0x7fff75ddc000 (LWP 78646) "starpu_adv_pipe"):
+#0  0x00007ffff7518c4f in __GI___poll (fds=0x7fff8094f7a0, nfds=2, timeout=100) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fffadaf95d7 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007fffadbd6697 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007fffadae4f93 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 9 (Thread 0x7fff777fe000 (LWP 78642) "cuda-EvtHandlr"):
+#0  0x00007ffff7518c4f in __GI___poll (fds=0x7fff6c000c20, nfds=10, timeout=38) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fffadaf95d7 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007fffadbd6697 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007fffadae4f93 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 8 (Thread 0x7fff77fff000 (LWP 78641) "starpu_adv_pipe"):
+#0  __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x7fff77fd0890, op=393, expected=0, futex_word=0x555555f36808) at ./nptl/futex-internal.c:57
+#1  __futex_abstimed_wait_common (cancel=true, private=0, abstime=0x7fff77fd0890, clockid=0, expected=0, futex_word=0x555555f36808) at ./nptl/futex-internal.c:87
+#2  __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x555555f36808, expected=expected@entry=0, clockid=clockid@entry=0, abstime=abstime@entry=0x7fff77fd0890, private=private@entry=0) at ./nptl/futex-internal.c:139
+#3  0x00007ffff7493e9b in __pthread_cond_wait_common (abstime=0x7fff77fd0890, clockid=0, mutex=0x555555f1cfe8, cond=0x555555f367e0) at ./nptl/pthread_cond_wait.c:503
+#4  ___pthread_cond_timedwait64 (cond=0x555555f367e0, mutex=0x555555f1cfe8, abstime=0x7fff77fd0890) at ./nptl/pthread_cond_wait.c:652
+#5  0x00007fffada5cc3a in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#6  0x00007fffadae4f93 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#7  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#8  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 7 (Thread 0x7fff84ffc000 (LWP 78639) "CPU 2"):
+#0  _starpu_exponential_backoff (worker=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:411
+#1  _starpu_get_worker_task (worker=<optimized out>, workerid=3, memnode=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:539
+#2  0x00007ffff7d3eb2f in _starpu_cpu_driver_run_once (cpu_worker=0x7ffff7dcc1b0 <_starpu_config+9104>) at ../../src/drivers/cpu/driver_cpu.c:684
+#3  0x00007ffff7d3ef02 in _starpu_cpu_worker (arg=0x7ffff7dcc1b0 <_starpu_config+9104>) at ../../src/drivers/cpu/driver_cpu.c:785
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 6 (Thread 0x7fff857fd000 (LWP 78638) "CPU 1"):
+#0  _starpu_exponential_backoff (worker=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:411
+#1  _starpu_get_worker_task (worker=<optimized out>, workerid=2, memnode=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:539
+#2  0x00007ffff7d3eb2f in _starpu_cpu_driver_run_once (cpu_worker=0x7ffff7dcba60 <_starpu_config+7232>) at ../../src/drivers/cpu/driver_cpu.c:684
+#3  0x00007ffff7d3ef02 in _starpu_cpu_worker (arg=0x7ffff7dcba60 <_starpu_config+7232>) at ../../src/drivers/cpu/driver_cpu.c:785
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 5 (Thread 0x7fff85ffe000 (LWP 78637) "CPU 0"):
+#0  _starpu_exponential_backoff (worker=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:411
+#1  _starpu_get_worker_task (worker=<optimized out>, workerid=1, memnode=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:539
+#2  0x00007ffff7d3eb2f in _starpu_cpu_driver_run_once (cpu_worker=0x7ffff7dcb310 <_starpu_config+5360>) at ../../src/drivers/cpu/driver_cpu.c:684
+#3  0x00007ffff7d3ef02 in _starpu_cpu_worker (arg=0x7ffff7dcb310 <_starpu_config+5360>) at ../../src/drivers/cpu/driver_cpu.c:785
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 4 (Thread 0x7fff867ff000 (LWP 78636) "CUDA 0"):
+#0  0x00007ffff7497f44 in lll_mutex_lock_optimized (mutex=0x7ffff7dcacd8 <_starpu_config+3768>) at ./nptl/pthread_mutex_lock.c:48
+#1  ___pthread_mutex_lock (mutex=0x7ffff7dcacd8 <_starpu_config+3768>) at ./nptl/pthread_mutex_lock.c:93
+#2  0x00007ffff7cb1e13 in _starpu_get_multi_worker_task (workers=<optimized out>, tasks=0x7fff867d0710, nworkers=1, memnode=<optimized out>) at ../../src/drivers/driver_common/driver_common.c:610
+#3  0x00007ffff7d42df5 in _starpu_cuda_driver_run_once (worker=<optimized out>) at ../../src/drivers/cuda/driver_cuda.c:2451
+#4  0x00007ffff7d414bd in _starpu_cuda_worker (_arg=0x7ffff7dcabc0 <_starpu_config+3488>) at ../../src/drivers/cuda/driver_cuda.c:2504
+#5  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#6  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 3 (Thread 0x7fffacd6b000 (LWP 78633) "cuda0000300000d"):
+#0  0x00007ffff7518c4f in __GI___poll (fds=0x555555e9f860, nfds=3, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:29
+#1  0x00007fffadaf95d7 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#2  0x00007fffadbd6697 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#3  0x00007fffadae4f93 in ?? () from /lib/x86_64-linux-gnu/libcuda.so.1
+#4  0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#5  0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 2 (Thread 0x7fffad7ff000 (LWP 78632) "starpu_adv_pipe"):
+#0  __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x7fffad7d08b8, op=137, expected=0, futex_word=0x555555e849f8) at ./nptl/futex-internal.c:57
+#1  __futex_abstimed_wait_common (cancel=true, private=0, abstime=0x7fffad7d08b8, clockid=0, expected=0, futex_word=0x555555e849f8) at ./nptl/futex-internal.c:87
+#2  __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x555555e849f8, expected=expected@entry=0, clockid=clockid@entry=1, abstime=abstime@entry=0x7fffad7d08b8, private=private@entry=0) at ./nptl/futex-internal.c:139
+#3  0x00007ffff74942dd in __pthread_cond_wait_common (abstime=0x7fffad7d08b8, clockid=1, mutex=0x555555e84a00, cond=0x555555e849d0) at ./nptl/pthread_cond_wait.c:503
+#4  ___pthread_cond_clockwait64 (abstime=0x7fffad7d08b8, clockid=1, mutex=0x555555e84a00, cond=0x555555e849d0) at ./nptl/pthread_cond_wait.c:691
+#5  ___pthread_cond_clockwait64 (cond=0x555555e849d0, mutex=0x555555e84a00, clockid=1, abstime=0x7fffad7d08b8) at ./nptl/pthread_cond_wait.c:679
+#6  0x00007ffff7b8cce2 in std::__condvar::wait_until (this=0x555555e849d0, __m=..., __clock=1, __abs_time=...) at /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/bits/std_mutex.h:169
+#7  std::condition_variable::__wait_until_impl<std::chrono::duration<long, std::ratio<1l, 1000000000l> > > (this=0x555555e849d0, __lock=..., __atime=...) at /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/condition_variable:200
+#8  std::condition_variable::wait_until<std::chrono::duration<long, std::ratio<1l, 1000000000l> > > (this=0x555555e849d0, __lock=..., __atime=...) at /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/condition_variable:110
+#9  std::condition_variable::wait_for<long, std::ratio<1l, 1000000l> > (this=0x555555e849d0, __lock=..., __rtime=...) at /usr/bin/../lib/gcc/x86_64-linux-gnu/12/../../../../include/c++/12/condition_variable:162
+#10 apex::proc_data_reader::read_proc (this=0x555555e849c0) at /home/eric/CARLA_Latest/apex/src/apex/proc_read.cpp:833
+#11 0x00007ffff78dc253 in ?? () from /lib/x86_64-linux-gnu/libstdc++.so.6
+#12 0x00007ffff7494ac3 in start_thread (arg=<optimized out>) at ./nptl/pthread_create.c:442
+#13 0x00007ffff75268d0 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
+
+Thread 1 (Thread 0x7ffff7670000 (LWP 78614) "starpu_adv_pipe"):
+#0  __futex_abstimed_wait_common64 (private=0, cancel=true, abstime=0x0, op=393, expected=0, futex_word=0x7ffff7e001f8 <_starpu_config+222168>) at ./nptl/futex-internal.c:57
+#1  __futex_abstimed_wait_common (cancel=true, private=0, abstime=0x0, clockid=0, expected=0, futex_word=0x7ffff7e001f8 <_starpu_config+222168>) at ./nptl/futex-internal.c:87
+#2  __GI___futex_abstimed_wait_cancelable64 (futex_word=futex_word@entry=0x7ffff7e001f8 <_starpu_config+222168>, expected=expected@entry=0, clockid=clockid@entry=0, abstime=abstime@entry=0x0, private=private@entry=0) at ./nptl/futex-internal.c:139
+#3  0x00007ffff7493a41 in __pthread_cond_wait_common (abstime=0x0, clockid=0, mutex=0x7ffff7e00180 <_starpu_config+222048>, cond=0x7ffff7e001d0 <_starpu_config+222128>) at ./nptl/pthread_cond_wait.c:503
+#4  ___pthread_cond_wait (cond=0x7ffff7e001d0 <_starpu_config+222128>, mutex=0x7ffff7e00180 <_starpu_config+222048>) at ./nptl/pthread_cond_wait.c:627
+#5  0x00007ffff7c2b0bb in _starpu_barrier_counter_wait_for_empty_counter (barrier_c=0x7ffff7e00168 <_starpu_config+222024>) at ../../src/common/barrier_counter.c:44
+#6  0x00007ffff7c8b9e0 in _starpu_wait_for_all_tasks_of_sched_ctx (sched_ctx_id=0) at ../../src/core/sched_ctx.c:1494
+#7  0x00007ffff7c43f80 in _starpu_task_wait_for_all_in_ctx_and_return_nb_waited_tasks (sched_ctx=0) at ../../src/core/task.c:1729
+#8  _starpu_task_wait_for_all_in_nested_ctx_and_return_nb_waited_tasks (sched_ctx_id=0) at ../../src/core/task.c:1660
+#9  0x00007ffff7c442a6 in starpu_task_wait_for_all () at ../../src/core/task.c:1720
+#10 0x0000555555560779 in main (argc=<optimized out>, argv=<optimized out>) at /home/eric/Antigravity_Starpu_UsageTest/tools/starpu_adv_pipeline/main.cpp:273
+[?2004hA debugging session is active.
+
+	Inferior 1 [process 78614] will be killed.
+
+Quit anyway? (y or n) Traceback (most recent call last):
+  File "gdb_script.py", line 19, in <module>
+    gdb.execute("quit")
+KeyboardInterrupt: Quit
+[?2004l[?2004h(gdb) 

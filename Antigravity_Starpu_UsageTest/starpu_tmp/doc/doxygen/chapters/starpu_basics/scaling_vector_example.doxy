@@ -1,0 +1,42 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page FullSourceCodeVectorScal Full source code for the ’Scaling a Vector’ example
+
+\section MainApplication Main Application
+
+\snippet basics_vector_scal_c.c To be included. You should update doxygen if you see this text.
+
+\section CPUKernel CPU Kernel
+
+\snippet basics_vector_scal_cpu.c To be included. You should update doxygen if you see this text.
+
+\section CUDAKernel CUDA Kernel
+
+\snippet basics_vector_scal_cuda.c To be included. You should update doxygen if you see this text.
+
+\section OpenCLKernel OpenCL Kernel
+
+\subsection InvokingtheKernel Invoking the Kernel
+
+\snippet basics_vector_scal_opencl.c To be included. You should update doxygen if you see this text.
+
+\subsection SourceoftheKernel Source of the Kernel
+
+\snippet basics_vector_scal_opencl_codelet.cl To be included. You should update doxygen if you see this text.
+
+*/
+

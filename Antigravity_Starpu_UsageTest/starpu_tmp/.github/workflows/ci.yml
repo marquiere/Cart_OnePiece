@@ -1,0 +1,122 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2022-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build in ${{ matrix.mode }} mode
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [native, simgrid]
+        include:
+          - mode: "native"
+            deps: "nvidia-cuda-toolkit-gcc"
+            config: ""
+          - mode: "simgrid"
+            deps: "libsimgrid-dev"
+            config: "--enable-simgrid"
+    steps:
+      - uses: actions/checkout@v3
+      - name: dependencies
+        run: sudo apt-get update ; sudo apt-get install
+            pkg-config libtool-bin
+            libnuma-dev
+            libglpk-dev
+            mpi-default-dev
+            libgl1-mesa-dev
+            libglu1-mesa-dev
+            freeglut3-dev
+            libx11-dev
+            libblas-dev
+            libfftw3-dev
+            libhwloc-dev
+            libleveldb-dev
+            libhdf5-dev
+            valgrind
+            opencl-c-headers ocl-icd-opencl-dev
+            gfortran
+            help2man doxygen
+            ${{ matrix.deps }}
+      - name: autoconf
+        run: ./autogen.sh
+      - name: configure
+        run: ./configure --prefix=/tmp/foobar --enable-quick-check --disable-mpi-check ${{ matrix.config }}
+      - name: Store the config
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: config-${{ matrix.mode }}.log
+          path: config.log
+      - name: make
+        run: make
+      - name: make check
+        run: make check -k
+      - name: make showfailed
+        if: ${{ always() }}
+        run: make showfailed
+      - name: make showsuite
+        if: ${{ always() }}
+        run: make showsuite
+      - name: make showcheck
+        if: ${{ always() }}
+        run: make showcheck
+      - name: make install
+        run: make install
+      - name: make dist
+        if: ${{ matrix.mode != 'simgrid' }}
+        run: make dist
+      - name: make distcheck
+        if: ${{ matrix.mode != 'simgrid' }}
+        run: make distcheck DISTCHECK_CONFIGURE_FLAGS="--enable-quick-check --disable-mpi-check"
+
+  reprotest:
+    runs-on: ubuntu-latest
+    name: Build with reprotest
+    steps:
+      - uses: actions/checkout@v3
+      - name: dependencies
+        run: sudo apt-get update ; sudo apt-get install
+            pkg-config libtool-bin
+            libnuma-dev
+            libglpk-dev
+            mpi-default-dev
+            libgl1-mesa-dev
+            libglu1-mesa-dev
+            freeglut3-dev
+            libx11-dev
+            libblas-dev
+            libfftw3-dev
+            libhwloc-dev
+            libleveldb-dev
+            libhdf5-dev
+            valgrind
+            opencl-c-headers ocl-icd-opencl-dev
+            gfortran
+            help2man doxygen
+            reprotest
+      - name: autoconf
+        run: ./autogen.sh
+      - name: run
+        run: reprotest --vary=-domain_host 'export SOURCE_DATE_EPOCH=946684800 ; sed -i "/^HTML_TIMESTAMP/s/YES/NO/" doc/doxygen.cfg ; mkdir build && cd build && FCFLAGS=-ffile-prefix-map=$PWD=. FFLAGS=-ffile-prefix-map=$PWD=. CFLAGS=-ffile-prefix-map=$PWD=. CXXFLAGS=-ffile-prefix-map=$PWD=. ../configure --enable-quick-check --disable-build-doc --disable-build-doc-pdf && TZ= make && make install-strip DESTDIR=$PWD/../tmp' tmp

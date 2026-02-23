@@ -1,0 +1,80 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2015-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+{
+   gomp2
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:gomp_malloc
+   fun:gomp_init_num_threads
+   fun:initialize_env
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   ...
+}
+
+{
+   gomp3
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.21
+   fun:call_init.part.0
+   fun:_dl_init
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-2.28.so
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:calloc
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+   fun:call_init
+   fun:call_init
+   fun:_dl_init
+   obj:/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+}

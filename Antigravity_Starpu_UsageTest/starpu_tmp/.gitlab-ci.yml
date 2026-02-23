@@ -1,0 +1,42 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2009-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+---
+stages:
+  - pre
+  - daily
+  - build
+  - check
+  - extended_check_basic
+  - extended_check_blas
+  - extended_check_extensions
+  - extended_check_gpu
+  - extended_check_grind
+  - extended_check_mpi
+  - extended_check_san
+  - extended_check_schedulers
+  - analyze
+  - deploy
+  - new-release
+  - set-release
+  - release
+
+include:
+  - local: ci/gitlab/common.yml
+  - local: ci/gitlab/daily.yml
+  - local: ci/gitlab/build.yml
+  - local: ci/gitlab/windows.yml
+  - local: ci/gitlab/extended_build.yml
+  - local: ci/gitlab/releases.yml

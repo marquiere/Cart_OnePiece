@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang='fr'>
+	<head>
+		<meta charset='utf-8'>
+		<link rel='stylesheet' href='http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css'>
+		<script src='http://code.jquery.com/jquery-1.10.2.js'></script>
+		<script src='http://code.jquery.com/ui/1.11.2/jquery-ui.js'></script>
+		<style>
+			table {
+				margin: 0;
+				padding: 0;
+			}
+			td {
+				margin: 0;
+				padding: 0;
+				vertical-align: top;
+				text-align: center;
+			}
+			td.box {
+				border: solid 1px;
+			}
+			td.worker_box {
+				border: solid 1px;
+				width: 75px;
+			}
+			td.worker_box_sched {
+				border: solid 1px;
+				width: 75px;
+				background-color: lightgreen;
+			}
+			td.task {
+				border: solid 1px;
+				width: 23px;
+				height: 23px;
+				background-color: #87CEEB;
+			}
+			td.run_task {
+				border: solid 1px;
+				width: 69px;
+				max-width: 69px;
+				overflow: hidden;
+				font-size: 50%;
+				height: 23px;
+				background-color: #87CEEB;
+			}
+			td.task_prio {
+				border: solid 1px;
+				width: 23px;
+				height: 23px;
+				background-color: red;
+			}
+			td.last_task_empty {
+				border: dashed 1px;
+				width: 23px;
+				height: 23px;
+				background-color: white;
+			}
+			td.last_task_full {
+				border: dashed 1px;
+				width: 23px;
+				height: 23px;
+				background-color: #87CEEB;
+			}
+			td.last_task_full_prio {
+				border: dashed 1px;
+				width: 23px;
+				height: 23px;
+				background-color: red;
+			}
+			td.fake_task {
+				width: 25px;
+				height: 25px;
+			}
+		</style>
+		<script>
+			function getInput(){
+				var input = document.getElementById('input').value;
+				if (input <= 0 || input > $('#slider').slider('option', 'max')){
+					alert('Invalid state value');
+				}
+				document.getElementById('et' + document.getElementById('etape').value).style.display = 'none';
+				document.getElementById('et' + input).style.display = 'block';
+				$('#etape').val(input);
+				$('#slider').slider('value', input);
+			}
+		</script>
+		<script>
+			var myVar = null;
+			function changeState(number){
+				var state = document.getElementById('etape').value;
+				var state2 = parseInt(state) + parseInt(number);
+				var min = $('#slider').slider('option', 'min');
+				var max = $('#slider').slider('option', 'max');
+					document.getElementById('et' + document.getElementById('etape').value).style.display = 'none';
+				if (state2 >= min && state2 <= max){
+					document.getElementById('et' + state2).style.display = 'block';
+					$('#etape').val(state2);
+					$('#slider').slider('value', state2);
+				}
+				else if (state2 < min){
+					document.getElementById('et' + min).style.display = 'block';
+					$('#etape').val(min);
+					$('#slider').slider('value', min);
+				}
+				else if (state2 > max){
+					document.getElementById('et' + max).style.display = 'block';
+					$('#etape').val(max);
+					$('#slider').slider('value', max);
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<script>
+			$(function(){
+				sliderDiv = $('#slider') <!-- Alias -->
+				sliderDiv.slider({
+					value: 1,
+					min: 1,
+					max: 0,
+					step: 1,
+					animate: 'fast',
+					slide: function(event, ui){
+						var l_value = sliderDiv.slider('option', 'value');
+						$('#etape').val(ui.value);
+						document.getElementById('et' + l_value).style.display = 'none';
+						document.getElementById('et' + ui.value).style.display = 'block';
+					}
+				});
+				$('#etape').val(sliderDiv.slider('value')); <!-- Initialisation au lancement de la page -->
+				$('#max').val(sliderDiv.slider('option', 'max'));
+			});
+		</script>
+		<div id ='slider'></div>
+		<center>
+			<p>
+				<input type='button' value='-100' onclick="changeState(-100);"/>
+				<input type='button' value='<<' onmousedown="myVar = setInterval('changeState(-1)', 50)" onmouseup="clearInterval(myVar)" onmouseout="clearInterval(myVar)"/>
+				<input type='button' value='<' onclick="changeState(-1);"/>
+				<label for='etape'>State</label>
+				<input type='text' id='etape' size='3mm' readonly style='border:0;'>
+				<label for='max'>in</label>
+				<input type='text' id='max' size='3mm' readonly style='border:0;'>
+				<input type='button' value='>' onclick="changeState(1);" />
+				<input type='button' value='>>' onmousedown="myVar = setInterval('changeState(1)', 50)" onmouseup="clearInterval(myVar)" onmouseout="clearInterval(myVar)"/>
+				<input type='button' value='+100' onclick="changeState(100);"/>
+			</p>
+				<span id='range'>Auto speed (state/s): 4</span>
+				<input type='range' id='autoRange' min='1' max='50' value='4' step='1' onchange="showValue(this.value); clearInterval(myVar);"  />
+				<script>
+					document.getElementById('autoRange').value = 4;
+					function showValue(newValue)
+					{
+						document.getElementById('range').innerHTML='Auto speed (state/s): '+ newValue;
+					}
+				</script>
+				<input type='button' value='Auto' onclick="if(myVar){ clearInterval(myVar); myVar = null;}changeState(1); myVar = setInterval('changeState(1)', 1000/document.getElementById('autoRange').value);"/>
+				<input type='button' value='Stop' onclick="clearInterval(myVar);"/>
+			<p>
+			</p>
+			<FORM>
+				<span>Go to state</span>
+				<input type='text' name='setinput' id='input' value='' onKeyPress="if(event.keyCode == 13){ getInput(); javascript:this.value=''}" onFocus="javascript:this.value=''"/>
+				<input type='text' name='message' id='' value='' style='display:none'>
+				<input type='button' value='Go' onclick="getInput(); javascript:input.value=''"/>
+			</FORM>
+			<br />
+		</center>
+	</body>
+</html>

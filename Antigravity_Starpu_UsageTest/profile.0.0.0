@@ -1,0 +1,24 @@
+3 templated_functions_MULTI_TIME
+# Name Calls Subrs Excl Incl ProfileCalls #
+"int apex_preload_main(int, char **, char **)" 1 0 320616 320616 0 GROUP="TAU_USER" 
+"UNRESOLVED ADDR (nil)" 4 0 755.456 755.231 0 GROUP="TAU_USER" 
+".TAU application" 1 0 0 321205 0 GROUP="TAU_DEFAULT" 
+0 aggregates
+16 userevents
+# eventname numevents max min mean sumsqr
+"status:nonvoluntary_ctxt_switches" 1 1 1 1 1 
+"status:voluntary_ctxt_switches" 1 0 0 0 0 
+"1 Minute Load average" 1 8.58 8.58 8.58 73.6164 
+"status:VmPeak kB" 1 1.36208e+06 1.36208e+06 1.36208e+06 1.85526e+12 
+"status:VmSize kB" 1 1.29654e+06 1.29654e+06 1.29654e+06 1.68103e+12 
+"status:VmLck kB" 1 0 0 0 0 
+"status:VmPin kB" 1 0 0 0 0 
+"status:VmPTE kB" 1 784 784 784 614656 
+"status:VmStk kB" 1 136 136 136 18496 
+"status:VmExe kB" 1 536 536 536 287296 
+"status:VmLib kB" 1 837460 837460 837460 7.01339e+11 
+"status:VmHWM kB" 1 199840 199840 199840 3.9936e+10 
+"status:VmData kB" 1 223596 223596 223596 4.99952e+10 
+"status:VmSwap kB" 1 0 0 0 0 
+"status:VmRSS kB" 1 199840 199840 199840 3.9936e+10 
+"status:Threads" 1 2 2 2 4 

@@ -1,0 +1,760 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page DataManagement Data Management
+
+TODO: intro which mentions consistency among other things
+
+\section DataInterface Data Interface
+
+StarPU provides several data interfaces for programmers to describe
+the data layout of their application. There are predefined interfaces
+already available in StarPU. Users can define new data interfaces as
+explained in \ref DefiningANewDataInterface. All functions provided by
+StarPU are documented in \ref API_Data_Interfaces. You will find a
+short list below.
+
+\subsection VariableDataInterface Variable Data Interface
+
+A variable is a given-size byte element, typically a scalar or a pointer to an application-specific structure.
+
+Here is an example of how to register a variable data to StarPU by using
+starpu_variable_data_register(). A full code example for the variable data
+interface is available in the file <c>examples/basic_examples/variable.c</c>.
+
+\code{.c}
+float var = 42.0;
+starpu_data_handle_t var_handle;
+starpu_variable_data_register(&var_handle, STARPU_MAIN_RAM, (uintptr_t)&var, sizeof(var));
+\endcode
+
+Here is an example of how to register an application-specific data to StarPU,
+the idea is to register the variable that contains the pointer to the
+application-specific data. This will not provide support for GPUs and MPI, but
+can be an easy start before defining your own data interface to describe the
+application-specific structure (see \ref DefiningANewDataInterface).
+
+\code{.c}
+struct mystructure *A = ...;
+starpu_data_handle_t var_handle;
+starpu_variable_data_register(&var_handle, STARPU_MAIN_RAM, (uintptr_t)&A, sizeof(A));
+\endcode
+
+\subsection VectorDataInterface Vector Data Interface
+
+A vector is a fixed number of elements of a given size. Here is an
+example of how to register a vector data to StarPU by using
+starpu_vector_data_register(). A full code example for the vector data interface is available in the file <c>examples/filters/fvector.c</c>.
+
+\code{.c}
+float vector[NX];
+starpu_data_handle_t vector_handle;
+starpu_vector_data_register(&vector_handle, STARPU_MAIN_RAM, (uintptr_t)vector, NX, sizeof(vector[0]));
+\endcode
+
+Vectors can be partitioned into pieces by using
+starpu_vector_filter_block(). They can also be partitioned with some overlapping
+by using starpu_vector_filter_block_shadow(). An
+example is in the file <c>examples/filters/shadow.c</c>.
+
+By default, StarPU uses the same size for each piece. If different
+sizes are desired, starpu_vector_filter_list() or
+starpu_vector_filter_list_long() can be used instead.
+
+To just divide in two pieces, starpu_vector_filter_divide_in_2() can
+be used.
+
+In addition, contiguous variables can be picked from a vector by using
+starpu_vector_filter_pick_variable() with starpu_data_filter::get_child_ops set to starpu_vector_filter_pick_variable_child_ops(). An example is in the file <c>examples/filters/fvector_pick_variable.c</c>.
+
+\subsection MatrixDataInterface Matrix Data Interface
+
+To register 2-D matrices with a potential padding, one can use the
+matrix data interface. Here is an example of how to register a matrix
+data to StarPU by using starpu_matrix_data_register().
+
+A full code example for the matrix data interface is available in the file
+<c>examples/filters/fmatrix.c</c>.
+
+\code{.c}
+float *matrix;
+starpu_data_handle_t matrix_handle;
+matrix = (float*)malloc(width * height * sizeof(float));
+starpu_matrix_data_register(&matrix_handle, STARPU_MAIN_RAM, (uintptr_t)matrix, width, width, height, sizeof(float));
+\endcode
+
+2D matrices can be partitioned into 2D matrices along the x dimension by
+using starpu_matrix_filter_block(), and along the y dimension by using
+starpu_matrix_filter_vertical_block().
+
+They can also be partitioned with some overlapping by using
+starpu_matrix_filter_block_shadow() and
+starpu_matrix_filter_vertical_block_shadow(). An
+example is in the file <c>examples/filters/shadow2d.c</c>.
+
+In addition, contiguous vectors can be picked from a matrix along the
+Y dimension by using starpu_matrix_filter_pick_vector_y() with
+starpu_data_filter::get_child_ops set to
+starpu_matrix_filter_pick_vector_child_ops(). An example
+is in the file <c>examples/filters/fmatrix_pick_vector.c</c>.
+
+Variable can be also picked from a matrix by using
+starpu_matrix_filter_pick_variable() with
+starpu_data_filter::get_child_ops needs set to
+starpu_matrix_filter_pick_variable_child_ops(). An
+example is in the file
+<c>examples/filters/fmatrix_pick_variable.c</c>.
+
+\subsection BlockDataInterface Block Data Interface
+
+To register 3-D matrices with potential paddings on Y and Z dimensions,
+one can use the block data interface. Here is an example of how to
+register a block data to StarPU by using starpu_block_data_register(). A full code example for the block data interface is available in the file <c>examples/filters/fblock.c</c>.
+
+\code{.c}
+float *block;
+starpu_data_handle_t block_handle;
+block = (float*)malloc(nx*ny*nz*sizeof(float));
+starpu_block_data_register(&block_handle, STARPU_MAIN_RAM, (uintptr_t)block, nx, nx*ny, nx, ny, nz, sizeof(float));
+\endcode
+
+3D matrices can be partitioned along the x dimension by
+using starpu_block_filter_block(), or along the y dimension
+by using starpu_block_filter_vertical_block(), or along the
+z dimension by using starpu_block_filter_depth_block(). They
+can also be partitioned with some overlapping by using
+starpu_block_filter_block_shadow(), starpu_block_filter_vertical_block_shadow(),
+or starpu_block_filter_depth_block_shadow(). An
+example is in the file <c>examples/filters/shadow3d.c</c>.
+
+In addition, contiguous matrices
+can be picked from a block along the Z dimension or the Y dimension
+by using starpu_block_filter_pick_matrix_z() or
+starpu_block_filter_pick_matrix_y() with
+starpu_data_filter::get_child_ops set to
+starpu_block_filter_pick_matrix_child_ops(). An example
+is in the file <c>examples/filters/fblock_pick_matrix.c</c>.
+
+Variable can be also picked from a block by using
+starpu_block_filter_pick_variable() with
+starpu_data_filter::get_child_ops set to
+starpu_block_filter_pick_variable_child_ops(). An example
+is in the file <c>examples/filters/fblock_pick_variable.c</c>.
+
+\subsection TensorDataInterface Tensor Data Interface
+
+To register 4-D matrices with potential paddings on Y, Z, and T dimensions,
+one can use the tensor data interface. Here is an example of how to
+register a tensor data to StarPU by using starpu_tensor_data_register(). A full code example for the tensor data interface is available in the file <c>examples/filters/ftensor.c</c>.
+
+\code{.c}
+float *block;
+starpu_data_handle_t block_handle;
+block = (float*)malloc(nx*ny*nz*nt*sizeof(float));
+starpu_tensor_data_register(&block_handle, STARPU_MAIN_RAM, (uintptr_t)block, nx, nx*ny, nx*ny*nz, nx, ny, nz, nt, sizeof(float));
+\endcode
+
+4D matrices can be partitioned along the x dimension by
+using starpu_tensor_filter_block(), or along the y dimension
+by using starpu_tensor_filter_vertical_block(), or along the
+z dimension by using starpu_tensor_filter_depth_block(), or
+along the t dimension by using starpu_tensor_filter_time_block().
+
+They can also be partitioned with some overlapping by using
+starpu_tensor_filter_block_shadow(),
+starpu_tensor_filter_vertical_block_shadow(),
+starpu_tensor_filter_depth_block_shadow(), or
+starpu_tensor_filter_time_block_shadow(). An example is in the file
+<c>examples/filters/shadow4d.c</c>.
+
+In addition, contiguous blocks can be picked from a block along the T dimension,
+Z dimension or the Y dimension by using starpu_tensor_filter_pick_block_t(),
+starpu_tensor_filter_pick_block_z(), or
+starpu_tensor_filter_pick_block_y(), and
+starpu_data_filter::get_child_ops set to
+starpu_tensor_filter_pick_block_child_ops(). An example
+is in the file <c>examples/filters/ftensor_pick_block.c</c>.
+
+Variable can be also picked from a tensor by using
+starpu_tensor_filter_pick_variable() with
+starpu_data_filter::get_child_ops set to
+starpu_tensor_filter_pick_variable_child_ops(). An
+example is in the file
+<c>examples/filters/ftensor_pick_variable.c</c>.
+
+\subsection NdimDataInterface Ndim Data Interface
+
+To register N-dim matrices, one can use the Ndim data interface.
+Here is an example of how to register a 5-dim data to StarPU by using starpu_ndim_data_register(). A full code example for the ndim data interface is available in the file <c>examples/filters/fndim.c</c>.
+
+\code{.c}
+float *arr5d;
+starpu_data_handle_t arr5d_handle;
+starpu_malloc((void **)&arr5d, NX*NY*NZ*NT*NG*sizeof(float));
+
+unsigned nn[5] = {NX, NY, NZ, NT, NG};
+unsigned ldn[5] = {1, NX, NX*NY, NX*NY*NZ, NX*NY*NZ*NT};
+
+starpu_ndim_data_register(&arr5d_handle, STARPU_MAIN_RAM, (uintptr_t)arr5d, ldn, nn, 5, sizeof(float));
+\endcode
+
+N-dim matrices can be partitioned along the given dimension
+by using starpu_ndim_filter_block(). They can also be partitioned
+with some overlapping by using starpu_ndim_filter_block_shadow(). An
+example is in the file <c>examples/filters/shadownd.c</c>.
+
+Taking into account existing data interfaces, there are several
+specialized functions which can partition a 0-dim array, 1-dim array,
+2-dim array, 3-dim array or 4-dim array into
+<ul>
+<LI>variables by using starpu_ndim_filter_to_variable() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_to_variable_child_ops() (see file <c>examples/filters/fndim_to_variable.c</c>)</li>,
+<Li>vectors by using starpu_ndim_filter_to_vector() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_to_vector_child_ops() (see file <c>examples/filters/fndim_to_vector.c</c>)</li>,
+<Li>matrices by using starpu_ndim_filter_to_matrix() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_to_matrix_child_ops() (see file <c>examples/filters/fndim_to_matrix.c</c>)</li>,
+<Li>blocks by using starpu_ndim_filter_to_block() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_to_block_child_ops() (see file <c>examples/filters/fndim_to_block.c</c>)</li>,
+<Li>or tensors by using starpu_ndim_filter_to_tensor() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_to_tensor_child_ops() (see file <c>examples/filters/fndim_to_tensor.c</c>)</li>.
+</ul>
+
+In addition, contiguous (n-1)dim arrays can be picked from a ndim array
+along the given dimension by using starpu_ndim_filter_pick_ndim(). An
+example is in the file <c>examples/filters/fndim_pick_ndim.c</c>.
+
+In specific cases which consider existing data interfaces, contiguous
+variables, vectors, matrices, blocks, or tensors can be along the
+given dimension picked from a
+<ul>
+<li>1-dim array by using starpu_ndim_filter_1d_pick_variable() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_variable_child_ops() (see file <c>examples/filters/fndim_1d_pick_variable.c</c>),
+<li>2-dim array by using starpu_ndim_filter_2d_pick_vector() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_vector_child_ops() (see file <c>examples/filters/fndim_2d_pick_vector.c</c>),
+<li>3-dim array by using starpu_ndim_filter_3d_pick_matrix() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_matrix_child_ops() (see file <c>examples/filters/fndim_3d_pick_matrix.c</c>),
+<li>4-dim array by using starpu_ndim_filter_4d_pick_block() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_block_child_ops() (see file <c>examples/filters/fndim_4d_pick_block.c</c>),
+<li>or 5-dim array by using starpu_ndim_filter_5d_pick_tensor() and starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_tensor_child_ops() (see file <c>examples/filters/fndim_5d_pick_tensor.c</c>).
+</ul>
+
+Variable can be also picked from a ndim array by using
+starpu_ndim_filter_pick_variable() with starpu_data_filter::get_child_ops set to starpu_ndim_filter_pick_variable_child_ops(). An example is in the file <c>examples/filters/fndim_pick_variable.c</c>.
+
+\subsection BCSRDataInterface BCSR Data Interface
+
+BCSR (Blocked Compressed Sparse Row Representation) sparse matrix data
+can be registered to StarPU using the bcsr data interface. Here is an
+example on how to do so by using starpu_bcsr_data_register().
+
+\code{.c}
+/*
+ * We use the following matrix:
+ *
+ *   +----------------+
+ *   |  0   1   0   0 |
+ *   |  2   3   0   0 |
+ *   |  4   5   8   9 |
+ *   |  6   7  10  11 |
+ *   +----------------+
+ *
+ * nzval  = [0, 1, 2, 3] ++ [4, 5, 6, 7] ++ [8, 9, 10, 11]
+ * colind = [0, 0, 1]
+ * rowptr = [0, 1, 3]
+ * r = c = 2
+ */
+
+/* Size of the blocks */
+int R = 2;
+int C = 2;
+
+int NROWS = 2;
+int NNZ_BLOCKS = 3;    /* out of 4 */
+int NZVAL_SIZE = (R*C*NNZ_BLOCKS);
+
+int nzval[NZVAL_SIZE]  =
+{
+	0, 1, 2, 3,    /* First block  */
+	4, 5, 6, 7,    /* Second block */
+	8, 9, 10, 11   /* Third block  */
+};
+uint32_t colind[NNZ_BLOCKS] =
+{
+	0, /* block-column index for first block in nzval */
+	0, /* block-column index for second block in nzval */
+	1  /* block-column index for third block in nzval */
+};
+uint32_t rowptr[NROWS+1] =
+{
+	0, /* block-index in nzval of the first block of the first row. */
+	1, /* block-index in nzval of the first block of the second row. */
+	NNZ_BLOCKS /* number of blocks, to allow an easier element's access for the kernels */
+};
+
+starpu_data_handle_t bcsr_handle;
+starpu_bcsr_data_register(&bcsr_handle,
+			  STARPU_MAIN_RAM,
+			  NNZ_BLOCKS,
+			  NROWS,
+			  (uintptr_t) nzval,
+			  colind,
+			  rowptr,
+			  0, /* firstentry */
+			  R,
+			  C,
+			  sizeof(nzval[0]));
+\endcode
+
+An example on how to deal with such matrices is in the file <c>examples/spmv/dw_block_spmv.c</c>.
+
+BCSR data handles can be partitioned into its dense matrix blocks by using
+starpu_bcsr_filter_canonical_block(), or split into other BCSR data handles by
+using starpu_bcsr_filter_vertical_block() (but only split along the leading dimension is
+supported, i.e. along adjacent nnz blocks). starpu_data_filter::get_child_ops needs to be set to starpu_bcsr_filter_canonical_block_child_ops() and starpu_data_filter::get_nchildren set to starpu_bcsr_filter_canonical_block_get_nchildren(). An example is available in <c>tests/datawizard/bcsr.c</c>.
+
+\subsection CSRDataInterface CSR Data Interface
+
+TODO
+
+To register a Compressed Sparse Row Representation (CSR) sparse matrix, one can use the
+CSR data interface. A full code example for the CSR data interface is available in the file <c>mpi/tests/datatypes.c</c> to show how to register a COO matrix data to StarPU by using starpu_csr_data_register().
+
+CSR data handles can be partitioned into vertical CSR matrices by using
+starpu_csr_filter_vertical_block(). An example is available in the file <c>examples/spmv/spmv.c</c>.
+
+\subsection COODataInterface COO Data Interface
+
+To register 2-D matrices given in the coordinate format (COO), one can use the
+COO data interface. A full code example for the COO data interface is available in the file <c>tests/datawizard/interfaces/coo/coo_interface.c</c> to show how to register a COO matrix data to StarPU by using starpu_coo_data_register().
+
+\section PartitioningData Partitioning Data
+
+An existing piece of data can be partitioned in sub parts to be used by different tasks, for instance:
+
+\code{.c}
+#define NX 1048576
+#define PARTS 16
+int vector[NX];
+starpu_data_handle_t handle;
+
+/* Declare data to StarPU */
+starpu_vector_data_register(&handle, STARPU_MAIN_RAM, (uintptr_t)vector, NX, sizeof(vector[0]));
+
+/* Partition the vector in PARTS sub-vectors */
+struct starpu_data_filter f =
+{
+    .filter_func = starpu_vector_filter_block,
+    .nchildren = PARTS
+};
+starpu_data_partition(handle, &f);
+\endcode
+
+The handle of a sub-data block of a composite data block can be retrieved by calling starpu_data_get_child(). Or the task submission first retrieves the number of sub-data blocks in a composite data block by calling starpu_data_get_nb_children() and then uses the function starpu_data_get_sub_data() or starpu_data_vget_sub_data() to retrieve the sub-handles to be passed as tasks parameters.
+
+\code{.c}
+/* Submit a task on each sub-vector */
+for (i=0; i<starpu_data_get_nb_children(handle); i++)
+{
+    /* Get subdata number i (there is only 1 dimension) */
+    starpu_data_handle_t sub_handle = starpu_data_get_sub_data(handle, 1, i);
+    struct starpu_task *task = starpu_task_create();
+
+    task->handles[0] = sub_handle;
+    task->cl = &cl;
+    task->synchronous = 1;
+    task->cl_arg = &factor;
+    task->cl_arg_size = sizeof(factor);
+
+    starpu_task_submit(task);
+}
+\endcode
+
+Partitioning can be applied several times by using starpu_data_map_filters() or starpu_data_vmap_filters() or starpu_data_map_filters_parray() or starpu_data_map_filters_array(), see
+<c>examples/basic_examples/mult.c</c> and <c>examples/filters/</c>.
+
+Wherever the whole piece of data is already available, the partitioning will
+be done in-place, i.e. without allocating new buffers but just using pointers
+inside the existing copy. This is particularly important to be aware of when
+using OpenCL, where the kernel parameters are not pointers, but \c cl_mem handles. The
+kernel thus needs to be also passed the offset within the OpenCL buffer:
+
+\code{.c}
+void opencl_func(void *buffers[], void *cl_arg)
+{
+    cl_mem vector = (cl_mem) STARPU_VECTOR_GET_DEV_HANDLE(buffers[0]);
+    unsigned offset = STARPU_BLOCK_GET_OFFSET(buffers[0]);
+
+    ...
+    clSetKernelArg(kernel, 0, sizeof(vector), &vector);
+    clSetKernelArg(kernel, 1, sizeof(offset), &offset);
+    ...
+}
+\endcode
+
+And the kernel has to shift from the pointer passed by the OpenCL driver:
+
+\code{.c}
+__kernel void opencl_kernel(__global int *vector, unsigned offset)
+{
+    block = (__global void *)block + offset;
+    ...
+}
+\endcode
+
+When the sub-data is not of the same type as the original data, the field
+starpu_data_filter::get_child_ops needs to be set appropriately for StarPU
+to know which type should be used.
+
+starpu_data_unpartition() should be called in the end to collect back the sub-pieces of data into the original piece of data.
+
+StarPU provides various interfaces and filters for matrices, vectors, etc.,
+but applications can also write their own data interfaces and filters, see
+<c>examples/interface</c> and <c>examples/filters/custom_mf</c> for an example,
+and see \ref DefiningANewDataInterface and \ref DefiningANewDataFilter
+for documentation.
+
+\section AsynchronousPartitioning Asynchronous Partitioning
+
+The partitioning functions described in the previous section are synchronous:
+starpu_data_partition() and starpu_data_unpartition() both wait for all the tasks
+currently working on the data. This can be a bottleneck for the application.
+
+An asynchronous API also exists, it works only on handles with sequential
+consistency. The principle is to first plan the partitioning, which returns
+data handles of the partition, which are not functional yet. When submitting
+tasks, one can mix using the handles of the partition or the whole data. One
+can even partition recursively and mix using handles at different levels of the
+recursion. Of course, StarPU will have to introduce coherency synchronization.
+
+<c>examples/filters/fmultiple_submit_implicit.c</c> is a complete example using this technique.
+One can also look at <c>examples/filters/fmultiple_submit_readonly.c</c> which contains the
+explicit coherency synchronization which are automatically introduced by StarPU
+for <c>examples/filters/fmultiple_submit_implicit.c</c>.
+
+In short, we first register a matrix and plan the partitioning:
+
+\code{.c}
+starpu_matrix_data_register(&handle, STARPU_MAIN_RAM, (uintptr_t)matrix, NX, NX, NY, sizeof(matrix[0]));
+struct starpu_data_filter f_vert =
+{
+	.filter_func = starpu_matrix_filter_block,
+	.nchildren = PARTS
+};
+starpu_data_partition_plan(handle, &f_vert, vert_handle);
+\endcode
+
+starpu_data_partition_plan() returns the handles for the partition in <c>vert_handle</c>.
+
+One can then submit tasks working on the main \c handle, and tasks working on the sub handles
+<c>vert_handle</c>. Between using the main handle and the handles <c>vert_handle</c>, StarPU will automatically call starpu_data_partition_submit() and
+starpu_data_unpartition_submit(). Or call starpu_data_partition_submit_sequential_consistency() and starpu_data_unpartition_submit_sequential_consistency() to specify the coherency to be used for the main handle, or call starpu_data_unpartition_submit_sequential_consistency_cb() to specify a callback function for the unpartitiong task. One can also call starpu_data_partition_readonly_submit() and starpu_data_unpartition_readonly_submit() which do not guarantee coherency if the application attempts to write to the main handle or any of its sub-handles while a task is still running. However, in read-only case we can also call starpu_data_partition_readonly_submit_sequential_consistency() to specify the coherency to be used for the main handle, or call starpu_data_partition_readwrite_upgrade_submit() to upgrade the partitioning of a data handle from read-only to read-write mode for a specific sub-handle. If users want to specify that the data won't be touched in write mode anymore and use multiple partition of the data at the same time, they can call starpu_data_partition_readonly_downgrade_submit().
+
+After the task has completed using the data partition, starpu_data_partition_clean() or starpu_data_partition_clean_node() is used to clean up a data partition on the local node or on a specific node.
+
+Note that \c f_vert needs to be kept alive until we call starpu_data_partition_clean().
+
+All this code is asynchronous, just submitting which tasks, partitioning and
+unpartitioning will be done at runtime.
+
+Planning several partitioning of the same data is also possible, StarPU will
+unpartition and repartition as needed when mixing accesses of different
+partitions. If data access is done in read-only mode, StarPU will allow the
+different partitioning to coexist. As soon as a data is accessed in read-write
+mode, StarPU will automatically unpartition everything and activate only the
+partitioning leading to the data being written to.
+
+For instance, for a stencil application, one can split a subdomain into
+its interior and halos, and then just submit a task updating the whole
+subdomain, then submit MPI sends/receives to update the halos, then submit
+again a task updating the whole subdomain, etc. and StarPU will automatically
+partition/unpartition each time.
+
+By default, StarPU will collect the pieces of the children on the home node
+if there is one, or on the STARPU_MAIN_RAM memory node otherwise. This can be
+changed by calling starpu_data_set_gathering_node() before partitioning the
+data.
+
+\section DataCommute Commute Data Access
+
+By default, the implicit dependencies computed from data access use the
+sequential semantic. Notably, write accesses are always serialized in the order
+of submission. In some applicative cases, the write contributions can actually
+be performed in any order without affecting the eventual result. In this case,
+it is useful to drop the strictly sequential semantic, to improve parallelism
+by allowing StarPU to reorder the write accesses. This can be done by using
+the data access flag ::STARPU_COMMUTE. Accesses without this flag will however
+properly be serialized against accesses with this flag. For instance:
+
+\code{.c}
+    starpu_task_insert(&cl1, STARPU_R, h, STARPU_RW, handle, 0);
+    starpu_task_insert(&cl2, STARPU_R, handle1, STARPU_RW|STARPU_COMMUTE, handle, 0);
+    starpu_task_insert(&cl2, STARPU_R, handle2, STARPU_RW|STARPU_COMMUTE, handle, 0);
+    starpu_task_insert(&cl3, STARPU_R, g, STARPU_RW, handle, 0);
+\endcode
+
+The two tasks running <c>cl2</c> will be able to commute: depending on whether the
+value of <c>handle1</c> or <c>handle2</c> becomes available first, the corresponding task
+running <c>cl2</c> will start first. The task running <c>cl1</c> will however always be run
+before them, and the task running <c>cl3</c> will always be run after them.
+
+<c>tests/datawizard/commute2.c</c> is a complete example using the data access flag.
+
+If a lot of tasks use the commute access on the same set of data and a lot of
+them are ready at the same time, it may become interesting to use an arbiter,
+see \ref ConcurrentDataAccess.
+
+\section DataReduction Data Reduction
+
+In various cases, some piece of data is used to accumulate intermediate
+results. For instances, the dot product of a vector, maximum/minimum finding,
+the histogram of a picture, etc. When these results are produced along the
+whole machine, it would not be efficient to accumulate them in only one place,
+incurring data transmission each and access concurrency.
+
+StarPU provides a mode ::STARPU_REDUX, which permits to optimize
+this case: it will allocate one buffer on each worker (lazily), and let tasks accumulate
+intermediate results there. When the data is eventually accessed in the normal
+mode ::STARPU_R, StarPU will collect the intermediate results in just one
+buffer.
+
+The function starpu_data_set_reduction_methods() must be called to specify how to initialize these
+buffers, and how to assemble partial results. The function starpu_data_set_reduction_methods_with_args() can also be used to
+pass arguments to the reduction and init tasks.
+
+For instance, <c>examples/cg/cg.c</c> uses that to optimize its dot product: it first defines
+the codelets for initialization and reduction:
+
+\code{.c}
+struct starpu_codelet bzero_variable_cl =
+{
+        .cpu_funcs = { bzero_variable_cpu },
+        .cpu_funcs_name = { "bzero_variable_cpu" },
+        .cuda_funcs = { bzero_variable_cuda },
+        .nbuffers = 1,
+}
+
+static void accumulate_variable_cpu(void *descr[], void *cl_arg)
+{
+        double *v_dst = (double *)STARPU_VARIABLE_GET_PTR(descr[0]);
+        double *v_src = (double *)STARPU_VARIABLE_GET_PTR(descr[1]);
+        *v_dst = *v_dst + *v_src;
+}
+
+static void accumulate_variable_cuda(void *descr[], void *cl_arg)
+{
+        double *v_dst = (double *)STARPU_VARIABLE_GET_PTR(descr[0]);
+        double *v_src = (double *)STARPU_VARIABLE_GET_PTR(descr[1]);
+        cublasaxpy(1, (double)1.0, v_src, 1, v_dst, 1);
+        cudaStreamSynchronize(starpu_cuda_get_local_stream());
+}
+
+struct starpu_codelet accumulate_variable_cl =
+{
+        .cpu_funcs = { accumulate_variable_cpu },
+        .cpu_funcs_name = { "accumulate_variable_cpu" },
+        .cuda_funcs = { accumulate_variable_cuda },
+        .nbuffers = 2,
+	.modes = {STARPU_RW|STARPU_COMMUTE, STARPU_R},
+}
+\endcode
+
+and attaches them as reduction methods for its handle <c>dtq</c>:
+
+\code{.c}
+starpu_variable_data_register(&dtq_handle, -1, NULL, sizeof(type));
+starpu_data_set_reduction_methods(dtq_handle, &accumulate_variable_cl, &bzero_variable_cl);
+\endcode
+
+and <c>dtq_handle</c> can now be used with the mode ::STARPU_REDUX for the
+dot products with partitioned vectors:
+
+\code{.c}
+for (b = 0; b < nblocks; b++)
+    starpu_task_insert(&dot_kernel_cl,
+        STARPU_REDUX, dtq_handle,
+        STARPU_R, starpu_data_get_sub_data(v1, 1, b),
+        STARPU_R, starpu_data_get_sub_data(v2, 1, b),
+        0);
+\endcode
+
+Each <c>dot_kernel_cl</c> task will essentially compute <c>dtq += v1.v2</c>,
+i.e. accumulate into the StarPU-provided buffer the partial dot product result.
+
+During registration, we have here provided <c>NULL</c>, i.e. there is
+no initial value to be taken into account during reduction. StarPU
+will thus only take into account the contributions from the tasks
+<c>dot_kernel_cl</c>. For a given worker, the first of these tasks that runs on
+that worker will be given a buffer initialized with the initialization codelet.
+The others running on that worker will be given the same buffer, each task
+accumulating its contribution on top of the previous ones.
+Also, StarPU will not allocate any memory for
+<c>dtq_handle</c> before the tasks <c>dot_kernel_cl</c> are ready to run.
+
+If another dot product series has to be performed, one could unregister
+<c>dtq_handle</c>, and re-register it. But one can also call
+starpu_data_deinitialize_submit() or even starpu_data_invalidate_submit() with
+the parameter <c>dtq_handle</c>,
+which will clear all data from the handle, thus resetting it back to
+the initial status <c>register(NULL)</c>.
+
+The example <c>examples/cg/cg.c</c> also uses reduction for the blocked gemv kernel,
+leading to yet more relaxed dependencies and more parallelism.
+
+::STARPU_REDUX can also be passed to starpu_mpi_task_insert() in the MPI
+case. This will however not produce any MPI communication, but just pass
+::STARPU_REDUX to the underlying starpu_task_insert(). starpu_mpi_redux_data()
+posts tasks which will reduce the partial results among MPI nodes into the MPI
+node which owns the data. The function can be called by users to benefit from
+fine-tuning such as priority setting. If users do not call this function,
+StarPU wraps up reduction patterns automatically. The following example
+shows a hypothetical application which collects partial results
+into data <c>res</c>, then uses it for other computation, before looping again
+with a new reduction where the wrap-up of the reduction pattern is explicit:
+
+\code{.c}
+for (i = 0; i < 100; i++)
+{
+    starpu_mpi_task_insert(MPI_COMM_WORLD, &init_res, STARPU_W, res, 0);
+    starpu_mpi_task_insert(MPI_COMM_WORLD, &work, STARPU_RW, A, STARPU_R, B, STARPU_REDUX, res, 0);
+    starpu_mpi_redux_data(MPI_COMM_WORLD, res);
+    starpu_mpi_task_insert(MPI_COMM_WORLD, &work2, STARPU_RW, B, STARPU_R, res, 0);
+}
+\endcode
+
+starpu_mpi_redux_data() is called automatically in various cases, including
+when a task reading the reduced handle is inserted through starpu_mpi_task_insert().
+The previous example could avoid calling starpu_mpi_redux_data(). Default priority (0)
+is used. The reduction tree arity is decided based on the size of the data to reduce: a
+flat tree is used with a small data (default to less than 1024 bytes), a binary tree
+otherwise. If the environment variable \ref STARPU_MPI_REDUX_ARITY_THRESHOLD is set, the
+threshold between the size of a small data and a bigger data is modified. If the value is
+set to be negative, flat trees will always be used. If the value is set to 0, binary
+trees are used. Otherwise, the size of the data is compared to the size in the environment
+variable. Remaining distributed-memory reduction patterns are wrapped-up at the end of an
+application when calling starpu_mpi_wait_for_all().
+
+More details about MPI reduction are show in Section \ref MPIMpiRedux,
+and some examples for MPI data reduction are available in <c>mpi/examples/mpi_redux/</c>.
+
+\section ConcurrentDataAccess Concurrent Data Accesses
+
+When several tasks are ready and will work on several data, StarPU is faced with
+the classical Dining Philosopher's problem, and has to determine the order in
+which it will run the tasks.
+
+Data accesses usually use sequential ordering, so data accesses are usually
+already serialized, and thus by default, StarPU uses the Dijkstra solution which
+scales very well in terms of overhead: tasks will just acquire data one by one
+by data handle pointer value order.
+
+When sequential ordering is disabled or the flag ::STARPU_COMMUTE is used, there
+may be a lot of concurrent accesses to the same data, and the Dijkstra solution
+gets only poor parallelism, typically in some pathological cases which do happen
+in various applications, for instance
+
+\code{.c}
+for (i = 0; i < N; i++)
+    for (j = 0; j < N; j++)
+        task[i][j] = starpu_task_build(&cl, STARPU_RW|STARPU_COMMUTE, A[i], STARPU_RW|STARPU_COMMUTE, B[j], 0);
+\endcode
+
+It creates a series of tasks that are completely parallel in terms of
+tasks dependencies thanks to commutation, but StarPU still has to prevent two
+tasks from operating on the same data. The Dijkstra solution here leads to a
+worst-case: the \c task[0][j] tasks will wait for each other since
+they all access the same \c A[0]. And \c task[1][0] will wait for
+\c task[0][0] because they both access the same \c B[0], \c task[1][1] will wait
+for \c task[0][1] because of \c B[1], etc. In the end, no parallism is achieved:
+
+\image html arbiter.png
+\image latex arbiter.png "" width=0.7\textwidth
+
+In this case, one can use a data access arbiter ::starpu_arbiter_t, which
+implements the classical centralized solution for the Dining Philosophers
+problem. One can call starpu_arbiter_create() to create a data access arbiter, and starpu_data_assign_arbiter() to make access to handle managed by arbiter. Once the application no longer needs the arbiter, one can call starpu_arbiter_destroy() to destroy the arbiter after all data assigned to the arbiter have been unregistered. This is more expensive in terms of overhead since it is centralized,
+but it opportunistically gets a lot of parallelism. The centralization can also
+be avoided by using several arbiters, thus separating sets of data for which
+arbitration will be done.  If a task accesses data from different arbiters, it
+will acquire them arbiter by arbiter, in arbiter pointer value order.
+
+See the <c>tests/datawizard/test_arbiter.cpp</c> example.
+
+Arbiters however do not support the flag ::STARPU_REDUX yet.
+
+\section TemporaryBuffers Temporary Buffers
+
+There are two kinds of temporary buffers: temporary data which just pass results
+from a task to another, and scratch data which are needed only internally by
+tasks.
+
+\subsection TemporaryData Temporary Data
+
+Data can be produced by a task, and consumed by another task, without
+being used by other parts of the application. In such case,
+registration can be done without prior allocation, by using
+the special memory node number <c>-1</c>, and passing a NULL pointer. StarPU will
+actually allocate memory only when the task creating the content gets scheduled,
+and destroy it on unregistration.
+
+As the application will not use the data, it can be tedious for the
+application to have to unregister it. The unregistration can be
+done lazily by using the function starpu_data_unregister_submit(),
+which will record that no other tasks accessing the handle will be submitted, so
+that it can be freed as soon as the last task accessing it is completed.
+
+The following code examplifies both points: it registers the temporary
+data, submits three tasks accessing it, and records the data for automatic
+unregistration.
+
+\code{.c}
+starpu_vector_data_register(&handle, -1, NULL, n, sizeof(float));
+starpu_task_insert(&produce_data, STARPU_W, handle, 0);
+starpu_task_insert(&compute_data, STARPU_RW, handle, 0);
+starpu_task_insert(&summarize_data, STARPU_R, handle, STARPU_W, result_handle, 0);
+starpu_data_unregister_submit(handle);
+\endcode
+
+The application may also want for the temporary data to be initialized
+on the fly before being used by the task. This can be done by using
+starpu_data_set_reduction_methods() to set an initialization codelet (no redux
+codelet is needed).
+
+\subsection ScratchData Scratch Data
+
+Some kernels sometimes need temporary data to complete the computations, like a
+workspace. The application could allocate it at the start of the codelet
+function, and free it at the end, but this would be costly. It could also
+allocate one buffer per worker (similarly to \ref HowToInitializeAComputationLibraryOnceForEachWorker),
+but this would
+make them systematic and permanent. A more  optimized way is to use
+the data access mode ::STARPU_SCRATCH, as examplified below, which
+provides per-worker buffers without content consistency. The buffer is
+registered only once, using memory node <c>-1</c>, i.e. the application didn't allocate
+memory for it, and StarPU will allocate it on demand at task execution.
+
+\code{.c}
+starpu_variable_data_register(&workspace, -1, NULL, sizeof(float));
+for (i = 0; i < N; i++)
+    starpu_task_insert(&compute, STARPU_R, input[i], STARPU_SCRATCH, workspace, STARPU_W, output[i], 0);
+\endcode
+
+StarPU will make sure that the buffer is allocated before executing the task,
+and make this allocation per-worker: for CPU workers, notably, each worker has
+its own buffer. This means that each task submitted above will actually have its
+own workspace, which will actually be the same for all tasks running one after
+the other on the same worker. Also, if for instance memory becomes scarce,
+StarPU will notice that it can free such buffers easily, since the content does
+not matter.
+
+The example <c>examples/pi</c> uses scratches for some temporary buffer.
+
+It may be useful to additionally use the ::STARPU_NOFOOTPRINT flag, when this
+buffer may have various size depending e.g. on specific CUDA versions or
+devices, to make it simpler to use performance models for simulated
+execution. See for instance <c>examples/cholesky/cholesky_kernels.c</c>
+
+*/

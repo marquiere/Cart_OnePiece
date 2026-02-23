@@ -1,0 +1,49 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2025  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page Helpers Helpers
+
+StarPU provides several utilities functions to help programmers:
+
+<ul>
+<li>
+starpu_conf_noworker() sets configuration fields so that no
+worker is enabled, i.e. it sets starpu_conf::ncpus to 0,
+starpu_conf::ncuda to 0, etc.
+</li>
+<li>
+starpu_is_initialized() returns a value indicating whether StarPU is
+already initialized, starpu_wait_initialized() only returns when the
+initialization is finished.
+</li>
+<li>
+starpu_topology_print() prints the current topology of the system, and
+is therefore useful for debugging purposes or for understanding the
+underlying architecture of the system.
+</li>
+<li>
+starpu_get_version() returns the version of StarPU used when running
+the application.
+</li>
+<li>
+starpu_sleep() and starpu_usleep() allow the application to pause the
+execution of the current thread for a specified amount of time.
+starpu_sleep() pauses the thread for a specified number of seconds and
+starpu_usleep() for a specified number of microseconds.
+</li>
+</ul>
+
+*/

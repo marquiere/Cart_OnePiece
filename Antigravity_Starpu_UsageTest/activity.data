@@ -1,0 +1,75 @@
+name	0	CUDA 0
+name	1	CPU 0
+name	2	CPU 1
+name	3	CPU 2
+name	4	CPU 3
+name	5	CPU 4
+name	6	CPU 5
+name	7	CPU 6
+name	8	CPU 7
+name	9	CPU 8
+set_profiling	259.305936000	1
+cnt_submitted	282.267618000	1
+cnt_ready	282.291261000	1
+cnt_submitted	282.309448000	2
+cnt_ready	282.312008000	2
+cnt_ready	282.320079000	1
+cnt_submitted	282.320079000	1
+cnt_submitted	282.329856000	2
+cnt_ready	282.333092000	2
+cnt_submitted	282.339929000	3
+cnt_ready	282.342358000	3
+cnt_submitted	282.351741000	4
+cnt_ready	282.354555000	4
+cnt_submitted	282.361263000	5
+cnt_ready	282.363652000	5
+cnt_submitted	282.371226000	6
+cnt_ready	282.375371000	6
+cnt_submitted	282.384249000	7
+cnt_ready	282.386452000	7
+cnt_submitted	282.391941000	8
+cnt_ready	282.394097000	8
+cnt_submitted	282.403860000	9
+cnt_ready	282.406252000	9
+cnt_submitted	282.413693000	10
+cnt_ready	282.447571000	10
+cnt_submitted	282.456457000	11
+cnt_ready	282.459016000	11
+cnt_submitted	282.463925000	12
+cnt_ready	282.466106000	12
+cnt_submitted	282.474003000	13
+cnt_ready	282.476170000	13
+cnt_submitted	282.481049000	14
+cnt_ready	282.483208000	14
+cnt_submitted	282.503333000	15
+cnt_ready	282.505998000	15
+cnt_ready	283.527142000	14
+cnt_submitted	283.527142000	14
+cnt_ready	283.920844000	13
+cnt_submitted	283.920844000	13
+cnt_ready	284.302277000	12
+cnt_submitted	284.302277000	12
+cnt_ready	284.684042000	11
+cnt_submitted	284.684042000	11
+cnt_ready	285.062305000	10
+cnt_submitted	285.062305000	10
+cnt_ready	285.189040000	9
+cnt_submitted	285.189040000	9
+cnt_ready	285.297665000	8
+cnt_submitted	285.297665000	8
+cnt_ready	285.406941000	7
+cnt_submitted	285.406941000	7
+cnt_ready	285.796249000	6
+cnt_submitted	285.796249000	6
+cnt_ready	285.917297000	5
+cnt_submitted	285.917297000	5
+cnt_ready	286.021265000	4
+cnt_submitted	286.021265000	4
+cnt_ready	286.136120000	3
+cnt_submitted	286.136120000	3
+cnt_ready	286.521618000	2
+cnt_submitted	286.521618000	2
+cnt_ready	286.641160000	1
+cnt_submitted	286.641160000	1
+cnt_ready	286.752429000	0
+cnt_submitted	286.752429000	0

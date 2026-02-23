@@ -1,0 +1,896 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page OnlinePerformanceTools Online Performance Tools
+
+\section On-linePerformanceFeedback On-line Performance Feedback
+
+Some examples which apply online performance monitoring are in the directory <c>tests/perfmodels/</c>
+
+\subsection EnablingOn-linePerformanceMonitoring Enabling On-line Performance Monitoring
+
+In order to enable online performance monitoring, the application can
+call starpu_profiling_status_set() with the parameter
+::STARPU_PROFILING_ENABLE. It is possible to detect whether monitoring
+is already enabled or not by calling starpu_profiling_status_get().
+Enabling monitoring also reinitialize all previously collected
+feedback. The environment variable \ref STARPU_PROFILING can also be
+set to <c>1</c> to achieve the same effect. The function
+starpu_profiling_init() can also be called during the execution to
+reinitialize performance counters and to start the profiling if the
+environment variable \ref STARPU_PROFILING is set to <c>1</c>.
+
+Likewise, performance monitoring is stopped by calling
+starpu_profiling_status_set() with the parameter
+::STARPU_PROFILING_DISABLE. Note that this does not reset the
+performance counters so that the application may consult them later
+on.
+
+More details about the performance monitoring API are available in \ref API_Profiling.
+
+\subsection Per-taskFeedback Per-task Feedback
+
+If profiling is enabled, a pointer to a structure
+starpu_profiling_task_info is put in the field
+starpu_task::profiling_info when a task terminates. This structure is
+automatically destroyed when the task structure is destroyed, either
+automatically or by calling starpu_task_destroy().
+
+The structure starpu_profiling_task_info indicates the date when the
+task was submitted (starpu_profiling_task_info::submit_time), started
+(starpu_profiling_task_info::start_time), and terminated
+(starpu_profiling_task_info::end_time), relative to the initialization
+of StarPU with starpu_init(). User can call starpu_timing_timespec_delay_us()
+to calculate the time elapsed between start time and end time in microseconds.
+It also specifies the identifier of the worker
+that has executed the task (starpu_profiling_task_info::workerid).
+These dates are stored as <c>timespec</c> structures which users may convert
+into micro-seconds using the helper function
+starpu_timing_timespec_to_us(). User can call starpu_worker_get_current_task_exp_end() to get the date when the current task is expected to be finished.
+
+When \ref STARPU_ENERGY_PROFILING is enabled,
+starpu_profiling_task_info::energy_consumed, provides the amount of Joules used
+by the task.
+
+It is worth noting that the application may directly access this structure from
+the callback executed at the end of the task. The structure starpu_task
+associated to the callback currently being executed is indeed accessible with
+the function starpu_task_get_current().
+
+It is also possible to directly print informations about task profiling by setting the environment variable \ref STARPU_PROFILING_TASK. When set, StarPU will automatically display informations before destroying a task. All related lines are prefixed by <c>SPT</c> or <c>#SPT</c> to be easily grepped from the standard error stream. The environment variable can be set with different values to filter the output columns.
+- <c>push</c> will display the time between the submission time and the start and end times when the task was submitted to the scheduler (starpu_profiling_task_info::push_start_time and starpu_profiling_task_info::push_end_time)
+- <c>pop</c> will display the time between the submission time and the start and end times when the scheduler started to be requested for a task, and eventually gave that task (starpu_profiling_task_info::pop_start_time and starpu_profiling_task_info::pop_end_time)
+- <c>callback</c> will display the time between the submission time and the start and end times when the worker started the application callback for the task (starpu_profiling_task_info::callback_start_time and starpu_profiling_task_info::callback_end_time)
+- <c>acquire</c> will display the time between the submission time and the start and end times when the worker started fetching input data (starpu_profiling_task_info::acquire_data_start_time and starpu_profiling_task_info::acquire_data_end_time)
+- <c>release</c> will display the time between the submission time and the start and end times when the worker started releasing data (starpu_profiling_task_info::release_data_start_time and starpu_profiling_task_info::release_data_end_time)
+- <c>ALL</c> will display all the above values
+- any other values will only display the task name, the worker id it was executed on, the delay between the submission time and the execution time and the lenght of the execution.
+
+\verbatim
+$ STARPU_PROFILING=1 STARPU_PROFILING_TASK="ALL" ./cholesky_tag
+#SPT:Task_name:worker_id:delay:length:push_start:push_end:pop_start:pop_end:callback_start:callback_end:acquire_data_start:acquire_data_end:release_data_start:release_data_end
+SPT:chol_model_potrf:1:32.02:29.29:3.51:10.74:15.11:19.75:0.00:0.00:22.71:29.34:63.15:64.27
+SPT:chol_model_trsm:0:136.47:33825.37:126.75:129.04:129.49:133.42:0.00:0.00:134.34:135.92:33965.11:33968.82
+SPT:chol_model_potrf:0:33986.64:10.70:33977.80:33979.61:33979.89:33982.29:0.00:0.00:33983.29:33985.72:33997.90:33998.20
+SPT:chol_model_syrk:5:33967.01:24.87:33946.56:33950.79:33952.95:33958.00:0.00:0.00:33960.02:33965.20:33992.98:33994.43
+# size	ms	GFlop/s
+64	40	0.0
+\endverbatim
+
+\verbatim
+$ STARPU_PROFILING=1 STARPU_PROFILING_TASK="1" ./cholesky_tag
+#SPT:Task_name:worker_id:delay:length
+SPT:chol_model_potrf:1:38.79:27.88
+SPT:chol_model_trsm:10:201.69:32765.37
+SPT:chol_model_syrk:7:32942.70:22.96
+# size	ms	GFlop/s
+SPT:chol_model_potrf:19:32942.75:17.32
+64	33	0.0
+\endverbatim
+
+\verbatim
+$ STARPU_PROFILING=1 STARPU_PROFILING_TASK="callback" ./examples/callback/callback
+#SPT:Task_name:worker_id:delay:length:callback_start:callback_end
+SPT:with_callback:1:31.51:12.41:51.82:62.88
+SPT:without_callback:3:15.79:3.59:0.00:0.00
+v -> 42
+\endverbatim
+
+\subsection Per-codeletFeedback Per-codelet Feedback
+
+The field starpu_codelet::per_worker_stats is
+an array of counters. Unless the \ref STARPU_CODELET_PROFILING environment
+variable was set to 0, the <c>i</c>-th entry of the array is incremented every time a
+task implementing the codelet is executed on the <c>i</c>-th worker.
+This array is not reinitialized when profiling is enabled or disabled.
+The function starpu_codelet_display_stats() can be used to display the execution statistics of a specific codelet.
+
+\subsection Per-workerFeedback Per-worker Feedback
+
+The second argument returned by the function
+starpu_profiling_worker_get_info() is a structure
+starpu_profiling_worker_info that gives statistics about the specified
+worker. This structure specifies:
+
+- In starpu_profiling_worker_info::start_time, when StarPU started collecting
+profiling information for that worker.
+
+- In starpu_profiling_worker_info::total_time, the duration of the profiling
+measurement interval.
+
+- In starpu_profiling_worker_info::executed_tasks, the number of tasks that
+were executed while profiling was enabled.
+
+It also specifies how much time was spent in various states (executing a task,
+executing a callback, waiting for a data transfer to complete, etc.). Since
+these can happen at the same time (waiting for a data transfer while executing
+the previous tasks, and scheduling the next task), we provide two views. Firstly,
+the "all" view:
+
+- In starpu_profiling_worker_info::all_executing_time, the time spent executing
+kernels, thus real useful work.
+
+- In starpu_profiling_worker_info::all_callback_time, the time spent executing
+application callbacks.
+
+- In starpu_profiling_worker_info::all_waiting_time, the time spent waiting for data
+transfers.
+
+- In starpu_profiling_worker_info::all_sleeping_time, the time spent during which
+there was no task to be executed, i.e. lack of parallelism.
+
+- In starpu_profiling_worker_info::all_scheduling_time, the time spent scheduling
+tasks.
+
+But these times overlap, notably with GPUs the schedulers runs while tasks
+are getting executed. Another view is the "split" view, which eliminates the
+overlapping, by considering for instance that it does not matter what is
+happening while tasks are getting executed, that should be accounted for
+"executing" time, and e.g. only the scheduling periods that happen while no task
+is getting executed should be accounted in "scheduling" time. More precisely:
+
+- In starpu_profiling_worker_info::executing_time, the time spent executing
+kernels, normally equal to starpu_profiling_worker_info::all_executing_time.
+
+- In starpu_profiling_worker_info::callback_time, the time spent executing
+application callbacks while not executing a task.
+
+- In starpu_profiling_worker_info::waiting_time, the time spent waiting for data
+transfers while not executing a task or a callback.
+
+- In starpu_profiling_worker_info::sleeping_time, the time spent during which
+there was no task to be executed and not executing a task or a callback or
+waiting for a data transfer, i.e. real lack of parallelism.
+
+- In starpu_profiling_worker_info::scheduling_time, the time spent scheduling
+tasks while not executing a task or a callback or waiting for a data transfer to
+finish, and there are tasks to be scheduled.
+
+This thus provides a split of the starpu_profiling_worker_info::total_time into
+various states. The difference between starpu_profiling_worker_info::total_time
+and the sum of this split is the remaining uncategorized overhead of the runtime.
+
+Calling starpu_profiling_worker_get_info() resets the profiling
+information associated to a worker.
+
+To easily display all this information, the environment variable
+\ref STARPU_WORKER_STATS can be set to <c>1</c> (in addition to setting
+\ref STARPU_PROFILING to 1). A summary will then be displayed at
+program termination.  To display the summary in a file instead of the
+standard error stream, use the environment variable \ref STARPU_WORKER_STATS_FILE.
+
+\verbatim
+Worker stats:
+CUDA 0.0 (Tesla M2075 4.7 GiB 03:00.0)
+	133 task(s)
+	time split: total 3212.86 ms = executing: 1588.56 ms + callback: 2.95 ms + waiting: 5.34 ms + sleeping: 1613.67 ms + scheduling: 0.01 ms + overhead 2.33 ms
+	all time: executing: 1588.56 ms callback: 2.95 ms waiting: 22.83 ms sleeping: 1725.93 ms scheduling: 1726.88 ms
+	286.388333 GFlop/s
+
+CPU 0
+	10 task(s)
+	time split: total 3212.89 ms = executing: 2117.19 ms + callback: 0.23 ms + waiting: 0.01 ms + sleeping: 1095.06 ms + scheduling: 0.02 ms + overhead 0.37 ms
+	all time: executing: 2117.19 ms callback: 0.23 ms waiting: 0.01 ms sleeping: 1095.06 ms scheduling: 283.86 ms
+	22.029695 GFlop/s
+
+CPU 1
+	10 task(s)
+	time split: total 3212.92 ms = executing: 2116.18 ms + callback: 0.17 ms + waiting: 0.01 ms + sleeping: 1096.10 ms + scheduling: 0.02 ms + overhead 0.44 ms
+	all time: executing: 2116.18 ms callback: 0.17 ms waiting: 0.01 ms sleeping: 1096.10 ms scheduling: 284.40 ms
+	22.029487 GFlop/s
+
+CPU 2
+	10 task(s)
+	time split: total 3212.94 ms = executing: 2116.08 ms + callback: 0.18 ms + waiting: 0.01 ms + sleeping: 1096.21 ms + scheduling: 0.02 ms + overhead 0.44 ms
+	all time: executing: 2116.08 ms callback: 0.18 ms waiting: 0.01 ms sleeping: 1096.21 ms scheduling: 283.75 ms
+	22.029343 GFlop/s
+
+Global time split: total 12851.60 ms = executing: 7938.01 ms (61.77%) + callback: 3.53 ms (0.03%) + waiting: 5.36 ms (0.04%) + sleeping: 4901.05 ms (38.14%) + scheduling: 0.06 ms (0.00%) + overhead 3.59 ms (0.03%)
+\endverbatim
+
+The number of GFlops/s is available because the starpu_task::flops field of the
+tasks were filled (or \ref STARPU_FLOPS used in starpu_task_insert()).
+
+When an FxT trace is generated (see \ref GeneratingTracesWithFxT), it is also
+possible to use the tool <c>starpu_workers_activity</c> (see
+\ref MonitoringActivity) to generate a graphic showing the evolution of
+these values during the time, for the different workers.
+
+\subsection Bus-relatedFeedback Bus-related Feedback
+
+// how to enable/disable performance monitoring
+// what kind of information do we get ?
+
+The bus speed measured by StarPU can be displayed by using the tool
+<c>starpu_machine_display</c>, for instance:
+
+\verbatim
+StarPU has found:
+        3 CUDA devices
+                CUDA 0 (Tesla C2050 02:00.0)
+                CUDA 1 (Tesla C2050 03:00.0)
+                CUDA 2 (Tesla C2050 84:00.0)
+from    to RAM          to CUDA 0       to CUDA 1       to CUDA 2
+RAM     0.000000        5176.530428     5176.492994     5191.710722
+CUDA 0  4523.732446     0.000000        2414.074751     2417.379201
+CUDA 1  4523.718152     2414.078822     0.000000        2417.375119
+CUDA 2  4534.229519     2417.069025     2417.060863     0.000000
+\endverbatim
+
+Statistics about the data transfers which were performed and temporal average
+of bandwidth usage can be obtained by setting the environment variable
+\ref STARPU_BUS_STATS to <c>1</c>; a summary will then be displayed at
+program termination. To display the summary in a file instead of the
+standard error stream, use the environment variable \ref STARPU_BUS_STATS_FILE.
+
+\verbatim
+Data transfer stats:
+	RAM 0 -> CUDA 0	319.92 MB	213.10 MB/s	(transfers : 91 - avg 3.52 MB)
+	CUDA 0 -> RAM 0	214.45 MB	142.85 MB/s	(transfers : 61 - avg 3.52 MB)
+	RAM 0 -> CUDA 1	302.34 MB	201.39 MB/s	(transfers : 86 - avg 3.52 MB)
+	CUDA 1 -> RAM 0	133.59 MB	88.99 MB/s	(transfers : 38 - avg 3.52 MB)
+	CUDA 0 -> CUDA 1	144.14 MB	96.01 MB/s	(transfers : 41 - avg 3.52 MB)
+	CUDA 1 -> CUDA 0	130.08 MB	86.64 MB/s	(transfers : 37 - avg 3.52 MB)
+	RAM 0 -> CUDA 2	312.89 MB	208.42 MB/s	(transfers : 89 - avg 3.52 MB)
+	CUDA 2 -> RAM 0	133.59 MB	88.99 MB/s	(transfers : 38 - avg 3.52 MB)
+	CUDA 0 -> CUDA 2	151.17 MB	100.69 MB/s	(transfers : 43 - avg 3.52 MB)
+	CUDA 2 -> CUDA 0	105.47 MB	70.25 MB/s	(transfers : 30 - avg 3.52 MB)
+	CUDA 1 -> CUDA 2	175.78 MB	117.09 MB/s	(transfers : 50 - avg 3.52 MB)
+	CUDA 2 -> CUDA 1	203.91 MB	135.82 MB/s	(transfers : 58 - avg 3.52 MB)
+Total transfers: 2.27 GB
+\endverbatim
+
+\subsection MPI-relatedFeedback MPI-related Feedback
+
+Statistics about the data transfers which were performed over MPI can be
+obtained by setting the environment variable \ref STARPU_MPI_STATS to <c>1</c>;
+a summary will then be displayed at program termination:
+
+\verbatim
+[starpu_comm_stats][1] TOTAL:	456.000000 B	0.000435 MB	 0.000188 B/s	 0.000000 MB/s
+[starpu_comm_stats][1:0]	456.000000 B	0.000435 MB	 0.000188 B/s	 0.000000 MB/s
+
+[starpu_comm_stats][0] TOTAL:	456.000000 B	0.000435 MB	 0.000188 B/s	 0.000000 MB/s
+[starpu_comm_stats][0:1]	456.000000 B	0.000435 MB	 0.000188 B/s	 0.000000 MB/s
+\endverbatim
+
+These statistics can be plotted as heatmaps using StarPU tool <c>starpu_mpi_comm_matrix.py</c> (see \ref MPIDebug).
+
+\section TaskAndWorkerProfiling Task And Worker Profiling
+
+A full example showing how to use the profiling API is available in
+the StarPU sources in the directory <c>examples/profiling/</c>.
+
+\code{.c}
+struct starpu_task *task = starpu_task_create();
+task->cl = &cl;
+task->synchronous = 1;
+/* We will destroy the task structure by hand so that we can
+ * query the profiling info before the task is destroyed. */
+task->destroy = 0;
+
+/* Submit and wait for completion (since synchronous was set to 1) */
+starpu_task_submit(task);
+
+/* The task is finished, get profiling information */
+struct starpu_profiling_task_info *info = task->profiling_info;
+
+/* How much time did it take before the task started ? */
+double delay += starpu_timing_timespec_delay_us(&info->submit_time, &info->start_time);
+
+/* How long was the task execution ? */
+double length += starpu_timing_timespec_delay_us(&info->start_time, &info->end_time);
+
+/* We no longer need the task structure */
+starpu_task_destroy(task);
+\endcode
+
+\code{.c}
+/* Display the occupancy of all workers during the test */
+int worker;
+for (worker = 0; worker < starpu_worker_get_count(); worker++)
+{
+        struct starpu_profiling_worker_info worker_info;
+        int ret = starpu_profiling_worker_get_info(worker, &worker_info);
+        STARPU_ASSERT(!ret);
+
+        double total_time = starpu_timing_timespec_to_us(&worker_info.total_time);
+        double executing_time = starpu_timing_timespec_to_us(&worker_info.executing_time);
+        double sleeping_time = starpu_timing_timespec_to_us(&worker_info.sleeping_time);
+        double overhead_time = total_time - executing_time - sleeping_time;
+
+        float executing_ratio = 100.0*executing_time/total_time;
+        float sleeping_ratio = 100.0*sleeping_time/total_time;
+        float overhead_ratio = 100.0 - executing_ratio - sleeping_ratio;
+
+        char workername[128];
+        starpu_worker_get_name(worker, workername, 128);
+        fprintf(stderr, "Worker %s:\n", workername);
+        fprintf(stderr, "\ttotal time: %.2lf ms\n", total_time*1e-3);
+        fprintf(stderr, "\texec time: %.2lf ms (%.2f %%)\n", executing_time*1e-3, executing_ratio);
+        fprintf(stderr, "\tblocked time: %.2lf ms (%.2f %%)\n", sleeping_time*1e-3, sleeping_ratio);
+        fprintf(stderr, "\toverhead time: %.2lf ms (%.2f %%)\n", overhead_time*1e-3, overhead_ratio);
+}
+\endcode
+
+\section PerformanceModelExample Performance Model Example
+
+To achieve good scheduling, StarPU scheduling policies need to be able to
+estimate in advance the duration of a task. This is done by giving to codelets
+a performance model, by defining a structure starpu_perfmodel and
+providing its address in the field starpu_codelet::model. The fields
+starpu_perfmodel::symbol and starpu_perfmodel::type are mandatory, to
+give a name to the model, and the type of the model, since there are
+several kinds of performance models. Then starpu_task_get_model_name() can be called to retrieve the name of the performance model associated with a task. For compatibility, make sure to
+initialize the whole structure to zero, either by using explicit
+memset(), or by letting the compiler implicitly do it as examplified
+below.
+
+<ul>
+<li>
+Measured at runtime (model type ::STARPU_HISTORY_BASED). This assumes that for a
+given set of data input/output sizes, the performance will always be about the
+same. This is very true for regular kernels on GPUs for instance (<0.1% error),
+and just a bit less true on CPUs (~=1% error). This also assumes that there are
+few different sets of data input/output sizes. StarPU will then keep record of
+the average time of previous executions on the various processing units, and use
+it as an estimation. History is done per task size, by using a hash of the input
+and output sizes as an index.
+It will also save it in <c>$STARPU_HOME/.starpu/sampling/codelets</c>
+for further executions, and can be observed by using the tool
+<c>starpu_perfmodel_display</c>, or drawn by using
+the tool <c>starpu_perfmodel_plot</c> (\ref PerformanceModelCalibration).  The
+models are indexed by machine name. To
+share the models between machines (e.g. for a homogeneous cluster), use
+<c>export STARPU_HOSTNAME=some_global_name</c>. Measurements are only done
+when using a task scheduler which makes use of it, such as
+<c>dmda</c>. Measurements can also be provided explicitly by the application, by
+using the function starpu_perfmodel_update_history(). An example is in the file <c>tests/perfmodels/feed.c</c>.
+
+The following is a small code example.
+
+If e.g. the code is recompiled with other compilation options, or several
+variants of the code are used, the <c>symbol</c> string should be changed to reflect
+that, in order to recalibrate a new model from zero. The <c>symbol</c> string can even
+be constructed dynamically at execution time, as long as this is done before
+submitting any task using it.
+
+\code{.c}
+static struct starpu_perfmodel mult_perf_model =
+{
+    .type = STARPU_HISTORY_BASED,
+    .symbol = "mult_perf_model"
+};
+
+struct starpu_codelet cl =
+{
+    .cpu_funcs = { cpu_mult },
+    .cpu_funcs_name = { "cpu_mult" },
+    .nbuffers = 3,
+    .modes = { STARPU_R, STARPU_R, STARPU_W },
+    /* for the scheduling policy to be able to use performance models */
+    .model = &mult_perf_model
+};
+\endcode
+
+</li>
+<li>
+Measured at runtime and refined by regression (model types
+::STARPU_REGRESSION_BASED and ::STARPU_NL_REGRESSION_BASED). This
+still assumes performance regularity, but works
+with various data input sizes, by applying regression over observed
+execution times. ::STARPU_REGRESSION_BASED uses an <c>a*n^b</c> regression
+form, ::STARPU_NL_REGRESSION_BASED uses an <c>a*n^b+c</c> (more precise than
+::STARPU_REGRESSION_BASED, but costs a lot more to compute).
+
+For instance,
+<c>tests/perfmodels/regression_based.c</c> uses a regression-based performance
+model for the function \c memset().
+
+Of course, the application has to issue
+tasks with varying size so that the regression can be computed. StarPU will not
+trust the regression unless there is at least 10% difference between the minimum
+and maximum observed input size. It can be useful to set the
+environment variable \ref STARPU_CALIBRATE to <c>1</c> and run the application
+on varying input sizes with \ref STARPU_SCHED set to <c>dmda</c> scheduler,
+to feed the performance model for a variety of
+inputs. The application can also provide the measurements explicitly by
+using the function starpu_perfmodel_update_history(). The tools
+<c>starpu_perfmodel_display</c> and <c>starpu_perfmodel_plot</c> can
+be used to observe how much the performance model is calibrated
+(\ref PerformanceModelCalibration); when their output looks good,
+\ref STARPU_CALIBRATE can be reset to <c>0</c> to let
+StarPU use the resulting performance model without recording new measures, and
+\ref STARPU_SCHED can be set to <c>dmda</c> to benefit from the performance models. If
+the data input sizes vary a lot, it is really important to set
+\ref STARPU_CALIBRATE to <c>0</c>, otherwise StarPU will continue adding the
+measures, and result with a very big performance model, which will take time a
+lot of time to load and save.
+
+For non-linear regression, since computing it
+is quite expensive, it is only done at termination of the application. This
+means that the first execution of the application will use only history-based
+performance model to perform scheduling, without using regression.
+</li>
+
+<li>
+
+Another type of model is ::STARPU_MULTIPLE_REGRESSION_BASED, which
+is based on multiple linear regression. In this model, users
+define both the relevant parameters and the equation for computing the
+task duration.
+
+\f[
+T_{kernel} = a + b(M^{\alpha_1} * N^{\beta_1} * K^{\gamma_1}) + c(M^{\alpha_2} * N^{\beta_2} * K^{\gamma_2}) + ...
+\f]
+
+\f$M, N, K\f$ are the parameters of the task, added at the task
+creation. These need to be extracted by the <c>cl_perf_func</c>
+function, which should be defined by users. \f$\alpha, \beta,
+\gamma\f$ are the exponents defined by users in
+<c>model->combinations</c> table. Finally, coefficients \f$a, b, c\f$
+are computed automatically by the StarPU at the end of the execution, using least
+squares method of the <c>dgels_</c> LAPACK function.
+
+<c>examples/mlr/mlr.c</c> example provides more details on
+the usage of ::STARPU_MULTIPLE_REGRESSION_BASED models. The \ref enable-mlr
+"--enable-mlr" configure option needs to be set to calibrate the model.
+
+Coefficients computation is done at the end of the execution, and the
+results are stored in standard codelet perfmodel files. Additional
+files containing the duration of tasks together with the value of each
+parameter are stored in <c>.starpu/sampling/codelets/tmp/</c>
+directory. These files are reused when \ref STARPU_CALIBRATE
+environment variable is set to <c>1</c>, to recompute coefficients
+based on the current, but also on the previous
+executions. By default, StarPU uses a lightweight dgels implementation, but the
+\ref enable-mlr-system-blas "--enable-mlr-system-blas" configure option can be
+used to make StarPU use a system-provided dgels BLAS.
+
+Additionally, when multiple linear regression models are not enabled through
+\ref enable-mlr "--enable-mlr" or when the
+<c>model->combinations</c> are not defined, StarPU will still write
+output files into <c>.starpu/sampling/codelets/tmp/</c> to allow
+performing an analysis. This analysis typically aims at finding the
+most appropriate equation for the codelet and
+<c>tools/starpu_mlr_analysis</c> script provides an example of how to
+perform such study.
+
+</li>
+
+<li>
+Provided as an estimation from the application itself (model type
+::STARPU_COMMON and field starpu_perfmodel::cost_function),
+see for instance
+<c>examples/common/blas_model.h</c> and <c>examples/common/blas_model.c</c>.
+</li>
+
+<li>
+Provided explicitly by the application (model type ::STARPU_PER_ARCH):
+either field starpu_perfmodel::arch_cost_function, or
+the fields <c>.per_arch[arch][nimpl].cost_function</c> have to be
+filled with pointers to functions which return the expected duration
+of the task in micro-seconds, one per architecture, see for instance
+<c>tests/datawizard/locality.c</c>
+</li>
+
+<li>
+Provided explicitly by the application (model type ::STARPU_PER_WORKER)
+similarly with the starpu_perfmodel::worker_cost_function field.
+</li>
+</ul>
+
+For ::STARPU_HISTORY_BASED, ::STARPU_REGRESSION_BASED, and
+::STARPU_NL_REGRESSION_BASED, the dimensions of task data (both input
+and output) are used as an index by default. ::STARPU_HISTORY_BASED uses a CRC
+hash of the dimensions as an index to distinguish histories, and
+::STARPU_REGRESSION_BASED and ::STARPU_NL_REGRESSION_BASED use the total
+size as an index for the regression. (Data marked with ::STARPU_NOFOOTPRINT are
+not taken into account).
+
+The starpu_perfmodel::size_base and starpu_perfmodel::footprint fields however
+permit the application to override that, when for instance some of the data
+do not matter for task cost (e.g. mere reference table), or when using sparse
+structures (in which case it is the number of non-zeros which matter), or when
+there is some hidden parameter such as the number of iterations, or when the
+application actually has a very good idea of the complexity of the algorithm,
+and just not the speed of the processor, etc.  The example in the directory
+<c>examples/pi</c> uses this to include the number of iterations in the base
+size. starpu_perfmodel::size_base should be used when the variance of the actual
+performance is known (i.e. bigger return value is longer execution
+time), and thus particularly useful for ::STARPU_REGRESSION_BASED or
+::STARPU_NL_REGRESSION_BASED. starpu_perfmodel::footprint can be used when the
+variance of the actual performance is unknown (irregular performance behavior,
+etc.), and thus only useful for ::STARPU_HISTORY_BASED.
+starpu_task_data_footprint() can be used as a base and combined with other
+parameters through starpu_hash_crc32c_be() for instance.
+
+StarPU will automatically determine when the performance model is calibrated,
+or rather, it will assume the performance model is calibrated until the
+application submits a task for which the performance can not be predicted. For
+::STARPU_HISTORY_BASED, StarPU will require 10 (STARPU_CALIBRATE_MINIMUM)
+measurements for a given size before estimating that an average can be taken as
+estimation for further executions with the same size. For
+::STARPU_REGRESSION_BASED and ::STARPU_NL_REGRESSION_BASED, StarPU will require
+10 (STARPU_CALIBRATE_MINIMUM) measurements, and that the minimum measured
+data size is smaller than 90% of the maximum measured data size (i.e. the
+measurement interval is large enough for a regression to have a meaning).
+Calibration can also be forced by setting the \ref STARPU_CALIBRATE environment
+variable to <c>1</c>, or even reset by setting it to <c>2</c>.
+
+How to use schedulers which can benefit from such performance model is explained
+in \ref TaskSchedulingPolicy.
+
+The same can be done for task energy consumption estimation, by setting
+the field starpu_codelet::energy_model the same way as the field
+starpu_codelet::model. Note: for now, the application has to give to
+the energy consumption performance model a name which is different from
+the execution time performance model.
+
+The application can request time estimations from the StarPU performance
+models by filling a task structure as usual without actually submitting
+it. The data handles can be created by calling any of the functions
+<c>starpu_*_data_register</c> with a <c>NULL</c> pointer and <c>-1</c>
+node and the desired data sizes, and need to be unregistered as usual.
+The functions starpu_task_expected_length() and
+starpu_task_expected_energy() can then be called to get an estimation
+of the task cost on a given arch. starpu_task_footprint() can also be
+used to get the footprint used for indexing history-based performance
+models. starpu_task_destroy() needs to be called to destroy the dummy
+task afterwards. See <c>tests/perfmodels/regression_based.c</c> for an example.
+
+The application can also request an on-the-fly XML report of the performance
+model, by calling starpu_perfmodel_dump_xml() to print the report to a
+<c>FILE*</c>.
+
+\section PerformanceMonitoringCounters Performance Monitoring Counters
+
+This section presents the StarPU performance monitoring framework. It summarizes the objectives of the framework. It then introduces the entities involved in the framework. It presents the API of the framework, as well as some implementation details. It exposes the typical sequence of operations to plug an external tool to monitor a performance counter of StarPU.
+
+\subsection PerfMonCountObjectives Objectives
+
+The objectives of this framework are to let external tools interface with StarPU to collect various performance metrics at runtime, in a generic, safe, extensible way. For that, it enables such tools to discover the available performance metrics in a particular StarPU build, as well as the type of each performance counter value. It lets these tools build sets of performance counters to monitor, and then register listener callbacks to collect the measurement samples of these sets of performance counters at runtime.
+
+\subsection PerfMonCountEntities Entities
+
+The performance monitoring framework is built on a series of concepts and items, organized consistently. The corresponding C language objects should be considered opaque by external tools, and should only be manipulated through proper function calls and accessors.
+
+\subsubsection PerfMonCountCounter Performance Counter
+
+The performance counter entity is the fundamental object of the framework, representing one piece of performance metrics, such as for instance the total number of tasks submitted so far, that is exported by StarPU and can be collected through the framework at runtime. A performance counter has a type and belongs to a scope. A performance counter is designated by a unique name and unique ID integer.
+We can start or stop collecting performance counter values by using starpu_perf_counter_collection_start() and starpu_perf_counter_collection_stop().
+
+\subsubsection PerfMonCountCounterType Performance Counter Type
+
+A performance counter has a type. A type is designated by a unique name and unique ID number. Currently, supported types include:
+
+Type Name|Type Definition
+---------|--------------------------------------
+"int32"  |32-bit signed integers
+"int64"  |64-bit signed integers
+"float"  |32-bit single-precision floating point
+"double" |64-bit double-precision floating point
+
+\subsubsection PerfMonCountCounterScope Performance Counter Scope
+
+A performance counter belongs to a scope. The scope of a counter defines the context considered for computing the corresponding performance counter. A scope is designated with a unique name and unique ID number. Currently, defined scopes include:
+
+Scope Name   |Scope Definition
+-------------|----------------------------------------------
+"global"     |Counter is global to the StarPU instance
+"per_worker" |Counter is within the scope of a thread worker
+"per_codelet"|Counter is within the scope of a task codelet
+
+\subsubsection PerfMonCountCounterSet Performance Counter Set
+
+A performance counter set is a subset of the performance counters belonging to the same scope. Each counter of the scope can be in the enabled or disabled state in a performance counter set. A performance counter set enables a performance monitoring tool to indicate the set of counters to be collected for a particular listener callback.
+
+\subsubsection PerfMonCountCounterSample Performance Counter Sample
+
+A performance counter sample corresponds to one sample of collected measurement values of a performance counter set. Only the values corresponding to enabled counters in the sample's counter set should be observed by the listener callback. Whether the sample contains valid values for counters disabled in the set is unspecified.
+
+\subsubsection PerfMonCountCounterListener Performance Counter Listener
+
+A performance counter listener is a callback function registered by some external tool to monitor a set of performance counters in a particular scope. It is called each time a new performance counter sample is ready to be observed. The sample object should not be accessed outside the callback.
+
+\subsubsection PerfMonCountCounterAPI Application Programming Interface
+
+The API of the performance monitoring framework is defined in the \ref starpu_perf_monitoring.h public header file of StarPU. This header file is automatically included with \ref starpu.h. An example of use of the routines is given in \ref PerfMonCountCounterSequence.
+
+\subsection PerfMonCountCounterImplementation Implementation Details
+
+\subsubsection PerfMonCountCounterImplRegistration Performance Counter Registration
+
+Each module of StarPU can export performance counters. In order to do so, modules that need to export some counters define a registration function that is called at StarPU initialization time. This function is responsible for calling the "_starpu_perf_counter_register()" function once for each counter it exports, to let the framework know about the list of counters managed by the module. It also registers performance sample updater callbacks for the module, one for each scope for which it exports counters.
+
+\subsubsection PerfMonCountCounterImplUpdaters Performance Sample Updaters
+
+The updater callback for a module and scope combination is internally called every time a sample for a set of performance counter must be updated. Thus, the updated callback is responsible for filling the sample's selected counters with the counter values found at the time of the call.
+Global updaters are currently called at task submission time, as well as any blocking tasks management function of the StarPU API, such as starpu_task_wait_for_all(), which waits for the completion of all tasks submitted up to this point.
+Per-worker updaters are currently called at the level of StarPU's drivers, that is, the modules in charge of task execution of hardware-specific worker threads. The actual calls occur in-between the execution of tasks.
+Per-codelet updaters are currently called both at task submission time, and at the level of StarPU's drivers together with the per-worker updaters.
+
+A performance sample object is locked during the sample collection. The locking prevents the following issues:
+
+<ul>
+<li>The listener of sample being changed during sample collection;
+<li>The set of counters enabled for a sample being changed;
+<li>Conflicting concurrent updates;
+<li>Updates while the sample is being read by the listener.
+</ul>
+
+The location of the updaters' calls is chosen to minimize the sequentialization effect of the locking, in order to limit the level of interference of the monitoring process. For Global updaters, the calls are performed only on the application thread(s) in charge of submitting tasks. Since, in most cases, only a single application thread submits tasks, the sequentialization effect is moderate. Per-worker updates are local to their worker, thus here again the sample lock is un-contented, unless the external monitoring tool frequently changes the set of enabled counters in the sample.
+
+\subsubsection PerfMonCountCounterImplOperations Counter operations
+
+In practice, the sample updaters only take snapshots of the actual performance counters. The performance counters themselves are updated with ad-hoc procedures depending on each counter. Such procedures typically involve atomic operations. While operations such as atomic increments or decrements on integer values are readily available, this is not the case for more complex operations such as min/max for computing peak value counters (for instance in the global and per-codelet counters for peak number of submitted tasks and peak number of ready tasks waiting for execution), and this is also not the case for computations on floating point data (used for instance in computing cumulated execution time of tasks, either per worker or per codelet). The performance monitoring framework therefore supplies such missing routines, for the internal use of StarPU.
+
+\subsubsection PerfMonCountCounterImplRuntime Runtime checks
+
+The performance monitoring framework features a comprehensive set of runtime checks to verify that both StarPU and some external tool do not access a performance counter with the wrong typed routines, to quickly detect situations of mismatch that can result from the evolution of multiple pieces of software at distinct paces. Moreover, no StarPU data structure is accessed directly, either by the external code making use of the performance monitoring framework. The use of the C enum constants is optional; referring to values through constant strings is available when more robustness is desired. These runtime checks enable the framework to be extensible. Moreover, while the framework's counters currently are permanently compiled in, they could be made optional at compile time, for instance to suppress any overhead once the analysis and optimization process has been completed by the programmer. Thanks to the runtime discovery of available counters, the applicative code, or an intermediate layer such as skeleton layer acting on its behalf, would then be able to adapt to performance analysis builds versus optimized builds.
+
+\subsection PerfMonCountCounterExported Exported Counters
+
+\subsubsection PerfMonCountCounterExportedGlobal Global Scope
+
+Counter Name  	                 |Counter Definition
+---------------------------------|--------------------------------------------------------------------------------------
+\c starpu.task.g_total_submitted |Total number of tasks submitted
+\c starpu.task.g_peak_submitted  |Maximum number of tasks submitted, waiting for dependencies resolution at any time
+\c starpu.task.g_peak_ready      |Maximum number of tasks ready for execution, waiting for an execution slot at any time
+
+\subsubsection PerfMonCountCounterExportedPerWorker Per-worker Scope
+
+Counter Name	                      |Counter Definition
+--------------------------------------|------------------------------------------------------------
+\c starpu.task.w_total_executed	      |Total number of tasks executed on a given worker
+\c starpu.task.w_cumul_execution_time |Cumulated execution time of tasks executed on a given worker
+
+\subsubsection PerfMonCountCounterExportedPerCodelet Per-Codelet Scope
+
+Counter Name	                      |Counter Definition
+--------------------------------------|-----------------------------------------------------------------------------------------------------
+\c starpu.task.c_total_submitted      |Total number of submitted tasks for a given codelet
+\c starpu.task.c_peak_submitted       |Maximum number of submitted tasks for a given codelet waiting for dependencies resolution at any time
+\c starpu.task.c_peak_ready           |Maximum number of ready tasks for a given codelet waiting for an execution slot at any time
+\c starpu.task.c_total_executed       |Total number of executed tasks for a given codelet
+\c starpu.task.c_cumul_execution_time |Cumulated execution time of tasks for a given codelet
+
+\subsection PerfMonCountCounterSequence Sequence of operations
+
+This section presents a typical sequence of operations to interface an external tool with some StarPU performance counters. In this example, the counters monitored are the per-worker total number of executed tasks (\c starpu.task.w_total_executed) and the tasks' cumulated execution time (\c starpu.task.w_cumul_execution_time).
+
+<b>Step 0: Initialize StarPU</b>
+
+StarPU must first be initialized, by a call to starpu_init(), for performance counters to become available, since each module of StarPU registers the performance counters it exports during that initialization phase.
+
+\code{.c}
+int ret = starpu_init(NULL);
+\endcode
+
+<b>Step 1: Allocate a counter set</b>
+
+A counter set has to be allocated on the per-worker scope. The per-worker scope id can be obtained by name, or with the pre-defined enum value ::starpu_perf_counter_scope_per_worker.
+
+\code{.c}
+enum starpu_perf_counter_scope w_scope = starpu_perf_counter_scope_per_worker;
+struct starpu_perf_counter_set *w_set = starpu_perf_counter_set_alloc(w_scope);
+\endcode
+
+<b>Step 2: Get the counter IDs</b>
+Each performance counter has a unique ID used to refer to it in subsequent calls to the performance monitoring framework.
+
+\code{.c}
+int id_w_total_executed = starpu_perf_counter_name_to_id(w_scope,
+                                                     "starpu.task.w_total_executed");
+
+int id_w_cumul_execution_time = starpu_perf_counter_name_to_id(w_scope,
+                                               "starpu.task.w_cumul_execution_time");
+\endcode
+
+<b>Step 3: Enable the counters in the counter set</b>
+
+This step indicates which counters will be collected into performance monitoring samples for the listeners referring to this counter set.
+
+\code{.c}
+starpu_perf_counter_set_enable_id(w_set, id_w_total_executed);
+starpu_perf_counter_set_enable_id(w_set, id_w_cumul_execution_time);
+\endcode
+
+<b>Step 4: Write a listener callback</b>
+
+This callback will be triggered when a sample becomes available. Upon execution, it reads the values for the two counters from the sample and displays these values, for the sake of the example.
+
+\code{.c}
+void w_listener_cb(struct starpu_perf_counter_listener *listener,
+                   struct starpu_perf_counter_sample   *sample,
+                   void *context)
+{
+  int32_t w_total_executed =
+             starpu_perf_counter_sample_get_int32_value(sample, id_w_total_executed);
+
+  double w_cumul_execution_time =
+      starpu_perf_counter_sample_get_double_value(sample, id_w_cumul_execution_time);
+
+  printf("worker[%d]: w_total_executed = %d, w_cumul_execution_time = %lf\n",
+                                 starpu_worker_get_id(),
+                                 w_total_executed,
+                                 w_cumul_execution_time);
+}
+\endcode
+
+<b>Step 5: Initialize the listener</b>
+
+This step allocates the listener structure and prepares it to listen to the selected set of per-worker counters. However, it is not actually active until Step 6, once it is attached to one or more worker.
+
+\code{.c}
+struct starpu_perf_counter_listener * w_listener =
+                       starpu_perf_counter_listener_init(w_set, w_listener_cb, NULL);
+\endcode
+
+<b>Step 6: Set the listener on all workers</b>
+This step actually makes the listener active, in this case on every StarPU worker thread.
+
+\code{.c}
+starpu_perf_counter_set_all_per_worker_listeners(w_listener);
+\endcode
+
+After this step, any task assigned to a worker will be counted in that worker selected performance counters, and reported to the listener.
+
+\section PerfKnobs Performance Steering Knobs
+
+This section presents the StarPU performance steering framework. It summarizes the objectives of the framework. It introduces the entities involved in the framework, and then details the API, implementation and sequence of operations.
+
+\subsection PerfKnobsObjectives Objectives
+
+The objectives of this framework are to let external tools interface with StarPU, observe, and act at runtime on actionable performance steering knobs exported by StarPU, in a generic, safe, extensible way. It defines an API to let such external tools discover the available performance steering knobs in a particular StarPU revision of build, as well as the type of each knob.
+
+\subsection PerfKnobsEntities Entities
+
+\subsubsection PerfKnobsEntitiesKnob Performance Steering Knob
+
+The performance steering knob entity designates one runtime-actionable knob exported by StarPU. It may represent some setting, or some constant used within StarPU for a given purpose. The value of the knob is typed, it can be obtained or modified with the appropriate getter/setter routine. The knob belongs to a scope. A performance steering knob is designated with a unique name and unique ID number.
+
+\subsubsection PerfKnobsEntitiesKnobType Knob Type
+
+A performance steering knob has a type. A type is designated by a unique name and unique ID number. Currently, supported types include:
+
+Type Name |Type Definition
+----------|--------------------------------------
+"int32"	  |32-bit signed integers
+"int64"	  |64-bit signed integers
+"float"	  |32-bit single precision floating point
+"double"  |64-bit double precision floating point
+
+On/Off knobs are defined as "int32" type, with value 0 for Off and value !0 for On, unless otherwise specified.
+
+\subsubsection PerfKnobsEntitiesKnobScope Knob Scope
+
+A performance steering knob belongs to a scope. The scope of a knob defines the context considered for computing the corresponding knob. A scope is designated with a unique name and unique ID number. Currently, defined scopes include:
+
+Scope Name	|Scope Definition
+----------------|--------------------------------------------------------
+"global"	|Knob is global to the StarPU instance
+"per_worker"	|Knob is within the scope of a thread worker
+"per_scheduler" |Knob is within the scope of a scheduling policy instance
+
+\subsubsection PerfKnobsEntitiesKnobGroup Knob Group
+
+The notion of Performance Steering Knob Group is currently internal to StarPU. It defines a series of knobs that are handled by the same couple of setter/getter functions internally. A knob group belongs to a knob scope.
+
+\subsection PerfKnobsAPI Application Programming Interface
+
+The API is defined in the \ref starpu_perf_steering.h public header file of StarPU. This header file is automatically included with \ref starpu.h.
+
+\subsection PerfKnobsImpl Implementation Details
+
+While the APIs of the monitoring and the steering frameworks share a similar design philosophy, the internals are significantly different. Since the effect of the steering knobs varies widely, there is no global locking scheme in place shared for all knobs. Instead, each knob gets its own procedures to get the value of a setting, or change it. To prevent code duplication, some related knobs may share getter/setter routines as knob groups.
+
+The steering framework does not involve callback routines. Knob get operations proceed immediately, except for the possible delay in getting access to the knob value. Knob set operations also proceed immediately, not counting the exclusive access time, though their action result may be observed with some latency, depending on the knob and on the current workload. For instance, acting on a per-worker \c starpu.worker.w_enable_worker_knob to disable a worker thread may be observed only after the corresponding worker's assigned task queue becomes empty, since its actual effect is to prevent additional tasks to be queued to the worker, and not to migrate already queued tasks to another worker. Such design choices aim at providing a compromise between offering some steering capabilities and keeping the cost of supporting such steering capabilities to an acceptable level.
+
+The framework is designed to be easily extensible. At StarPU initialization time, the framework calls initialization functions if StarPU modules to initialize the set of knobs they export. Knob get/set accessors can be shared among multiple knobs in a knob group. Thus, exporting a new knob is basically a matter of declaring it at initialization time, by specifying its name and value type, and either add its handling to an existing getter/setter pair of accessors in a knob group, or create a new group. As the performance monitoring framework, the performance steering framework is currently permanently enabled, but could be made optional at compile-time to separate testing builds from production builds.
+
+\subsection PerfKnobsExported Exported Steering Knobs
+
+\subsubsection PerfKnobsExportedGlobal Global Scope
+
+Knob Name  	                            |Knob Definition
+--------------------------------------------|----------------------------------------------------
+\c starpu.global.g_calibrate_knob           |Enable/disable the calibration of performance models
+\c starpu.global.g_enable_catch_signal_knob |Enable/disable the catching of UNIX signals
+
+\subsubsection PerfKnobsExportedPerWorker Per-worker Scope
+
+Knob Name	                      |Knob Definition
+--------------------------------------|------------------------------------------------------------
+\c starpu.worker.w_bind_to_pu_knob    |Change the processing unit to which a worker thread is bound
+\c starpu.worker.w_enable_worker_knob |Disable/re-enable a worker thread to be selected for task execution
+
+\subsubsection PerfKnobsExportedPerScheduler Per-Scheduler Scope
+
+Knob Name	                       |Knob Definition
+---------------------------------------|----------------
+\c starpu.task.s_max_priority_cap_knob |Set a capping maximum priority value for subsequently submitted tasks
+\c starpu.task.s_min_priority_cap_knob |Set a capping minimum priority value for subsequently submitted tasks
+\c starpu.dmda.s_alpha_knob 	       |Scaling factor for the Alpha constant for Deque Model schedulers to alter the weight of the estimated task execution time
+\c starpu.dmda.s_beta_knob 	       |Scaling factor for the Beta constant for Deque Model schedulers to alter the weight of the estimated data transfer time for the task's input(s)
+\c starpu.dmda.s_gamma_knob	       |Scaling factor for the Gamma constant for Deque Model schedulers to alter the weight of the estimated power consumption of the task
+\c starpu.dmda.s_idle_power_knob       |Scaling factor for the baseline Idle power consumption estimation of the corresponding processing unit
+
+\subsection PerfKnobsSequence Sequence of operations
+
+This section presents an example of a sequence of operations representing a typical use of the performance steering knobs exported by StarPU. In this example, a worker thread is temporarily barred from executing tasks. For that, the corresponding \c starpu.worker.w_enable_worker_knob of the worker, initially set to 1 (= enabled) is changed to 0 (= disabled).
+
+<b>Step 0: Initialize StarPU</b>
+
+StarPU must first be initialized, by a call to starpu_init(). Performance steering knobs only become available after this step, since each module of StarPU registers the knobs it exports during that initialization phase.
+
+\code{.c}
+int ret = starpu_init(NULL);
+\endcode
+
+<b>Step 1: Get the knob ID</b>
+
+Each performance steering knob has a unique ID used to refer to it in subsequent calls to the performance steering framework. The knob belongs to the "per_worker" scope.
+
+\code{.c}
+int w_scope = starpu_perf_knob_scope_name_to_id("per_worker");
+int w_enable_id = starpu_perf_knob_name_to_id(w_scope, "starpu.worker.w_enable_worker_knob");
+\endcode
+
+<b>Step 2: Get the knob current value</b>
+
+This knob is an On/Off knob. Its value type is therefore a 32-bit integer, with value 0 for Off and value !0 for On. The getter functions for per-worker knobs expect the knob ID as first argument, and the worker ID as second argument. Here the getter call obtains the value of worker 5.
+
+\code{.c}
+int32_t val = starpu_perf_knob_get_per_worker_int32_value(w_enable_id, 5);
+\endcode
+
+<b>Step 3: Set the knob current value</b>
+
+The setter functions for per-worker knobs expect the knob ID as first argument, the worker ID as second argument, and the new value as third argument. Here, the value for worker 5 is set to 0 to temporarily bar the worker thread from accepting new tasks for execution.
+
+\code{.c}
+starpu_perf_knob_set_per_worker_int32_value(w_enable_id, 5, 0);
+\endcode
+
+Subsequently, setting the value of the knob back to 1 enables the corresponding to accept new tasks for execution again.
+
+\code{.c}
+starpu_perf_knob_set_per_worker_int32_value(w_enable_id, 5, 1);
+\endcode
+
+*/

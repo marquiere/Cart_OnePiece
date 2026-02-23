@@ -1,0 +1,96 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2009-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+INPUT                  = @top_srcdir@/doc/doxygen/chapters/starpu_introduction/introduction_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_introduction/doc_organization.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_introduction/glossary.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_installation/installation_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_installation/building.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_installation/configure_options.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_installation/environment_variables.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_installation/configuration_and_initialization.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/basics_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/starpu_applications.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/basic_examples.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/scaling_vector_example.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/tasks.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/data_management.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/scheduling.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/examples_sources.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_applications/applications_intro.doxy \
+       			 @top_srcdir@/doc/doxygen/chapters/starpu_applications/vector_scaling.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_applications/stencil.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_performances/performances_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_performances/benchmarking_starpu.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_performances/online_performance_tools.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_performances/offline_performance_tools.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_faq/faq_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_faq/check_list_performance.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_faq/faq.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/languages_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/native_fortran_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/java.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/python.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/openmp_runtime_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/extensions_intro.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/advanced_tasks.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/advanced_data_management.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/advanced_scheduling.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/scheduling_contexts.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/scheduling_context_hypervisor.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/scheduling_policy_definition.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/cuda_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/opencl_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/max_fpga_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/out_of_core.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/mpi_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/tcpip_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/transactions.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/fault_tolerance.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/fft_support.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/socl_opencl_extensions.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/recursive_tasks.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/parallel_worker.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/darts.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/interoperability.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/simgrid.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/debugging_tools.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/helpers.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/fdl_1_3.doxy \
+			 @top_srcdir@/doc/doxygen/chapters/files.doxy
+
+EXAMPLE_PATH           = @top_srcdir@/doc/doxygen \
+		       	 @top_srcdir@/doc/doxygen/chapters \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_applications/code \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_basics/code  \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/code \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/code
+
+INPUT_FILTER           = @top_builddir@/doc/doxygen/doxygen_filter.sh
+
+#LATEX_HEADER           = @top_srcdir@/doc/doxygen/refman.tex
+
+IMAGE_PATH             = @top_srcdir@/doc/doxygen/chapters/starpu_basics/images \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_performances/images \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_faq/images \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_languages/images \
+			 @top_srcdir@/doc/doxygen/chapters/starpu_extensions/images
+
+GENERATE_LATEX         = @DOC_GENERATE_LATEX@
+
+PROJECT_NAME           = "StarPU Handbook"
+ALIASES                += "intropage{2} = \page \1 \2"
+ALIASES		       += "foreword = \htmlonly <h1><a class='anchor' id='Foreword'></a>Foreword</h1> \endhtmlonly \htmlinclude version.html \htmlinclude foreword.html"
+ALIASES		       += "webforeword = "

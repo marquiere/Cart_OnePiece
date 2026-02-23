@@ -1,0 +1,107 @@
+#! /bin/bash
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2021-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+if test -n "$STARPU_LAUNCHER_DEBUG"
+then
+    set -x
+fi
+set -e # fail fast
+PROGNAME=$0
+
+help_script()
+{
+cat << EOF
+Execute a StarPU TCP IP application
+
+$0 [option ....] application
+
+Options:
+   -np      To set the number of workers
+   -nobind
+   -ncpus   To set the number of threads to use on the TCP/IP client devices (environment variable STARPU_TCPIP_SC_NTHREADS)
+   -nolocal
+   -ex      To specify an external launcher for the application
+   -v       Output version information and exit
+   -h       Display the help and exit
+
+Examples:
+
+$0 -np 2 -nobind -ncpus 1 myapp
+$0 -np 2 -nobind -ncpus 1 -ex 'xterm -e gdb' myapp
+
+Report bugs to <@PACKAGE_BUGREPORT@>
+EOF
+}
+
+if [ "$1" = "--version" ] ; then
+    echo "$PROGNAME (@PACKAGE_NAME@) @PACKAGE_VERSION@"
+    exit 0
+fi
+
+if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "" ] ; then
+    help_script
+    exit 0
+fi
+
+NP=""
+EXECUTE=""
+while true; do
+	case "$1" in
+		"-np")
+			NP=$2
+			shift 2
+			;;
+		"-nobind")
+			export STARPU_WORKERS_NOBIND=1
+			shift
+			;;
+		"-ncpus")
+			export STARPU_TCPIP_SC_NTHREADS=$2
+			shift 2
+			;;
+		"-nolocal")
+			export STARPU_TCPIP_USE_LOCAL_SOCKET=0
+			shift
+			;;
+		"-ex")
+			EXECUTE="$2"
+			shift 2
+			;;
+		*)
+			break
+			;;
+	esac
+done
+
+trap 'kill -INT $CHILDPIDS' INT
+trap 'kill -QUIT $CHILDPIDS' QUIT
+
+export STARPU_TCPIP_SC_PORT=$((10000 + $$ % 20000))
+#echo "STARPU_TCPIP_SC_CLIENTS=$NP $@"
+STARPU_TCPIP_SC_CLIENTS=$NP $EXECUTE "$@" &
+CHILDPIDS="$!"
+
+sleep 1
+for i in $(seq 1 $NP):
+do
+	STARPU_TCPIP_SC_CLIENTS=$NP STARPU_TCPIP_SC_SERVER="127.0.0.1" $EXECUTE "$@" &
+	CHILDPIDS="$CHILDPIDS $!"
+done
+wait %1
+RET=$?
+wait
+exit $RET

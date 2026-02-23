@@ -1,0 +1,78 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2010-2026   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:_pe_libpfm4_init
+   ...
+}
+
+# This happens in multithreaded_init: papi does not support getting initialized in one thread and shut down in another thread.
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   ...
+   fun:allocate_thread
+   ...
+}
+
+# This seems like a leak in papi
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   ...
+   fun:pfmlib_build_fstr.part.0
+   fun:pfmlib_perf_event_encode
+   fun:allocate_native_event
+   fun:_pe_libpfm4_ntv_name_to_code
+   fun:_papi_hwi_native_name_to_code
+   fun:PAPI_event_name_to_code
+   fun:PAPI_event_name_to_code
+   fun:PAPI_add_named_event
+   fun:add_event
+   ...
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:malloc
+   fun:__scandir64_tail
+   obj:/usr/lib/x86_64-linux-gnu/libpfm.so.4.13.0
+   fun:pfm_initialize
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   fun:PAPI_library_init
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libpfm.so.4.13.0
+   fun:pfm_initialize
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   obj:/usr/lib/x86_64-linux-gnu/libpapi.so.7.1.0.0
+   fun:PAPI_library_init
+}

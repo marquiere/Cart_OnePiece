@@ -1,0 +1,220 @@
+# StarPU --- Runtime system for heterogeneous multicore architectures.
+#
+# Copyright (C) 2012-2025   University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+#
+# StarPU is free software; you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation; either version 2.1 of the License, or (at
+# your option) any later version.
+#
+# StarPU is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# See the GNU Lesser General Public License in COPYING.LGPL for more details.
+#
+
+{
+   don't care about cache hit stats
+   Helgrind:Race
+   fun:_starpu_msi_cache_hit
+   ...
+}
+
+{
+   don't care about cache miss stats
+   Helgrind:Race
+   fun:_starpu_msi_cache_miss
+   ...
+}
+
+{
+   don't care about data status query race, this is just a hint
+   Helgrind:Race
+   fun:starpu_data_query_status
+   ...
+}
+
+{
+   don't care about data status query race, this is just a hint
+   Helgrind:Race
+   fun:starpu_data_query_status2
+   ...
+}
+
+{
+   known race, but not problematic in practice, see comment in _starpu_tag_clear
+   Helgrind:LockOrder
+   ...
+   fun:_starpu_tag_free
+   fun:_starpu_htbl_clear_tags
+   ...
+   fun:_starpu_tag_clear
+   fun:starpu_shutdown
+   ...
+}
+
+
+{
+   There is actually no race on current_mode, because the mode can not change unexpectedly, until _starpu_notify_data_dependencies() is called further down. Valgrind can not know about such software rwlock.
+   Helgrind:Race
+   fun:_starpu_release_data_on_node
+   fun:_starpu_push_task_output
+   ...
+}
+
+{
+   We do not care about races on profiling statistics
+   Helgrind:Race
+   fun:_starpu_worker_get_status
+   fun:_starpu_worker_reset_profiling_info_with_lock
+   ...
+}
+
+{
+   This is racy, but since we'll always put the same values, this is not a problem.
+   Helgrind:Race
+   fun:_starpu_codelet_check_deprecated_fields
+   ...
+}
+
+{
+   This is racy, but we don't care, it's only a statistic
+   Helgrind:Race
+   fun:starpu_task_nsubmitted
+   ...
+}
+
+{
+   This is racy, but we don't care, it's only a statistic
+   Helgrind:Race
+   fun:starpu_task_nready
+   ...
+}
+
+{
+   This is racy, but we don't care, it's only a statistic
+   Helgrind:Race
+   fun:_starpu_bus_update_profiling_info
+   ...
+}
+
+{
+   fscanf error
+   Memcheck:Cond
+   ...
+   fun:fscanf
+   fun:_starpu_load_bus_performance_files
+   ...
+}
+
+{
+   locking order. It's not a problem when it's a trylock... but helgrind doesn't handle that :/ https://bugs.kde.org/show_bug.cgi?id=243232
+   Helgrind:LockOrder
+   fun:mutex_trylock_WRK
+   ...
+}
+
+{
+   locking order. It's not a problem when it's a trylock... but helgrind doesn't handle that :/ https://bugs.kde.org/show_bug.cgi?id=243232
+   Helgrind:LockOrder
+   fun:pthread_rwlock_trywrlock_WRK
+   ...
+}
+
+{
+   locking order. It's not a problem when it's a trylock... but helgrind doesn't handle that :/ https://bugs.kde.org/show_bug.cgi?id=243232
+   Helgrind:LockOrder
+   fun:pthread_rwlock_tryrdlock_WRK
+   ...
+}
+
+{
+   mc / handle locking order1
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:try_to_free_mem_chunk
+   ...
+}
+
+{
+   mc / handle locking order1
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:try_to_throw_mem_chunk
+   ...
+}
+
+{
+   mc / handle locking order2
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:try_to_find_reusable_mem_chunk
+   ...
+}
+
+{
+   mc / handle locking order2
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:try_to_find_reusable_mc
+   ...
+}
+
+{
+   mc / handle locking order3
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:free_potentially_in_use_mc
+   ...
+}
+
+{
+   mc / handle locking order4
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:free_potentially_in_use_mc
+   ...
+}
+
+{
+   mc / handle locking order5
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:register_mem_chunk
+   ...
+}
+
+{
+   mc / handle locking order6
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:_starpu_request_mem_chunk_removal
+   ...
+}
+
+{
+   mc / handle locking order7
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:_starpu_allocate_interface
+   ...
+}
+
+{
+   mc / handle locking order8
+   Helgrind:LockOrder
+   ...
+   fun:__starpu_spin_lock
+   fun:_starpu_memchunk_recently_used
+   ...
+}

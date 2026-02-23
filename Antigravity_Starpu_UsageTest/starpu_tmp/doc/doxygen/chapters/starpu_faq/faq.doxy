@@ -1,0 +1,514 @@
+/* StarPU --- Runtime system for heterogeneous multicore architectures.
+ *
+ * Copyright (C) 2009-2026  University of Bordeaux, CNRS (LaBRI UMR 5800), Inria
+ *
+ * StarPU is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2.1 of the License, or (at
+ * your option) any later version.
+ *
+ * StarPU is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * See the GNU Lesser General Public License in COPYING.LGPL for more details.
+ */
+
+/*! \page FrequentlyAskedQuestions Frequently Asked Questions
+
+\section HowToInitializeAComputationLibraryOnceForEachWorker How To Initialize A Computation Library Once For Each Worker?
+
+Some libraries need to be initialized once for each concurrent instance that
+may run on the machine. For instance, a C++ computation class which is not
+thread-safe by itself, but for which several instantiated objects of that class
+can be used concurrently. This can be used in StarPU by initializing one such
+object per worker. For instance, the <c>libstarpufft</c> example does the following to
+be able to use FFTW on CPUs.
+
+Some global array stores the instantiated objects:
+
+\code{.c}
+fftw_plan plan_cpu[STARPU_NMAXWORKERS];
+\endcode
+
+At initialization time of libstarpu, the objects are initialized:
+
+\code{.c}
+int workerid;
+for (workerid = 0; workerid < starpu_worker_get_count(); workerid++)
+{
+    switch (starpu_worker_get_type(workerid))
+    {
+        case STARPU_CPU_WORKER:
+            plan_cpu[workerid] = fftw_plan(...);
+            break;
+    }
+}
+\endcode
+
+And in the codelet body, they are used:
+
+\code{.c}
+static void fft(void *descr[], void *_args)
+{
+    int workerid = starpu_worker_get_id();
+    fftw_plan plan = plan_cpu[workerid];
+    ...
+
+    fftw_execute(plan, ...);
+}
+\endcode
+
+We call starpu_worker_get_id() to retrieve the worker ID associated with the currently executing task, or call starpu_worker_get_id_check() with the error checking.
+
+This however is not sufficient for FFT on CUDA: initialization has
+to be done from the workers themselves.  This can be done thanks to
+starpu_execute_on_each_worker() or starpu_execute_on_each_worker_ex() with a specified task name, or starpu_execute_on_specific_workers() with specified workers. For instance, <c>libstarpufft</c> does the following.
+
+\code{.c}
+static void fft_plan_gpu(void *args)
+{
+    plan plan = args;
+    int n2 = plan->n2[0];
+    int workerid = starpu_worker_get_id();
+
+    cufftPlan1d(&plan->plans[workerid].plan_cuda, n, _CUFFT_C2C, 1);
+    cufftSetStream(plan->plans[workerid].plan_cuda, starpu_cuda_get_local_stream());
+}
+void starpufft_plan(void)
+{
+    starpu_execute_on_each_worker(fft_plan_gpu, plan, STARPU_CUDA);
+}
+\endcode
+
+\section HardwareTopology Hardware Topology
+
+\subsection InteroperabilityHWLOC Interoperability hwloc
+If hwloc is used, we can call starpu_get_hwloc_topology() to get the hwloc topology used by StarPU, and call starpu_get_pu_os_index() to get the OS index of a PU. We can call starpu_worker_get_hwloc_cpuset() to retrieve the hwloc CPU set associated with a worker.
+
+\subsection TopologyMemory Memory
+
+There are various functions that we can use to retrieve information of memory node, such as to get the name of a memory node we call starpu_memory_node_get_name() and to get the kind of a memory node we call starpu_node_get_kind(). To retrieve the device ID associated with a memory node we call starpu_memory_node_get_devid(). We can call starpu_worker_get_local_memory_node() to retrieve the local memory node associated with the current worker. We can also specify a worker and call starpu_worker_get_memory_node() to retrieve the associated memory node. To get the type of memory node associated with a kind of worker we call starpu_worker_get_memory_node_kind(). If we want to know the total number of memory nodes in the system we can call starpu_memory_nodes_get_count(), and we can also retrieve the total number of memory nodes in the system that match a specific memory node kind by calling starpu_memory_nodes_get_count_by_kind(). We can call starpu_memory_node_get_ids_by_type() to get the identifiers of memory nodes in the system that match a specific memory node type.
+To obtain a bitmap representing logical indexes of NUMA nodes we can call starpu_get_memory_location_bitmap().
+
+\subsection TopologyWorkers Workers
+
+StarPU provides a range of functions for querying and managing the worker configurations on a given system. One such function is starpu_worker_get_count(), which returns the total number of workers in the system. In addition to this, there are also specific functions to obtain the number of workers associated with various processing units controlled by StarPU: to retrieve the number of CPUs we can call starpu_cpu_worker_get_count(), to retrieve the number of CUDA devices we can call starpu_cuda_worker_get_count(), to retrieve the number of HIP devices we can call starpu_hip_worker_get_count(), to retrieve the number of OpenCL devices we can call starpu_opencl_worker_get_count(), to retrieve the number of MPI clients we can call starpu_mpi_sc_worker_get_count(), and to retrieve the number of TCPIP clients we can call starpu_tcpip_sc_worker_get_count().
+
+There are various functions that we can use to retrieve information of the worker. We call starpu_worker_get_name() to get the name of the worker, we call starpu_worker_get_devid() to get the device ID of the worker or call starpu_worker_get_devids() to retrieve the list of device IDs that are associated with a worker, and call starpu_worker_get_devnum() to get number of the device controlled by the worker which begin from 0. We call starpu_worker_get_subworkerid() to get the ID of sub-worker for the device. We call starpu_worker_get_sched_ctx_list() to retrieve a list of scheduling contexts that a worker is associated with. We call starpu_worker_get_stream_workerids() to retrieve the list of worker IDs that share the same stream as a given worker.
+
+To retrieve the total number of NUMA nodes in the system we call starpu_memory_nodes_get_numa_count(). To get the device identifier associated with a specific NUMA node and to get the NUMA node identifier associated with a specific device we can call starpu_memory_nodes_numa_id_to_devid() and starpu_memory_nodes_numa_devid_to_id() respectively.
+
+We can also print out information about the workers currently registered with StarPU. starpu_worker_display_all() prints out information of all workers, starpu_worker_display_names() prints out information of all the workers of the given type, starpu_worker_display_count() prints out the number of workers of the given type.
+
+StarPU provides various functions associated to the type of processing unit, such as starpu_worker_get_type(), which returns the type of processing unit associated to the worker, e.g. CPU or CUDA. We can call starpu_worker_get_type_as_string() to retrieve a string representation of the type of a worker or call starpu_worker_get_type_from_string() to retrieve a worker type enumeration value from a string representation of a worker type or call starpu_worker_get_type_as_env_var() to retrieve a string representation of the type of a worker that can be used as an environment variable. Another function, starpu_worker_get_count_by_type(), returns the number of workers of a specific type. starpu_worker_get_ids_by_type() returns a list of worker IDs for a specific type, and starpu_worker_get_by_type() returns the ID of the specific worker that has the specific type, starpu_worker_get_by_devid() returns the ID of the worker that has the specific type and device ID. To get the type of worker associated with a kind of memory node we call starpu_memory_node_get_worker_archtype().
+To check if type of processing unit matches one of StarPU's defined worker architectures we can call starpu_worker_archtype_is_valid(), while in order to convert an architecture mask to a worker architecture we can call starpu_arch_mask_to_worker_archtype().
+
+To retrieve the binding ID of the worker associated with the currently executing task we can call starpu_worker_get_bindid(), it is useful for applications that require information about the binding of a particular task to a specific processor. We can call starpu_bindid_get_workerids() to retrieve the list of worker IDs that are bound to a given binding ID. 
+
+We can call starpu_workers_get_tree() to get information about the tree facilities provided by StarPU.
+
+\subsection TopologyBus Bus
+
+StarPU provides several functions to declare or retrieve information about the buses in a machine. The function starpu_bus_get_count() can be used to get the total number of buses available. To obtain the identifier of the bus between a source and destination point, the function starpu_bus_get_id() can be called. The source and destination points of a bus can be obtained by calling the functions starpu_bus_get_src() and starpu_bus_get_dst() respectively. Furthermore, users can use the function starpu_bus_set_direct() to declare that there is a direct link between a GPU and memory to the driver. The direct link can significantly reduce data transfer latency and improve overall performance. Moreover, users can use the function starpu_bus_get_direct() to retrieve information about whether a direct link has been established between a GPU and memory using the starpu_bus_set_direct() function. starpu_bus_set_ngpus() and starpu_bus_get_ngpus() functions can be used to declare and retrieve the number of GPUs of this bus that users need.
+
+\section UsingTheDriverAPI Using The Driver API
+
+\ref API_Running_Drivers
+
+\code{.c}
+int ret;
+struct starpu_driver =
+{
+    .type = STARPU_CUDA_WORKER,
+    .id.cuda_id = 0
+};
+ret = starpu_driver_init(&d);
+if (ret != 0)
+    error();
+while (some_condition)
+{
+    ret = starpu_driver_run_once(&d);
+    if (ret != 0)
+        error();
+}
+ret = starpu_driver_deinit(&d);
+if (ret != 0)
+    error();
+\endcode
+
+same as:
+
+\code{.c}
+int ret;
+struct starpu_driver =
+{
+    .type = STARPU_CUDA_WORKER,
+    .id.cuda_id = 0
+};
+
+ret = starpu_driver_run(&d);
+if (ret != 0)
+    error();
+
+\endcode
+
+The function starpu_driver_run() initializes the given driver, run it until starpu_drivers_request_termination() is called.
+
+To add a new kind of device to the structure starpu_driver, one needs to:
+<ol>
+<li> Add a member to the union starpu_driver::id
+</li>
+<li> Modify the internal function <c>_starpu_launch_drivers()</c> to
+make sure the driver is not always launched.
+</li>
+<li> Modify the function starpu_driver_run() so that it can handle
+another kind of architecture. The function starpu_driver_run() is equal to call starpu_driver_init(), then to call starpu_driver_run_once() in a loop, and finally to call starpu_driver_deinit().
+</li>
+<li> Write the new function <c>_starpu_run_foobar()</c> in the
+corresponding driver.
+</li>
+</ol>
+
+\section On-GPURendering On-GPU Rendering
+
+Graphical-oriented applications need to draw the result of their computations,
+typically on the very GPU where these happened. Technologies such as OpenGL/CUDA
+interoperability permit to let CUDA directly work on the OpenGL buffers, making
+them thus immediately ready for drawing, by mapping OpenGL buffer, textures or
+renderbuffer objects into CUDA.  CUDA however imposes some technical
+constraints: peer memcpy has to be disabled, and the thread that runs OpenGL has
+to be the one that runs CUDA computations for that GPU.
+
+To achieve this with StarPU, pass the option
+\ref disable-cuda-memcpy-peer "--disable-cuda-memcpy-peer"
+to <c>configure</c> (TODO: make it dynamic), OpenGL/GLUT has to be initialized
+first, and the interoperability mode has to
+be enabled by using the field
+starpu_conf::cuda_opengl_interoperability, and the driver loop has to
+be run by the application, by using the field
+starpu_conf::not_launched_drivers to prevent StarPU from running it in
+a separate thread, and by using starpu_driver_run() to run the loop.
+The examples <c>gl_interop</c> and <c>gl_interop_idle</c> show how it
+articulates in a simple case, where rendering is done in task
+callbacks. The former uses <c>glutMainLoopEvent</c> to make GLUT
+progress from the StarPU driver loop, while the latter uses
+<c>glutIdleFunc</c> to make StarPU progress from the GLUT main loop.
+
+Then, to use an OpenGL buffer as a CUDA data, StarPU simply needs to be given
+the CUDA pointer at registration, for instance:
+
+\code{.c}
+/* Get the CUDA worker id */
+for (workerid = 0; workerid < starpu_worker_get_count(); workerid++)
+        if (starpu_worker_get_type(workerid) == STARPU_CUDA_WORKER)
+                break;
+
+/* Build a CUDA pointer pointing at the OpenGL buffer */
+cudaGraphicsResourceGetMappedPointer((void**)&output, &num_bytes, resource);
+
+/* And register it to StarPU */
+starpu_vector_data_register(&handle, starpu_worker_get_memory_node(workerid), output, num_bytes / sizeof(float4), sizeof(float4));
+
+/* The handle can now be used as usual */
+starpu_task_insert(&cl, STARPU_RW, handle, 0);
+
+/* ... */
+
+/* This gets back data into the OpenGL buffer */
+starpu_data_unregister(handle);
+\endcode
+
+and display it e.g. in the callback function.
+
+\section UsingStarPUWithMKL Using StarPU With MKL 11 (Intel Composer XE 2013)
+
+Some users had issues with MKL 11 and StarPU (versions 1.1rc1 and
+1.0.5) on Linux with MKL, using 1 thread for MKL and doing all the
+parallelism using StarPU (no multithreaded tasks), setting the
+environment variable <c>MKL_NUM_THREADS</c> to <c>1</c>, and using the threaded MKL library,
+with <c>iomp5</c>.
+
+Using this configuration, StarPU only uses 1 core, no matter the value of
+\ref STARPU_NCPU. The problem is actually a thread pinning issue with MKL.
+
+The solution is to set the environment variable KMP_AFFINITY to <c>disabled</c>
+(http://software.intel.com/sites/products/documentation/studio/composer/en-us/2011Update/compiler_c/optaps/common/optaps_openmp_thread_affinity.htm).
+
+\section ThreadBindingOnNetBSD Thread Binding on NetBSD
+
+When using StarPU on a NetBSD machine, if the topology
+discovery library <c>hwloc</c> is used, thread binding will fail. To
+prevent the problem, you should at least use the version 1.7 of
+<c>hwloc</c>, and also issue the following call:
+
+\verbatim
+$ sysctl -w security.models.extensions.user_set_cpu_affinity=1
+\endverbatim
+
+Or add the following line in the file <c>/etc/sysctl.conf</c>
+
+\verbatim
+security.models.extensions.user_set_cpu_affinity=1
+\endverbatim
+
+\section StarPUEatsCPUs StarPU permanently eats 100% of all CPUs
+
+Yes, this is on purpose.
+
+By default, StarPU uses active polling on task queues to minimize wake-up
+latency for better overall performance. We can call starpu_is_paused() to check whether the task processing by workers has been paused or not.
+
+If eating CPU time is a problem (e.g. application running on a desktop),
+pass option \ref enable-blocking-drivers "--enable-blocking-drivers" to
+<c>configure</c>. This will add some overhead when putting CPU workers to
+sleep or waking them, but avoid eating 100% CPU permanently.
+
+\section PauseResume Interleaving StarPU and non-StarPU code
+
+If your application only partially uses StarPU, and you do not want to
+call starpu_init() / starpu_shutdown() at the beginning/end
+of each section, StarPU workers will poll for work between the
+sections. To avoid this behavior, you can "pause" StarPU with the
+starpu_pause() function. This will prevent the StarPU workers from
+accepting new work (tasks that are already in progress will not be
+frozen), and stop them from polling for more work.
+
+Note that this does not prevent you from submitting new tasks, but
+they won't execute until starpu_resume() is called. Also note
+that StarPU must not be paused when you call starpu_shutdown(), and
+that this function pair works in a push/pull manner, i.e. you need to
+match the number of calls to these functions to clear their effect.
+
+One way to use these functions could be:
+\code{.c}
+starpu_init(NULL);
+starpu_worker_wait_for_initialisation(); // Wait for the worker to complete its initialization process
+starpu_pause(); // To submit all the tasks without a single one executing
+submit_some_tasks();
+starpu_resume(); // The tasks start executing
+
+starpu_task_wait_for_all();
+starpu_pause(); // Stop the workers from polling
+
+// Non-StarPU code
+
+starpu_resume();
+// ...
+starpu_shutdown();
+\endcode
+
+\section GPUEatingCores When running with CUDA or OpenCL devices, I am seeing less CPU cores
+
+Yes, this is on purpose.
+
+Since GPU devices are way faster than CPUs, StarPU needs to react quickly when
+a task is finished, to feed the GPU with another task (StarPU actually submits
+a couple of tasks in advance to pipeline this, but filling the pipeline
+still has to be happening often enough), and thus it has to dedicate threads for
+this, and this is a very CPU-consuming duty. StarPU thus dedicates one CPU core
+for driving each GPU by default.
+
+Such dedication is also useful when a codelet is hybrid, i.e. while kernels are
+running on the GPU, the codelet can run some computation, which thus be run by
+the CPU core instead of driving the GPU.
+
+One can choose to dedicate only one thread for all the CUDA devices by setting
+the \ref STARPU_CUDA_THREAD_PER_DEV environment variable to \c 1. The application
+however should use ::STARPU_CUDA_ASYNC on its CUDA codelets (asynchronous
+execution), otherwise the execution of a synchronous CUDA codelet will
+monopolize the thread, and other CUDA devices will thus starve while it is
+executing.
+
+\section CUDADrivers StarPU does not see my CUDA device
+
+First, make sure that CUDA is properly running outside StarPU: build and
+run the following program with \c -lcudart :
+
+\code{.c}
+#include <stdio.h>
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+int main(void)
+{
+	int n, i, version;
+	cudaError_t err;
+
+	err = cudaGetDeviceCount(&n);
+	if (err)
+	{
+		fprintf(stderr,"cuda error %d\n", err);
+		exit(1);
+	}
+	cudaDriverGetVersion(&version);
+	printf("driver version %d\n", version);
+	cudaRuntimeGetVersion(&version);
+	printf("runtime version %d\n", version);
+	printf("\n");
+
+	for (i = 0; i < n; i++)
+	{
+		struct cudaDeviceProp props;
+		printf("CUDA%d\n", i);
+		err = cudaGetDeviceProperties(&props, i);
+		if (err)
+		{
+			fprintf(stderr,"cudaGetDeviceProperties cuda error %d\n", err);
+			continue;
+		}
+		printf("%s\n", props.name);
+		printf("%0.3f GB\n", (float) props.totalGlobalMem / (1<<30));
+		printf("%u MP\n", props.multiProcessorCount);
+		printf("\n");
+
+		err = cudaSetDevice(i);
+		if (err)
+		{
+			fprintf(stderr,"cudaSetDevice(%d) cuda error %d\n", err, i);
+			continue;
+		}
+
+		err = cudaFree(0);
+		if (err)
+		{
+			fprintf(stderr,"cudaFree(0) on %d cuda error %d\n", err, i);
+			continue;
+		}
+	}
+	return 0;
+}
+\endcode
+
+If that program does not find your device, the problem is not at the StarPU
+level, but with the CUDA drivers, check the documentation of your CUDA
+setup.  This program is available in the source directory of
+StarPU in <c>tools/gpus/check_cuda.c</c>, along with another CUDA
+program <c>tools/gpus/cuda_list.cu</c>.
+
+\section HIPDrivers StarPU does not see my HIP device
+
+First, make sure that HIP is properly running outside StarPU: build and
+run the following program with \c hipcc :
+
+\code{.c}
+#include <stdio.h>
+#include <hip/hip_runtime.h>
+#include <hip/hip_runtime_api.h>
+
+int main(void)
+{
+	int i, cnt;
+	hipError_t hipres;
+	hipres = hipGetDeviceCount(&cnt);
+	if (hipres)
+	{
+		fprintf(stderr,"hip error: <%s>\n", hipGetErrorString(hipres));
+		exit(1);
+	}
+	printf("number of hip devices: %d\n", cnt);
+	for (i = 0; i < cnt; i++)
+	{
+		struct hipDeviceProp_t props;
+		printf("HIP%d\n", i);
+		hipres = hipGetDeviceProperties(&props, i);
+		if (hipres)
+		{
+			fprintf(stderr,"hip error: <%s>\n", hipGetErrorString(hipres));
+			continue;
+		}
+		printf("%s\n", props.name);
+		printf("%0.3f GB\n", (float) props.totalGlobalMem / (1<<30));
+		printf("%u MP\n", props.multiProcessorCount);
+		printf("\n");
+	}
+	return 0;
+}
+\endcode
+
+If that program does not find your device, the problem is not at the StarPU
+level, but with the HIP drivers, check the documentation of your HIP
+setup.  This program is available in the source directory of
+StarPU in <c>tools/gpus/check_hip.c</c>.
+
+\section OpenCLDrivers StarPU does not see my OpenCL device
+
+First, make sure that OpenCL is properly running outside StarPU: build and
+run the following program with \c -lOpenCL :
+
+\code{.c}
+#include <CL/cl.h>
+#include <stdio.h>
+#include <assert.h>
+
+int main(void)
+{
+    cl_device_id did[16];
+    cl_int err;
+    cl_platform_id pid, pids[16];
+    cl_uint nbplat, nb;
+    char buf[128];
+    size_t size;
+    int i, j;
+
+    err = clGetPlatformIDs(sizeof(pids)/sizeof(pids[0]), pids, &nbplat);
+    assert(err == CL_SUCCESS);
+    printf("%u platforms\n", nbplat);
+    for (j = 0; j < nbplat; j++)
+    {
+        pid = pids[j];
+        printf("    platform %d\n", j);
+        err = clGetPlatformInfo(pid, CL_PLATFORM_VERSION, sizeof(buf)-1, buf, &size);
+        assert(err == CL_SUCCESS);
+        buf[size] = 0;
+        printf("        platform version %s\n", buf);
+
+        err = clGetDeviceIDs(pid, CL_DEVICE_TYPE_ALL, sizeof(did)/sizeof(did[0]), did, &nb);
+        if (err == CL_DEVICE_NOT_FOUND)
+          nb = 0;
+        else
+          assert(err == CL_SUCCESS);
+        printf("%d devices\n", nb);
+        for (i = 0; i < nb; i++)
+        {
+            err = clGetDeviceInfo(did[i], CL_DEVICE_VERSION, sizeof(buf)-1, buf, &size);
+            buf[size] = 0;
+            printf("    device %d version %s\n", i, buf);
+        }
+    }
+
+    return 0;
+}
+\endcode
+
+If that program does not find your device, the problem is not at the StarPU
+level, but with the OpenCL drivers, check the documentation of your OpenCL
+implementation. This program is available in the source directory of
+StarPU in <c>tools/gpus/check_opencl.c</c>.
+
+\section CUDACopyError There seems to be errors when copying to and from CUDA devices
+
+You should first try to disable asynchronous copies between CUDA and
+CPU workers. You can either do that with the configuration parameter
+\ref disable-asynchronous-cuda-copy "--disable-asynchronous-cuda-copy"
+or with the environment variable \ref
+STARPU_DISABLE_ASYNCHRONOUS_CUDA_COPY.
+
+If your application keeps failing, you will find in the source
+directory of StarPU, a directory named <c>tools/gpus</c> with various
+programs. <c>cuda_copy.cu</c> is testing the direct or undirect copy
+between CUDA devices.
+
+You can also try to just disable the direct gpu-gpu transfers (known
+to fail under some hardware/cuda combinations) by setting the \ref
+STARPU_ENABLE_CUDA_GPU_GPU_DIRECT environment variable to 0.
+
+\section IncorrectPerformanceModelFile I keep getting a "Incorrect performance model file" error
+
+The performance model file, used by StarPU to record the performance of
+codelets, seem to have been corrupted. Perhaps a previous run of StarPU stopped
+abruptly, and thus could not save it properly.  You can have a look at the file
+if you can fix it, but the simplest way is to just remove the file and run
+again, StarPU will just have to re-perform calibration for the corresponding codelet.
+
+*/
