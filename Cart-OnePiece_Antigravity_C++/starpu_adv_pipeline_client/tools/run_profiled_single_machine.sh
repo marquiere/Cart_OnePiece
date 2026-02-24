@@ -73,6 +73,7 @@ echo "Starting Client pinned to Cores $CLIENT_CORES..."
 
 # We run the client in the background temporarily just to record its PID, 
 # then we `wait` on it.
+export RUN_DIR="$LATEST_RUN"
 taskset -c "$CLIENT_CORES" $CLIENT_CMD > "${LATEST_RUN}/client.log" 2>&1 &
 CLIENT_PID=$!
 

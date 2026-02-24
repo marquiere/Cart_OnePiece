@@ -1,0 +1,94 @@
+# Task Plan
+
+## Step 0 (Completed)
+- [x] Create folder structure for `starpu_adv_pipeline_client`
+- [x] Create `.gitignore`
+- [x] Create `apps/client_smoke.cpp`
+- [x] Create `apps/starpu_smoke.cpp`
+- [x] Create `CMakeLists.txt` with required targets
+- [x] Create `README.md` with Step 0 checklist
+- [x] Verify Step 0 (CMake configuration, build, run smoke tests)
+
+## Step 1: CARLA Server & Client Connection
+- [x] Write `tools/run_server.sh` (Offscreen, Pidfile, Logs)
+- [x] Write `tools/kill_server.sh` (Read Pidfile, cleanup)
+- [x] Update `apps/client_smoke.cpp` to connect to CARLA
+- [x] Update `README.md` with Step 1 instructions and pass/fail criteria
+- [x] Verify Step 1 (Start server, run client, verify output, kill server)
+
+## Step 2: Workload Separation & Monitoring
+- [x] Create `tools/run_profiled_single_machine.sh`
+- [x] Create `tools/monitor_split.sh`
+- [x] Update `README.md` with Step 2 instructions
+- [x] Verify Step 2 (Run profiled launch, monitor, inspect logs, kill server)
+
+## Step 3: RGB Stream Smoke Test
+- [x] Create `apps/carla_rgb_stream_smoke.cpp` (spawn vehicle, attach camera, verify dt, cleanup)
+- [x] Update `CMakeLists.txt` for the new RGB target
+- [x] Update `tools/run_profiled_single_machine.sh` to accept custom client and client_args
+- [x] Update `README.md` with Step 3 instructions and pass/fail criteria
+- [x] Verify Step 3 (Run locally, verify buffer sizes, verify 200 frames, verify cleanup)
+
+## Step 4: GT Semantic Stream Smoke Test
+- [x] Create `include/semantic_decode.hpp` and `src/semantic_decode.cpp`
+- [x] Create `apps/carla_gt_stream_smoke.cpp` (spawn vehicle, attach camera, decode semantics, compute stats)
+- [x] Update `CMakeLists.txt` for the semantic logic and GT target
+- [x] Update `README.md` with Step 4 instructions and pass/fail criteria
+- [x] Verify Step 4 (Run locally with both BGRA and RGBA settings, verify frame counts and stats)
+
+## Step 5: RGB and GT Frame Synchronization
+- [x] Create `include/frame_sync.hpp` and `src/frame_sync.cpp`
+- [x] Create `apps/sync_smoke.cpp` (spawn vehicle, attach both RGB and GT cameras, push frames to sync, pop matched pairs)
+- [x] Update `CMakeLists.txt` for the sync logic and executable target
+- [x] Update `README.md` with Step 5 instructions and pass/fail criteria
+- [x] Verify Step 5 (Run locally, verify high match rate, bounded buffering, near-zero drops)
+
+## Step 6: Preprocess Module and Testing
+- [x] Create `include/preprocess.hpp` and `src/preprocess.cpp` (BGRA->NCHW_F32, resize, normalize)
+- [x] Create `include/tensor_stats.hpp` and `src/tensor_stats.cpp` (min/max/mean extraction)
+- [x] Create `apps/preprocess_smoke.cpp` (receive 1 frame, preprocess, print stats)
+- [x] Create `tests/preprocess_unit_test.cpp` (synthetic data tests)
+- [x] Update `CMakeLists.txt` to enable testing and add Step 6 targets
+- [x] Update `README.md` with Step 6 instructions and pass/fail criteria
+- [x] Verify Step 6 (Run CTest, run local preprocess_smoke with CARLA server)
+
+## Step 7: TensorRT Inference Runtime
+- [x] Create `include/trt_runner.hpp` and `src/trt_runner.cpp` (load engine, allocate buffers, run async inference, print bindings)
+- [x] Create `apps/trt_smoke.cpp` (parse CLI, create dummy buffers, warmup, iter, report latency/checksum)
+- [x] Update `CMakeLists.txt` (add WITH_TRT flag, find TensorRT/CUDA, build trt_runner/trt_smoke)
+- [x] Ensure a `.engine` model is available or generate one to test with
+- [x] Update `README.md` with Step 7 instructions and pass/fail criteria
+- [x] Verify Step 7 (Run trt_smoke locally, verify binding dump, latency, and checksums)
+
+## Step 8: Direct Pipeline End-to-End
+- [x] Add data types (`FrameIn`, `GtFrame`, `TensorIn`, `PredOut`)
+- [x] Create `include/postprocess.hpp` & `src/postprocess.cpp` (Engine output -> label map)
+- [x] Create `include/metrics.hpp` & `src/metrics.cpp` (PixelAccuracy, MeanIoU, async evaluation)
+- [x] Create `apps/pipeline_direct.cpp` (Thread A/B/C, drop-old policy, integrate preproc/trt/postproc, print stats to CSV)
+- [x] Update `CMakeLists.txt` for `postprocess`, `metrics`, and `pipeline_direct`
+- [x] Create `tools/run_pipeline_direct.sh`
+- [x] Update `README.md` with Step 8 instructions and verification
+- [x] Test and Verification (Run pipeline, verify drops, outputs, metrics)
+
+## Step 9: StarPU ADV Pipeline
+- [x] Create `include/starpu_runtime.hpp` and `src/starpu_runtime.cpp` (StarPU init and profiling)
+- [x] Create `include/starpu_codelets.hpp` and `src/starpu_codelets.cpp` (cl_preproc, cl_infer_trt, cl_post)
+- [x] Create `apps/pipeline_starpu.cpp` (orchestration, inflight slots, task submission)
+- [x] Update `CMakeLists.txt` to build `pipeline_starpu` and link StarPU
+- [x] Add CSV logging for `starpu_tasks.csv` and `pipeline_starpu.csv`
+- [x] Update `README.md` with Step 9 instructions and troubleshooting
+- [x] Test and Validation with 150 frames and overload stress test
+
+## Step 10: Single-Machine Workload Split Report
+- [x] Upgrade `tools/run_profiled_single_machine.sh` to log commands, environments, and PIDs
+- [x] Upgrade `tools/monitor_split.sh` to extract and serialize Server vs Client CPU telemetry securely
+- [x] Add `Pmon`/`ComputeApps` multi-tier GPU tracking into the monitor module
+- [x] Write `tools/summarize_run.py` to synthesize telemetry files and pipeline logs into TXT/JSON formats
+- [x] Update `README.md` to document Step 10 checklist, commands, and fallback guides
+## Step 10.5: Visual & Dataset Sanity Pack
+- [x] Implement visualization utilities (`vis.hpp`, `vis.cpp`)
+- [x] Implement `dataset_sanity` bounded dumping pipeline
+- [x] Configure `CMakeLists.txt` for the new targets
+- [x] Execute debugging dataset generation locally without Pred
+- [x] Execute debugging dataset generation locally with TensorRT
+- [x] Add instructions to `README.md`
