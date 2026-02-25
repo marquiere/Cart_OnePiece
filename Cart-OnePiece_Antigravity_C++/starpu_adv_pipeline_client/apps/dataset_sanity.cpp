@@ -159,6 +159,10 @@ int main(int argc, char **argv) {
     world = client.LoadWorld(map_name);
   }
 
+  auto tm = client.GetInstanceTM();
+  tm.SetSynchronousMode(true);
+  uint16_t tm_port = 8000;
+
   auto bp_lib = world.GetBlueprintLibrary();
   auto vehicle_bp = *bp_lib->Find("vehicle.mercedes.coupe_2020");
   auto spawn_points = world.GetMap()->GetRecommendedSpawnPoints();
@@ -181,7 +185,7 @@ int main(int argc, char **argv) {
   }
   vehicle->SetSimulatePhysics(true);
   auto p_vehicle = boost::static_pointer_cast<carla::client::Vehicle>(vehicle);
-  p_vehicle->SetAutopilot(true);
+  p_vehicle->SetAutopilot(true, tm_port);
 
   auto rgb_bp = *bp_lib->Find("sensor.camera.rgb");
   rgb_bp.SetAttribute("image_size_x", std::to_string(w));
@@ -381,6 +385,8 @@ int main(int argc, char **argv) {
     rgb_sensor->Destroy();
   if (vehicle)
     vehicle->Destroy();
+
+  tm.SetSynchronousMode(false);
 
   return 0;
 }

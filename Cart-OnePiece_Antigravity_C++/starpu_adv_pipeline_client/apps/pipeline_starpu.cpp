@@ -528,13 +528,18 @@ int main(int argc, char **argv) {
   auto world = client.GetWorld();
   auto map = world.GetMap();
 
+  auto tm = client.GetInstanceTM();
+  tm.SetSynchronousMode(true);
+  uint16_t tm_port = 8000;
+
   auto blueprint_library = world.GetBlueprintLibrary();
   auto vehicle_bp = *(blueprint_library->Find("vehicle.tesla.model3"));
   auto spawn_points = map->GetRecommendedSpawnPoints();
   auto spawn_point = spawn_points[0];
   spawn_point.location.z += 1.0f;
   auto vehicle = world.SpawnActor(vehicle_bp, spawn_point);
-  boost::static_pointer_cast<cc::Vehicle>(vehicle)->SetAutopilot(true);
+  vehicle->SetSimulatePhysics(true);
+  boost::static_pointer_cast<cc::Vehicle>(vehicle)->SetAutopilot(true, tm_port);
 
   cg::Transform camera_tf(cg::Location(0.0f, 0.0f, 2.0f),
                           cg::Rotation(0.0f, 0.0f, 0.0f));
@@ -749,6 +754,8 @@ int main(int argc, char **argv) {
     gt_sensor->Destroy();
   if (vehicle)
     vehicle->Destroy();
+
+  tm.SetSynchronousMode(false);
   settings.synchronous_mode = original_sync;
   world.ApplySettings(settings, std::chrono::seconds(2));
 

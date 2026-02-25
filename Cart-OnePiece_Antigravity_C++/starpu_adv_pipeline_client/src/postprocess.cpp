@@ -15,6 +15,31 @@ void ArgmaxLogitsToLabels(const float *logits, int c, int h, int w,
     out_labels.resize(spatial_size);
   }
 
+  // Cityscapes TrainID (0-18) to CARLA Raw ID (approximate lookup table)
+  // Maps classes like Road(0)->7, Building(2)->1, Vehicle(13)->10, etc.
+  static const uint8_t TRAINID_TO_CARLA_RAW[] = {
+      7,  // 0: Road
+      8,  // 1: Sidewalk
+      1,  // 2: Building
+      11, // 3: Wall
+      2,  // 4: Fence
+      5,  // 5: Pole
+      18, // 6: TrafficLight
+      12, // 7: TrafficSign
+      9,  // 8: Vegetation
+      22, // 9: Terrain
+      13, // 10: Sky
+      4,  // 11: Person (Pedestrian)
+      4,  // 12: Rider
+      10, // 13: Car (Vehicle)
+      10, // 14: Truck
+      10, // 15: Bus
+      10, // 16: Train
+      10, // 17: Motorcycle
+      10  // 18: Bicycle
+  };
+  bool is_cityscapes_19 = (c == 19);
+
 // Usually output logits are [1, C, H, W]. So shape is C*H*W in memory.
 // For a specific pixel at (y,x), the array of class scores is spaced by H*W.
 #pragma omp parallel for
@@ -29,8 +54,16 @@ void ArgmaxLogitsToLabels(const float *logits, int c, int h, int w,
         best_c = ch;
       }
     }
-    // Clip best_c to 255 to fit in uint8_t
-    out_labels[i] = static_cast<uint8_t>(std::min(best_c, 255));
+
+    // Bounds guard: predicted label must be within [0, c-1]
+    best_c = std::max(0, std::min(best_c, c - 1));
+
+    uint8_t final_label = static_cast<uint8_t>(best_c);
+    if (is_cityscapes_19 && best_c < 19) {
+      final_label = TRAINID_TO_CARLA_RAW[best_c];
+    }
+
+    out_labels[i] = final_label;
   }
 }
 
