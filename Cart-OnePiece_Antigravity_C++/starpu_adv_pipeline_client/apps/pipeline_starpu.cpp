@@ -33,6 +33,8 @@
 #include "preprocess.hpp"
 #include "semantic_decode.hpp"
 #include "trt_runner.hpp"
+#include "viewer_sdl2.hpp"
+#include "vis.hpp"
 
 #include "starpu_codelets.hpp"
 #include "starpu_runtime.hpp"
@@ -110,6 +112,7 @@ struct EvalConfig {
   std::vector<uint8_t> specific_classes;
   int out_w = 0;
   int out_h = 0;
+  SegmentationViewerSDL2 *viewer = nullptr;
 };
 
 static void ResizeLabelsNearest(const uint8_t *src, int in_w, int in_h,
@@ -201,6 +204,13 @@ void evaluate_thread(const EvalConfig &cfg) {
 
     double pa = 0.0;
     double miou = 0.0;
+
+    if (cfg.viewer) {
+      std::vector<uint8_t> color_img(cfg.out_w * cfg.out_h * 3);
+      vis::ColorizeCityscapes(payload.pred_labels.data(), cfg.out_w, cfg.out_h,
+                              color_img.data());
+      cfg.viewer->submit_frame_rgb888(color_img.data(), cfg.out_w, cfg.out_h);
+    }
 
     if (cfg.enabled) {
       metrics::EvalResult res =
@@ -391,6 +401,7 @@ int main(int argc, char **argv) {
   bool do_eval = true;
   float mean_vals[3] = {0.485f, 0.456f, 0.406f};
   float std_vals[3] = {0.229f, 0.224f, 0.225f};
+  bool display = false;
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -428,6 +439,8 @@ int main(int argc, char **argv) {
       inflight_pairs = std::stoi(argv[++i]);
     else if (arg == "--cpu_workers" && i + 1 < argc)
       cpu_workers = std::stoi(argv[++i]);
+    else if (arg == "--display" && i + 1 < argc)
+      display = (std::stoi(argv[++i]) != 0);
     else if (arg == "--no_eval")
       do_eval = false;
   }
@@ -488,12 +501,23 @@ int main(int argc, char **argv) {
   g_slots =
       new SlotManager(inflight_pairs, out_w, out_h, runner.GetOutputBytes());
 
+  std::unique_ptr<SegmentationViewerSDL2> viewer;
+  if (display) {
+    viewer = std::make_unique<SegmentationViewerSDL2>();
+    if (!viewer->init(out_w, out_h, 2.0f)) {
+      std::cerr << "[Pipeline] Viewer init failed, running headless.\n";
+      viewer.reset();
+    }
+  }
+
   // Eval Thread
   EvalConfig ecfg;
   ecfg.enabled = do_eval;
+  ecfg.specific_classes = {7, 8}; // roads and sidewalks
   ecfg.out_w = out_w;
   ecfg.out_h = out_h;
   ecfg.print_every = eval_every;
+  ecfg.viewer = viewer.get();
   std::thread eval_t(evaluate_thread, ecfg);
 
   // CARLA setup
@@ -585,6 +609,14 @@ int main(int argc, char **argv) {
             << " Frames: " << max_frames << "\n";
 
   while (!g_stop_requested && frames_processed < max_frames) {
+    if (viewer) {
+      if (viewer->poll_events()) {
+        g_stop_requested = true;
+        break;
+      }
+      viewer->render_latest();
+    }
+
     world.Tick(std::chrono::seconds(2));
 
     MatchedPair pair;
