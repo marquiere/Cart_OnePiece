@@ -43,18 +43,22 @@ if [ -n "$CLIENT_BIN" ]; then
 fi
 echo "=========================================="
 
-# 1. Start CARLA server pinned
-# We wrap run_server.sh in taskset so its children (CarlaUE4) inherit the affinity.
-# We also parse the CARLA_ROOT via env if not provided via args.
-taskset -c "$SERVER_CORES" ./tools/run_server.sh --port "$PORT" || { echo "Failed to start server"; exit 1; }
-
-# Give server time to initialize its runs/ directory and write the PID
-sleep 3
-
-# 2. Extract Server PID and Run Directory
+# 1. Skip server start if one is already running
+# We only start the server if runs/ doesn't have an active one
 LATEST_RUN=$(ls -td runs/*/ 2>/dev/null | head -n1)
 LATEST_RUN=${LATEST_RUN%/}
 PID_FILE="${LATEST_RUN}/server.pid"
+
+if [ ! -f "$PID_FILE" ] || ! kill -0 $(cat "$PID_FILE") 2>/dev/null; then
+    echo "No active CARLA server found. Starting a new one pinned to cores ${SERVER_CORES}..."
+    taskset -c "$SERVER_CORES" ./tools/run_server.sh --port "$PORT" || { echo "Failed to start server"; exit 1; }
+    sleep 3
+    LATEST_RUN=$(ls -td runs/*/ 2>/dev/null | head -n1)
+    LATEST_RUN=${LATEST_RUN%/}
+    PID_FILE="${LATEST_RUN}/server.pid"
+else
+    echo "Using existing CARLA server detected in $LATEST_RUN."
+fi
 
 if [ ! -f "$PID_FILE" ]; then
     echo "ERROR: Server PID file not found in $LATEST_RUN. Did run_server.sh succeed?"

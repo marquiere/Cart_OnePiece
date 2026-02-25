@@ -208,7 +208,7 @@ else
 fi
 
 # Construct Arguments
-ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every $FRAMES"
+ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every $FRAMES --display 1"
 
 # APEX / TaskStubs Handling
 RUN_CMD="$BIN_PATH $ARGS"
