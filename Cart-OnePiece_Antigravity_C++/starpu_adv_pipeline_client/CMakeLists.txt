@@ -12,6 +12,7 @@ include(CTest)
 enable_testing()
 
 find_package(PkgConfig REQUIRED)
+find_package(SDL2 REQUIRED)
 
 # Find StarPU configuration
 pkg_check_modules(STARPU REQUIRED starpu-1.4)
@@ -142,6 +143,14 @@ if(WITH_TRT)
     target_link_libraries(pipeline_direct PRIVATE trt_runner ${NVINFER_LIB} ${CUDA_RT_LIB})
 endif()
 
+# --- Visualization ---
+add_library(viewer_sdl2 STATIC src/viewer_sdl2.cpp)
+target_include_directories(viewer_sdl2 PUBLIC include)
+target_link_libraries(viewer_sdl2 PRIVATE ${SDL2_LIBRARIES})
+if(SDL2_INCLUDE_DIRS)
+  target_include_directories(viewer_sdl2 PUBLIC ${SDL2_INCLUDE_DIRS})
+endif()
+
 # 9) pipeline_starpu
 add_executable(pipeline_starpu apps/pipeline_starpu.cpp src/starpu_runtime.cpp src/starpu_codelets.cpp)
 target_link_libraries(pipeline_starpu PRIVATE
@@ -151,6 +160,8 @@ target_link_libraries(pipeline_starpu PRIVATE
     metrics
     semantic_decode
     frame_sync
+    viewer_sdl2
+    vis
     ${STARPU_LIBRARIES}
 )
 target_link_options(pipeline_starpu PRIVATE ${STARPU_LDFLAGS})
