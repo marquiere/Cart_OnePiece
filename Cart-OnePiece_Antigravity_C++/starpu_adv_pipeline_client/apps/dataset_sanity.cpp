@@ -28,6 +28,7 @@
 #include "preprocess.hpp"
 #include "semantic_decode.hpp"
 #include "trt_runner.hpp"
+#include "viewer_sdl2.hpp"
 #include "vis.hpp"
 
 using namespace std::chrono;
@@ -56,6 +57,7 @@ int main(int argc, char **argv) {
   bool save_raw_bin = true;
   bool save_png = true;
   int print_every = 5;
+  bool display = false;
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -91,6 +93,8 @@ int main(int argc, char **argv) {
       save_png = std::stoi(argv[++i]);
     else if (arg == "--print_every" && i + 1 < argc)
       print_every = std::stoi(argv[++i]);
+    else if (arg == "--display" && i + 1 < argc)
+      display = (std::stoi(argv[++i]) != 0);
   }
 
   if (!no_pred && engine_path.empty()) {
@@ -150,6 +154,15 @@ int main(int argc, char **argv) {
     fs::create_directories(run_dir + "/overlay");
   }
 
+  std::unique_ptr<SegmentationViewerSDL2> viewer = nullptr;
+  if (display) {
+    viewer = std::make_unique<SegmentationViewerSDL2>();
+    if (!viewer->init(w, h, 2.0f)) {
+      std::cerr << "[Sanity Dataset] Viewer init failed.\n";
+      viewer.reset();
+    }
+  }
+
   // Connect
   auto client = carla::client::Client(host, port);
   client.SetTimeout(std::chrono::seconds(10));
@@ -158,6 +171,12 @@ int main(int argc, char **argv) {
   if (!map_name.empty()) {
     world = client.LoadWorld(map_name);
   }
+
+  auto settings = world.GetSettings();
+  bool original_sync = settings.synchronous_mode;
+  settings.synchronous_mode = true;
+  settings.fixed_delta_seconds = 1.0f / fps;
+  world.ApplySettings(settings, std::chrono::seconds(2));
 
   auto tm = client.GetInstanceTM();
   tm.SetSynchronousMode(true);
@@ -253,9 +272,26 @@ int main(int argc, char **argv) {
 
   int total_processed = 0;
   while (total_processed < target_frames) {
+    if (viewer) {
+      if (viewer->poll_events()) {
+        break;
+      }
+    }
+
+    world.Tick(std::chrono::seconds(2));
+
     MatchedPair pair;
-    if (!sync.TryPopMatched(pair)) {
+    bool got_pair = false;
+    // Try for some timeout to avoid locking up totally if sensors drop a frame
+    for (int t = 0; t < 100; ++t) {
+      if (sync.TryPopMatched(pair)) {
+        got_pair = true;
+        break;
+      }
       std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+
+    if (!got_pair) {
       continue;
     }
 
@@ -345,6 +381,15 @@ int main(int argc, char **argv) {
     saved_frames.push_back(fid);
     total_processed++;
 
+    if (viewer) {
+      if (!no_pred) {
+        viewer->submit_frame_rgb888(overlay.data(), w, h);
+      } else {
+        viewer->submit_frame_rgb888(rgb_bytes.data(), w, h);
+      }
+      viewer->render_latest();
+    }
+
     if (total_processed % print_every == 0) {
       std::cout << "[Sanity Dataset] Saved frame " << total_processed << " / "
                 << target_frames << " (ID: " << fid << ")\n";
@@ -387,6 +432,8 @@ int main(int argc, char **argv) {
     vehicle->Destroy();
 
   tm.SetSynchronousMode(false);
+  settings.synchronous_mode = original_sync;
+  world.ApplySettings(settings, std::chrono::seconds(2));
 
   return 0;
 }

@@ -186,7 +186,11 @@ target_link_libraries(dataset_sanity PRIVATE
     postprocess
     semantic_decode
     frame_sync
+    viewer_sdl2
 )
 if(WITH_TRT)
     target_link_libraries(dataset_sanity PRIVATE trt_runner ${NVINFER_LIB} ${CUDA_RT_LIB})
+endif()
+if(SDL2_INCLUDE_DIRS)
+  target_include_directories(dataset_sanity PUBLIC ${SDL2_INCLUDE_DIRS})
 endif()
