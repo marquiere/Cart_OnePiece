@@ -8,10 +8,10 @@ echo "Waiting 15 seconds for CARLA to initialize Map..."
 sleep 15
 
 echo "--- RUNNING PROFILING HARNESS (DEFAULT SCHEDULER: DMDA) ---"
-./tools/verify_profiling.sh --frames 120 --sched dmda
+./tools/verify_profiling.sh --frames 1200 --sched dmda
 
 echo "--- RUNNING PROFILING HARNESS (CUSTOM SCHEDULER: RR_WORKERS) ---"
-./tools/verify_profiling.sh --frames 120 --sched rr_workers
+./tools/verify_profiling.sh --frames 1200 --sched rr_workers
 
 echo "--- KILLING SERVER ---"
 ./tools/kill_server.sh
