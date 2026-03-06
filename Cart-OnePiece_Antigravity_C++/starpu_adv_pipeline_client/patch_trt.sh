@@ -1,0 +1,3 @@
+sed -i '/if (!context_->enqueueV3(stream_)) {/i \  \n  nvinfer1::Dims in_dims = context_->getTensorShape(in_name);\n  nvinfer1::Dims out_dims = context_->getTensorShape(out_name);\n  if (host_input_bytes != input_bytes_ || host_output_bytes != output_bytes_) {\n    std::cerr << "SHAPE MISMATCH! CPU passed IN:" << host_input_bytes << " OUT:" << host_output_bytes << " | TRT expected IN:" << input_bytes_ << " OUT:" << output_bytes_ << std::endl;\n  }\n' src/trt_runner.cpp
+make -C build -j8 pipeline_starpu
+./build/pipeline_starpu --engine models/deeplabv3_mobilenet.engine --w 800 --h 600 --frames 2 --fps 1

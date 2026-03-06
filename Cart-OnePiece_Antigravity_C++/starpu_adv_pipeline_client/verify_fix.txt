@@ -1,0 +1,145 @@
+--- STARTING SERVER ---
+==========================================
+Starting CARLA Server...
+Port: 2000
+Run Directory: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_234724
+Log File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_234724/server.log
+PID File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_234724/server.pid
+==========================================
+SERVER STARTED with PID: 600772
+You can monitor logs with: tail -f /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_234724/server.log
+To stop the server, run: ./tools/kill_server.sh --run_dir /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_234724
+Waiting 15 seconds for CARLA to initialize Map...
+--- RUNNING PROFILING HARNESS (DEFAULT SCHEDULER: DMDA) ---
+=== Diagnostics ===
+APEX Mode: off
+Checking StarPU Config...
+#define STARPU_PAPI 1
+	libpapi.so.6.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so.6.0
+	libpapi.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so
+PAPI Available. First 30 lines:
+Available PAPI preset and user defined events plus hardware information.
+--------------------------------------------------------------------------------
+PAPI version             : 6.0.0.0
+Operating system         : Linux 6.8.0-101-generic
+Vendor string and code   : GenuineIntel (1, 0x1)
+Model string and code    : Intel(R) Core(TM) i9-10900F CPU @ 2.80GHz (165, 0xa5)
+CPU revision             : 5.000000
+CPUID                    : Family/Model/Stepping 6/165/5, 0x06/0xa5/0x05
+CPU Max MHz              : 5200
+CPU Min MHz              : 800
+Total cores              : 20
+SMT threads per core     : 2
+Cores per socket         : 10
+Sockets                  : 1
+Cores per NUMA region    : 20
+NUMA regions             : 1
+Running in a VM          : no
+Number Hardware Counters : 10
+Max Multiplex Counters   : 384
+Fast counter read (rdpmc): yes
+--------------------------------------------------------------------------------
+
+================================================================================
+  PAPI Preset Events
+================================================================================
+    Name        Code    Avail Deriv Description (Note)
+PAPI_L1_DCM  0x80000000  Yes   No   Level 1 data cache misses
+PAPI_L1_ICM  0x80000001  Yes   No   Level 1 instruction cache misses
+PAPI_L2_DCM  0x80000002  Yes   Yes  Level 2 data cache misses
+PAPI_L2_ICM  0x80000003  Yes   No   Level 2 instruction cache misses
+Checking Kernel Perf Permissions...
+perf_event_paranoid: 1
+=== STEP 0: Initialization ===
+Run ID: 20260228_234739_dummy_dmda
+Base Dir: /tmp/starpu_traces_adv/20260228_234739_dummy_dmda
+=== STEP 1: Run Application ===
+Starting Energy Capture...
+Starting GPU Power Sampling (10Hz)...
+Snapshotting CPU RAPL (Before)...
+=== STEP 1: Run Application (Primary) ===
+Executing: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 40 --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 40 --display 0
+Log: /tmp/starpu_traces_adv/20260228_234739_dummy_dmda/summary/run.log
+Snapshotting CPU RAPL (After)...
+Post-Processing APEX Artifacts in /tmp/starpu_traces_adv/20260228_234739_dummy_dmda/10_apex...
+Processing 10_apex...
+=== STEP 2: Verify RAW ===
+PASS: Raw traces exist.
+=== STEP 3: FxT Conversion ===
+=== STEP 4: Distribution ===
+=== STEP 5: Graphviz ===
+=== STEP 6: Tasks Completion ===
+=== STEP 7: Codelet Profile ===
+=== STEP 8: Histo Profile ===
+=== STEP 9: Data Trace ===
+=== STEP 10: State Stats ===
+=== STEP 11: StarVZ ===
+=== STEP 12: Summary ===
+RUN COMPLETE: /tmp/starpu_traces_adv/20260228_234739_dummy_dmda
+--- RUNNING PROFILING HARNESS (CUSTOM SCHEDULER: RR_WORKERS) ---
+=== Diagnostics ===
+APEX Mode: off
+Checking StarPU Config...
+#define STARPU_PAPI 1
+	libpapi.so.6.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so.6.0
+	libpapi.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so
+PAPI Available. First 30 lines:
+Available PAPI preset and user defined events plus hardware information.
+--------------------------------------------------------------------------------
+PAPI version             : 6.0.0.0
+Operating system         : Linux 6.8.0-101-generic
+Vendor string and code   : GenuineIntel (1, 0x1)
+Model string and code    : Intel(R) Core(TM) i9-10900F CPU @ 2.80GHz (165, 0xa5)
+CPU revision             : 5.000000
+CPUID                    : Family/Model/Stepping 6/165/5, 0x06/0xa5/0x05
+CPU Max MHz              : 5200
+CPU Min MHz              : 800
+Total cores              : 20
+SMT threads per core     : 2
+Cores per socket         : 10
+Sockets                  : 1
+Cores per NUMA region    : 20
+NUMA regions             : 1
+Running in a VM          : no
+Number Hardware Counters : 10
+Max Multiplex Counters   : 384
+Fast counter read (rdpmc): yes
+--------------------------------------------------------------------------------
+
+================================================================================
+  PAPI Preset Events
+================================================================================
+    Name        Code    Avail Deriv Description (Note)
+PAPI_L1_DCM  0x80000000  Yes   No   Level 1 data cache misses
+PAPI_L1_ICM  0x80000001  Yes   No   Level 1 instruction cache misses
+PAPI_L2_DCM  0x80000002  Yes   Yes  Level 2 data cache misses
+PAPI_L2_ICM  0x80000003  Yes   No   Level 2 instruction cache misses
+Checking Kernel Perf Permissions...
+perf_event_paranoid: 1
+=== STEP 0: Initialization ===
+Run ID: 20260228_234749_dummy_rr_workers
+Base Dir: /tmp/starpu_traces_adv/20260228_234749_dummy_rr_workers
+=== STEP 1: Run Application ===
+=== Custom Scheduler Config: rr_workers ===
+Starting Energy Capture...
+Starting GPU Power Sampling (10Hz)...
+Snapshotting CPU RAPL (Before)...
+=== STEP 1: Run Application (Primary) ===
+Executing: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 40 --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 40 --display 0
+Log: /tmp/starpu_traces_adv/20260228_234749_dummy_rr_workers/summary/run.log
+Snapshotting CPU RAPL (After)...
+Post-Processing APEX Artifacts in /tmp/starpu_traces_adv/20260228_234749_dummy_rr_workers/10_apex...
+Processing 10_apex...
+=== STEP 2: Verify RAW ===
+PASS: Raw traces exist.
+=== STEP 3: FxT Conversion ===
+=== STEP 4: Distribution ===
+=== STEP 5: Graphviz ===
+=== STEP 6: Tasks Completion ===
+=== STEP 7: Codelet Profile ===
+=== STEP 8: Histo Profile ===
+=== STEP 9: Data Trace ===
+=== STEP 10: State Stats ===
+=== STEP 11: StarVZ ===
+=== STEP 12: Summary ===
+RUN COMPLETE: /tmp/starpu_traces_adv/20260228_234749_dummy_rr_workers

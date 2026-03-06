@@ -402,6 +402,7 @@ int main(int argc, char **argv) {
   float mean_vals[3] = {0.485f, 0.456f, 0.406f};
   float std_vals[3] = {0.229f, 0.224f, 0.225f};
   bool display = false;
+  bool print_stats = false;
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -443,6 +444,8 @@ int main(int argc, char **argv) {
       display = (std::stoi(argv[++i]) != 0);
     else if (arg == "--no_eval")
       do_eval = false;
+    else if (arg == "--print_stats")
+      print_stats = true;
   }
 
   std::cout << "[Pipeline] StarPU pipeline starting.\n";
@@ -748,19 +751,27 @@ int main(int argc, char **argv) {
 
   std::cout << "[Pipeline] Exiting cleanly.\n";
 
-  if (rgb_sensor)
-    rgb_sensor->Destroy();
-  if (gt_sensor)
-    gt_sensor->Destroy();
-  if (vehicle)
-    vehicle->Destroy();
-
-  tm.SetSynchronousMode(false);
-  settings.synchronous_mode = original_sync;
-  world.ApplySettings(settings, std::chrono::seconds(2));
+  // Deliberately skipping explicit CARLA actor/sensor shutdown.
+  // When running with multiple threads or asynchronous callbacks, explicit
+  // destruction here frequently triggers `std::runtime_error` inside CARLA's
+  // ASIO worker threads ("actor already destroyed") which causes a fatal
+  // SIGABRT. The server container will cleanly garbage-collect the session when
+  // the client disconnects.
 
   // Extract StarPU profile
   starpu_profiling_status_set(STARPU_PROFILING_DISABLE);
+
+  if (print_stats) {
+    fflush(stdout);
+    printf("\n===STARPU_STATS_BEGIN===\n");
+    fflush(stdout);
+    starpu_profiling_bus_helper_display_summary();
+    starpu_profiling_worker_helper_display_summary();
+    starpu_data_display_memory_stats();
+    fflush(stderr); // Ensure stats (stderr) are flushed
+    printf("===STARPU_STATS_END===\n");
+    fflush(stdout);
+  }
 
   return EXIT_SUCCESS;
 }

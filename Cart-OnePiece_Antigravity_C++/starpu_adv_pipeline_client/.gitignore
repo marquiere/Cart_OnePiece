@@ -7,3 +7,5 @@ core*
 *.onnx
 starpu-1.4.0/
 __pycache__/
+*.onnx.data
+*.pth

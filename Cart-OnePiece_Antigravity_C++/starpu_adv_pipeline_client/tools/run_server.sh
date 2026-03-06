@@ -10,8 +10,10 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         --port) PORT="$2"; shift ;;
         --carla_root) CARLA_ROOT_DIR="$2"; shift ;;
+        --suffix) SUFFIX="_$2"; shift ;;
+        --run_dir) OVERRIDE_RUN_DIR="$2"; shift ;;
         --help|-h) 
-            echo "Usage: $0 [--port PORT] [--carla_root PATH]"
+            echo "Usage: $0 [--port PORT] [--carla_root PATH] [--suffix STRING]"
             echo "Starts CARLA Server in offscreen mode and tracks its PID."
             exit 0
             ;;
@@ -37,8 +39,12 @@ if [ ! -x "$CARLA_SH" ]; then
 fi
 
 # Setup Run Directory
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-RUN_DIR="$(pwd)/runs/${TIMESTAMP}"
+if [ -n "$OVERRIDE_RUN_DIR" ]; then
+    RUN_DIR="$OVERRIDE_RUN_DIR"
+else
+    TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+    RUN_DIR="$(pwd)/runs/${TIMESTAMP}${SUFFIX}"
+fi
 mkdir -p "$RUN_DIR"
 
 LOG_FILE="${RUN_DIR}/server.log"

@@ -1,0 +1,75 @@
+--- STARTING SERVER ---
+==========================================
+Starting CARLA Server...
+Port: 2000
+Run Directory: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260301_012957
+Log File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260301_012957/server.log
+PID File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260301_012957/server.pid
+==========================================
+SERVER STARTED with PID: 1017281
+You can monitor logs with: tail -f /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260301_012957/server.log
+To stop the server, run: ./tools/kill_server.sh --run_dir /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260301_012957
+Waiting 15 seconds for CARLA to initialize Map...
+--- RUNNING PROFILING HARNESS (DEFAULT SCHEDULER: DMDA) ---
+=== Diagnostics ===
+APEX Mode: all
+Checking StarPU Config...
+#define STARPU_PAPI 1
+	libpapi.so.6.0 (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so.6.0
+	libpapi.so (libc6,x86-64) => /lib/x86_64-linux-gnu/libpapi.so
+PAPI Available. First 30 lines:
+Available PAPI preset and user defined events plus hardware information.
+--------------------------------------------------------------------------------
+PAPI version             : 6.0.0.0
+Operating system         : Linux 6.8.0-101-generic
+Vendor string and code   : GenuineIntel (1, 0x1)
+Model string and code    : Intel(R) Core(TM) i9-10900F CPU @ 2.80GHz (165, 0xa5)
+CPU revision             : 5.000000
+CPUID                    : Family/Model/Stepping 6/165/5, 0x06/0xa5/0x05
+CPU Max MHz              : 5200
+CPU Min MHz              : 800
+Total cores              : 20
+SMT threads per core     : 2
+Cores per socket         : 10
+Sockets                  : 1
+Cores per NUMA region    : 20
+NUMA regions             : 1
+Running in a VM          : no
+Number Hardware Counters : 10
+Max Multiplex Counters   : 384
+Fast counter read (rdpmc): yes
+--------------------------------------------------------------------------------
+
+================================================================================
+  PAPI Preset Events
+================================================================================
+    Name        Code    Avail Deriv Description (Note)
+PAPI_L1_DCM  0x80000000  Yes   No   Level 1 data cache misses
+PAPI_L1_ICM  0x80000001  Yes   No   Level 1 instruction cache misses
+PAPI_L2_DCM  0x80000002  Yes   Yes  Level 2 data cache misses
+PAPI_L2_ICM  0x80000003  Yes   No   Level 2 instruction cache misses
+Checking Kernel Perf Permissions...
+perf_event_paranoid: 1
+=== STEP 0: Initialization ===
+Run ID: 20260301_013012_cityscapes_hrnet_direct_dmda
+Base Dir: /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda
+=== STEP 1: Run Application ===
+Enabling Memory Activity Stats...
+Starting Energy Capture...
+Starting GPU Power Sampling (10Hz)...
+Snapshotting CPU RAPL (Before)...
+=== STEP 1: Run Application (Primary) ===
+Executing: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 500 --engine models/cityscapes_hrnet_direct.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 500 --display 1 --print_stats
+Log: /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda/summary/run.log
+Snapshotting CPU RAPL (After)...
+=== APEX Verification Modes: gtrace gtrace-tasks taskgraph ===
+>> Running APEX Mode: gtrace (in /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda/10_apex/run_gtrace)
+>> Running APEX Mode: gtrace-tasks (in /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda/10_apex/run_gtrace-tasks)
+>> Running APEX Mode: taskgraph (in /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda/10_apex/run_taskgraph)
+Post-Processing APEX Artifacts in /tmp/starpu_traces_adv/20260301_013012_cityscapes_hrnet_direct_dmda/10_apex...
+Processing 10_apex...
+Processing run_gtrace...
+Processing run_gtrace-tasks...
+Processing run_taskgraph...
+Processing Memory Stats...
+FAIL: starpu_stats.txt is empty. Stats extraction failed.
