@@ -13,6 +13,8 @@
 #include <thread>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+
 #include <carla/actors/ActorBlueprint.h>
 #include <carla/actors/BlueprintLibrary.h>
 #include <carla/client/Actor.h>
@@ -21,10 +23,10 @@
 #include <carla/client/Sensor.h>
 #include <carla/client/Vehicle.h>
 #include <carla/client/World.h>
+#include <carla/geom/Location.h>
+#include <carla/geom/Rotation.h>
 #include <carla/geom/Transform.h>
 #include <carla/sensor/data/Image.h>
-
-#include <boost/shared_ptr.hpp>
 
 #include "frame_sync.hpp"
 #include "metrics.hpp"
@@ -38,6 +40,7 @@
 
 #include "starpu_codelets.hpp"
 #include "starpu_runtime.hpp"
+#include <starpu.h>
 
 namespace cc = carla::client;
 namespace cg = carla::geom;
@@ -57,7 +60,10 @@ void signal_handler(int signum) {
 // Types & Queues
 // ---------------------------------------------------------
 
+enum class CameraView { Front, Rear };
+
 struct EvalPayload {
+  CameraView view = CameraView::Front;
   uint64_t frame_id;
   std::vector<uint8_t> pred_labels; // HxW
   GtFrame gt_frame;                 // Contains raw BGRA semantic from CARLA
@@ -179,9 +185,13 @@ void task_epilogue_callback(void *arg) {
 }
 
 void evaluate_thread(const EvalConfig &cfg) {
-  int count = 0;
-  double sum_pa = 0.0;
-  double sum_miou = 0.0;
+  int count_front = 0;
+  double sum_pa_front = 0.0;
+  double sum_miou_front = 0.0;
+
+  int count_rear = 0;
+  double sum_pa_rear = 0.0;
+  double sum_miou_rear = 0.0;
 
   while (!g_stop_requested) {
     EvalPayload payload;
@@ -218,14 +228,31 @@ void evaluate_thread(const EvalConfig &cfg) {
                                  cfg.out_w, cfg.out_h, cfg.exclude_zero);
       pa = res.pixel_accuracy;
       miou = res.miou;
-      sum_pa += pa;
-      sum_miou += miou;
-      count++;
 
-      if (count % cfg.print_every == 0) {
-        std::cout << "[Eval] Frames evaluated: " << count
-                  << " | Avg PA: " << (sum_pa / count)
-                  << " | Avg mIoU: " << (sum_miou / count) << "\n";
+      std::string view_str;
+      if (payload.view == CameraView::Front) {
+        sum_pa_front += pa;
+        sum_miou_front += miou;
+        count_front++;
+        view_str = "Front";
+        if (count_front % cfg.print_every == 0) {
+          std::cout << "[Eval] " << view_str
+                    << " Frames evaluated: " << count_front
+                    << " | Avg PA: " << (sum_pa_front / count_front)
+                    << " | Avg mIoU: " << (sum_miou_front / count_front)
+                    << "\n";
+        }
+      } else {
+        sum_pa_rear += pa;
+        sum_miou_rear += miou;
+        count_rear++;
+        view_str = "Rear ";
+        if (count_rear % cfg.print_every == 0) {
+          std::cout << "[Eval] " << view_str
+                    << " Frames evaluated: " << count_rear
+                    << " | Avg PA: " << (sum_pa_rear / count_rear)
+                    << " | Avg mIoU: " << (sum_miou_rear / count_rear) << "\n";
+        }
       }
     }
 
@@ -233,10 +260,12 @@ void evaluate_thread(const EvalConfig &cfg) {
     {
       std::lock_guard<std::mutex> lck(g_csv_mu);
       if (g_csv_file.is_open()) {
-        g_csv_file << payload.frame_id << "," << payload.rgb_ts << ","
-                   << payload.gt_ts << "," << payload.total_ms << ","
-                   << payload.dropped_before_process << "," << pa << "," << miou
-                   << "\n";
+        std::string view_prefix =
+            (payload.view == CameraView::Front) ? "front" : "rear";
+        g_csv_file << view_prefix << "," << payload.frame_id << ","
+                   << payload.rgb_ts << "," << payload.gt_ts << ","
+                   << payload.total_ms << "," << payload.dropped_before_process
+                   << "," << pa << "," << miou << "\n";
       }
     }
   }
@@ -248,6 +277,7 @@ void evaluate_thread(const EvalConfig &cfg) {
 // ---------------------------------------------------------
 
 struct InflightSlot {
+  CameraView view = CameraView::Front;
   int id;
   std::vector<uint8_t> in_bgra;
   std::vector<float> tensor_in;
@@ -360,6 +390,7 @@ void post_finish_callback(void *arg) {
   double total_ms = duration<double, std::milli>(t_end - s->t_start).count();
 
   EvalPayload ep;
+  ep.view = s->view;
   ep.frame_id = s->match.frame_id;
   ep.gt_frame = std::move(s->match.gt);
   ep.pred_labels = s->pred_out; // Copy
@@ -465,7 +496,7 @@ int main(int argc, char **argv) {
   g_pipeline_csv_path = run_dir + "/pipeline_starpu.csv";
   g_csv_file.open(g_pipeline_csv_path);
   if (g_csv_file.is_open()) {
-    g_csv_file << "frame_id,rgb_ts,gt_ts,total_latency_ms,dropped_before_"
+    g_csv_file << "view,frame_id,rgb_ts,gt_ts,total_latency_ms,dropped_before_"
                   "process,pa,miou\n";
   }
 
@@ -544,26 +575,33 @@ int main(int argc, char **argv) {
   vehicle->SetSimulatePhysics(true);
   boost::static_pointer_cast<cc::Vehicle>(vehicle)->SetAutopilot(true, tm_port);
 
-  cg::Transform camera_tf(cg::Location(0.0f, 0.0f, 2.0f),
-                          cg::Rotation(0.0f, 0.0f, 0.0f));
+  cg::Transform front_tf(cg::Location(0.0f, 0.0f, 2.0f),
+                         cg::Rotation(0.0f, 0.0f, 0.0f));
+  cg::Transform rear_tf(cg::Location(-2.0f, 0.0f, 2.0f),
+                        cg::Rotation(0.0f, 180.0f, 0.0f));
 
   auto rgb_bp = *(blueprint_library->Find("sensor.camera.rgb"));
   rgb_bp.SetAttribute("image_size_x", std::to_string(w));
   rgb_bp.SetAttribute("image_size_y", std::to_string(h));
   rgb_bp.SetAttribute("sensor_tick", std::to_string(1.0f / fps));
-  auto rgb_sensor = world.SpawnActor(rgb_bp, camera_tf, vehicle.get());
+
+  auto front_rgb = world.SpawnActor(rgb_bp, front_tf, vehicle.get());
+  auto rear_rgb = world.SpawnActor(rgb_bp, rear_tf, vehicle.get());
 
   auto gt_bp =
       *(blueprint_library->Find("sensor.camera.semantic_segmentation"));
   gt_bp.SetAttribute("image_size_x", std::to_string(w));
   gt_bp.SetAttribute("image_size_y", std::to_string(h));
   gt_bp.SetAttribute("sensor_tick", std::to_string(1.0f / fps));
-  auto gt_sensor = world.SpawnActor(gt_bp, camera_tf, vehicle.get());
 
-  FrameSync sync(sync_window);
+  auto front_gt = world.SpawnActor(gt_bp, front_tf, vehicle.get());
+  auto rear_gt = world.SpawnActor(gt_bp, rear_tf, vehicle.get());
 
-  boost::static_pointer_cast<cc::Sensor>(rgb_sensor)
-      ->Listen([&sync, w, h](auto data) {
+  FrameSync front_sync(sync_window);
+  FrameSync rear_sync(sync_window);
+
+  boost::static_pointer_cast<cc::Sensor>(front_rgb)->Listen(
+      [&front_sync, w, h](auto data) {
         if (g_stop_requested)
           return;
         auto image = boost::static_pointer_cast<cs::Image>(data);
@@ -573,11 +611,25 @@ int main(int argc, char **argv) {
         f.w = image->GetWidth();
         f.h = image->GetHeight();
         f.carla_image = image;
-        sync.PushRgb(std::move(f));
+        front_sync.PushRgb(std::move(f));
       });
 
-  boost::static_pointer_cast<cc::Sensor>(gt_sensor)->Listen(
-      [&sync, w, h](auto data) {
+  boost::static_pointer_cast<cc::Sensor>(rear_rgb)->Listen(
+      [&rear_sync, w, h](auto data) {
+        if (g_stop_requested)
+          return;
+        auto image = boost::static_pointer_cast<cs::Image>(data);
+        FrameIn f;
+        f.frame_id = image->GetFrame();
+        f.timestamp = image->GetTimestamp();
+        f.w = image->GetWidth();
+        f.h = image->GetHeight();
+        f.carla_image = image;
+        rear_sync.PushRgb(std::move(f));
+      });
+
+  boost::static_pointer_cast<cc::Sensor>(front_gt)->Listen(
+      [&front_sync, w, h](auto data) {
         if (g_stop_requested)
           return;
         auto image = boost::static_pointer_cast<cs::Image>(data);
@@ -587,7 +639,21 @@ int main(int argc, char **argv) {
         g.w = image->GetWidth();
         g.h = image->GetHeight();
         g.carla_image = image;
-        sync.PushGt(std::move(g));
+        front_sync.PushGt(std::move(g));
+      });
+
+  boost::static_pointer_cast<cc::Sensor>(rear_gt)->Listen(
+      [&rear_sync, w, h](auto data) {
+        if (g_stop_requested)
+          return;
+        auto image = boost::static_pointer_cast<cs::Image>(data);
+        GtFrame g;
+        g.frame_id = image->GetFrame();
+        g.timestamp = image->GetTimestamp();
+        g.w = image->GetWidth();
+        g.h = image->GetHeight();
+        g.carla_image = image;
+        rear_sync.PushGt(std::move(g));
       });
 
   auto settings = world.GetSettings();
@@ -627,106 +693,120 @@ int main(int argc, char **argv) {
 
     world.Tick(std::chrono::seconds(2));
 
-    MatchedPair pair;
-    MatchedPair latest_pair;
-    bool found = false;
-    int popped = 0;
+    auto process_camera = [&](FrameSync &sync_instance, CameraView view_tag,
+                              int &dropped_counter, int &processed_counter) {
+      MatchedPair pair;
+      MatchedPair latest_pair;
+      bool found = false;
+      int popped = 0;
 
-    for (int retry = 0; retry < 50; retry++) {
-      while (sync.TryPopMatched(pair)) {
-        latest_pair = std::move(pair);
-        found = true;
-        popped++;
-      }
-      if (found)
-        break;
-      std::this_thread::sleep_for(std::chrono::milliseconds(2));
-    }
-
-    if (found) {
-      if (popped > inflight_pairs) {
-        dropped += (popped - 1);
-      }
-      auto t_start = high_resolution_clock::now();
-
-      // Acquire slot
-      InflightSlot *s = g_slots->acquire();
-      if (!s) {
-        // Stop requested or timeout
-        break;
-      }
-      s->match = std::move(latest_pair);
-      s->dropped = dropped;
-      s->t_start = t_start;
-      dropped = 0;
-
-      // Register raw image buffer temporarily
-      // Copy BGRA memory to statically registered slot buffer
-      size_t img_bytes = s->match.rgb.w * s->match.rgb.h * 4;
-      std::memcpy(s->in_bgra.data(), s->match.rgb.carla_image->data(),
-                  img_bytes);
-
-      s->pre_args = {s->match.frame_id, s->match.rgb.w, s->match.rgb.h,
-                     pre_cfg};
-      s->inf_args = {s->match.frame_id, out_c,  out_h, out_w,
-                     is_logits,         &runner};
-      s->post_args = {s->match.frame_id, out_c, out_h, out_w, is_logits};
-
-      // TASK 1: Preproc
-      struct starpu_task *t1 = starpu_task_create();
-      t1->cl = &cl_preproc;
-      t1->handles[0] = s->handle_bgra;
-      t1->handles[1] = s->handle_in;
-      t1->cl_arg = std::malloc(sizeof(PreprocArgs));
-      std::memcpy(t1->cl_arg, &s->pre_args, sizeof(PreprocArgs));
-      t1->cl_arg_size = sizeof(PreprocArgs);
-      t1->cl_arg_free = 1;
-      t1->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
-      starpu_task_submit(t1);
-
-      // TASK 2: Infer
-      struct starpu_task *t2 = starpu_task_create();
-      t2->cl = &cl_infer_trt;
-      t2->handles[0] = s->handle_in;
-      t2->handles[1] = s->handle_raw;
-      t2->cl_arg = std::malloc(sizeof(InferArgs));
-      std::memcpy(t2->cl_arg, &s->inf_args, sizeof(InferArgs));
-      t2->cl_arg_size = sizeof(InferArgs);
-      t2->cl_arg_free = 1;
-      t2->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
-      starpu_task_submit(t2);
-
-      // TASK 3: Post
-      struct starpu_task *t3 = starpu_task_create();
-      t3->cl = &cl_post;
-      t3->handles[0] = s->handle_raw;
-      t3->handles[1] = s->handle_pred;
-      t3->cl_arg = std::malloc(sizeof(PostArgs));
-      std::memcpy(t3->cl_arg, &s->post_args, sizeof(PostArgs));
-      t3->cl_arg_size = sizeof(PostArgs);
-      t3->cl_arg_free = 1;
-      t3->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
-      t3->callback_func = post_finish_callback;
-      t3->callback_arg = s;
-      t3->callback_arg_free = 0; // The slot manager manages this pointer
-      starpu_task_submit(t3);
-
-      {
-        std::lock_guard<std::mutex> lk(g_all_tasks_mu);
-        g_all_tasks.push_back(t1);
-        g_all_tasks.push_back(t2);
-        g_all_tasks.push_back(t3);
+      for (int retry = 0; retry < 50; retry++) {
+        while (sync_instance.TryPopMatched(pair)) {
+          latest_pair = std::move(pair);
+          found = true;
+          popped++;
+        }
+        if (found)
+          break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
       }
 
-      // Do not release the slot yet. It will be released in
-      // post_finish_callback.
+      if (found) {
+        if (popped > inflight_pairs) {
+          dropped_counter += (popped - 1);
+        }
+        auto t_start = high_resolution_clock::now();
 
-      frames_processed++;
-      if (frames_processed % print_every == 0) {
-        std::cout << "[Pipeline] Dispatched Frame " << frames_processed << "/"
-                  << max_frames << "\n";
+        // Acquire slot
+        InflightSlot *s = g_slots->acquire();
+        if (!s) {
+          // Stop requested or timeout
+          return false;
+        }
+        s->view = view_tag;
+        s->match = std::move(latest_pair);
+        s->dropped = dropped_counter;
+        s->t_start = t_start;
+        dropped_counter = 0;
+
+        // Register raw image buffer temporarily
+        // Copy BGRA memory to statically registered slot buffer
+        size_t img_bytes = s->match.rgb.w * s->match.rgb.h * 4;
+        std::memcpy(s->in_bgra.data(), s->match.rgb.carla_image->data(),
+                    img_bytes);
+
+        s->pre_args = {s->match.frame_id, s->match.rgb.w, s->match.rgb.h,
+                       pre_cfg};
+        s->inf_args = {s->match.frame_id, out_c,  out_h, out_w,
+                       is_logits,         &runner};
+        s->post_args = {s->match.frame_id, out_c, out_h, out_w, is_logits};
+
+        // TASK 1: Preproc
+        struct starpu_task *t1 = starpu_task_create();
+        t1->cl = &cl_preproc;
+        t1->handles[0] = s->handle_bgra;
+        t1->handles[1] = s->handle_in;
+        t1->cl_arg = std::malloc(sizeof(PreprocArgs));
+        std::memcpy(t1->cl_arg, &s->pre_args, sizeof(PreprocArgs));
+        t1->cl_arg_size = sizeof(PreprocArgs);
+        t1->cl_arg_free = 1;
+        t1->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
+        starpu_task_submit(t1);
+
+        // TASK 2: Infer
+        struct starpu_task *t2 = starpu_task_create();
+        t2->cl = &cl_infer_trt;
+        t2->handles[0] = s->handle_in;
+        t2->handles[1] = s->handle_raw;
+        t2->cl_arg = std::malloc(sizeof(InferArgs));
+        std::memcpy(t2->cl_arg, &s->inf_args, sizeof(InferArgs));
+        t2->cl_arg_size = sizeof(InferArgs);
+        t2->cl_arg_free = 1;
+        t2->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
+        starpu_task_submit(t2);
+
+        // TASK 3: Post
+        struct starpu_task *t3 = starpu_task_create();
+        t3->cl = &cl_post;
+        t3->handles[0] = s->handle_raw;
+        t3->handles[1] = s->handle_pred;
+        t3->cl_arg = std::malloc(sizeof(PostArgs));
+        std::memcpy(t3->cl_arg, &s->post_args, sizeof(PostArgs));
+        t3->cl_arg_size = sizeof(PostArgs);
+        t3->cl_arg_free = 1;
+        t3->destroy = 0; // PREVENT USE-AFTER-FREE IN TRACER
+        t3->callback_func = post_finish_callback;
+        t3->callback_arg = s;
+        t3->callback_arg_free = 0; // The slot manager manages this pointer
+        starpu_task_submit(t3);
+
+        {
+          std::lock_guard<std::mutex> lk(g_all_tasks_mu);
+          g_all_tasks.push_back(t1);
+          g_all_tasks.push_back(t2);
+          g_all_tasks.push_back(t3);
+        }
+
+        processed_counter++;
+        if (processed_counter % print_every == 0) {
+          std::string l = (view_tag == CameraView::Front) ? "front" : "rear";
+          std::cout << "[Pipeline] Dispatched " << l << " Frame "
+                    << processed_counter << "/" << max_frames << "\n";
+        }
       }
-    }
+      return true;
+    };
+
+    if (!process_camera(front_sync, CameraView::Front, dropped,
+                        frames_processed))
+      break;
+
+    // We maintain frames_processed loosely around the front camera, but we
+    // process both equally. If the front breaks early, we terminate.
+    int dummy_rear_dropped = 0;
+    int dummy_rear_processed = 0;
+    process_camera(rear_sync, CameraView::Rear, dummy_rear_dropped,
+                   dummy_rear_processed);
   }
 
   std::cout << "[Pipeline] Loop exit. Waiting for StarPU to drain...\n";
