@@ -67,6 +67,7 @@ struct EvalPayload {
   uint64_t frame_id;
   std::vector<uint8_t> pred_labels; // HxW
   GtFrame gt_frame;                 // Contains raw BGRA semantic from CARLA
+  FrameIn rgb_frame;
 
   // Metrics variables
   double total_ms = 0;
@@ -216,10 +217,25 @@ void evaluate_thread(const EvalConfig &cfg) {
     double miou = 0.0;
 
     if (cfg.viewer) {
-      std::vector<uint8_t> color_img(cfg.out_w * cfg.out_h * 3);
-      vis::ColorizeCityscapes(payload.pred_labels.data(), cfg.out_w, cfg.out_h,
-                              color_img.data());
-      cfg.viewer->submit_frame_rgb888(color_img.data(), cfg.out_w, cfg.out_h);
+      int w = payload.rgb_frame.w;
+      int h = payload.rgb_frame.h;
+      std::vector<uint8_t> rgb_bytes(w * h * 3);
+      vis::BgraToRgb(reinterpret_cast<const uint8_t *>(
+                         payload.rgb_frame.carla_image->data()),
+                     w, h, rgb_bytes.data());
+
+      std::vector<uint8_t> pred_upsampled(w * h);
+      vis::UpsampleNearest(payload.pred_labels.data(), cfg.out_w, cfg.out_h,
+                           pred_upsampled.data(), w, h);
+
+      std::vector<uint8_t> color_img(w * h * 3);
+      vis::ColorizeCityscapes(pred_upsampled.data(), w, h, color_img.data());
+
+      std::vector<uint8_t> overlay(w * h * 3);
+      vis::BlendOverlay(rgb_bytes.data(), color_img.data(), w, h, 0.5f,
+                        overlay.data());
+
+      cfg.viewer->submit_frame_rgb888(overlay.data(), w, h);
     }
 
     if (cfg.enabled) {
@@ -394,6 +410,7 @@ void post_finish_callback(void *arg) {
   ep.frame_id = s->match.frame_id;
   ep.gt_frame = std::move(s->match.gt);
   ep.pred_labels = s->pred_out; // Copy
+  ep.rgb_frame = std::move(s->match.rgb);
   ep.total_ms = total_ms;
   ep.dropped_before_process = s->dropped;
   ep.rgb_ts = s->match.rgb.timestamp;
@@ -538,7 +555,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<SegmentationViewerSDL2> viewer;
   if (display) {
     viewer = std::make_unique<SegmentationViewerSDL2>();
-    if (!viewer->init(out_w, out_h, 2.0f)) {
+    if (!viewer->init(w, h, 1.0f)) {
       std::cerr << "[Pipeline] Viewer init failed, running headless.\n";
       viewer.reset();
     }
@@ -831,12 +848,27 @@ int main(int argc, char **argv) {
 
   std::cout << "[Pipeline] Exiting cleanly.\n";
 
-  // Deliberately skipping explicit CARLA actor/sensor shutdown.
-  // When running with multiple threads or asynchronous callbacks, explicit
-  // destruction here frequently triggers `std::runtime_error` inside CARLA's
-  // ASIO worker threads ("actor already destroyed") which causes a fatal
-  // SIGABRT. The server container will cleanly garbage-collect the session when
-  // the client disconnects.
+  // Stop and destroy CARLA sensors and vehicles to prevent ASIO faults
+  // and zombie actors persisting between sequential profiling runs.
+  if (front_rgb) {
+    boost::static_pointer_cast<cc::Sensor>(front_rgb)->Stop();
+    front_rgb->Destroy();
+  }
+  if (front_gt) {
+    boost::static_pointer_cast<cc::Sensor>(front_gt)->Stop();
+    front_gt->Destroy();
+  }
+  if (rear_rgb) {
+    boost::static_pointer_cast<cc::Sensor>(rear_rgb)->Stop();
+    rear_rgb->Destroy();
+  }
+  if (rear_gt) {
+    boost::static_pointer_cast<cc::Sensor>(rear_gt)->Stop();
+    rear_gt->Destroy();
+  }
+  if (vehicle) {
+    vehicle->Destroy();
+  }
 
   // Extract StarPU profile
   starpu_profiling_status_set(STARPU_PROFILING_DISABLE);

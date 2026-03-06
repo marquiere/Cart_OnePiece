@@ -44,6 +44,12 @@ echo "--- RUNNING PROFILING HARNESS (DEFAULT SCHEDULER: DMDA) ---"
 echo "--- RUNNING PROFILING HARNESS (CUSTOM SCHEDULER: RR_WORKERS) ---"
 ./tools/verify_profiling.sh --frames "$FRAMES" --engine "$ENGINE" --sched rr_workers $EXTRA_ARGS
 
+echo "--- RUNNING PROFILING HARNESS (WORK STEALING SCHEDULER: WS) ---"
+./tools/verify_profiling.sh --frames "$FRAMES" --engine "$ENGINE" --sched ws $EXTRA_ARGS
+
+echo "--- RUNNING PROFILING HARNESS (EAGER SCHEDULER: EAGER) ---"
+./tools/verify_profiling.sh --frames "$FRAMES" --engine "$ENGINE" --sched eager $EXTRA_ARGS
+
 echo "--- KILLING SERVER ---"
 ./tools/kill_server.sh
 
