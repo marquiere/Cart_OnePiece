@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -35,10 +36,10 @@ public:
   // Support dynamic dimensions if the engine requires it
   bool SetInputShapeIfDynamic(int w, int h);
 
-  // Run synchronous/asumable async inference (blocks host until stream compute
-  // finishes on GPU)
+  // Run synchronous/asynchronous inference. If stream_override is provided,
+  // it executes fully async on that stream without host blocking.
   bool Infer(const void *host_input, size_t host_input_bytes, void *host_output,
-             size_t host_output_bytes);
+             size_t host_output_bytes, cudaStream_t stream_override = nullptr);
 
   // Print out the loaded engine's binding metadata (Inputs, Outputs, DTypes,
   // Dims)
@@ -70,6 +71,8 @@ private:
   size_t output_bytes_ = 0;
 
   bool is_dynamic_ = false;
+
+  std::mutex infer_mutex_;
 
   // Internal helper for CUDA errors
   bool CheckCudaError(int code, const char *file, int line) const;

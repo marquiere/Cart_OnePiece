@@ -38,7 +38,35 @@ void ArgmaxLogitsToLabels(const float *logits, int c, int h, int w,
       10, // 17: Motorcycle
       10  // 18: Bicycle
   };
+  
+  // Pascal VOC (21) to CARLA Raw ID approximation
+  // VOC doesn't have "road" or "building", so they fall into background (0).
+  static const uint8_t VOC21_TO_CARLA_RAW[] = {
+      0,  // 0: background
+      0,  // 1: aeroplane
+      10, // 2: bicycle
+      0,  // 3: bird
+      0,  // 4: boat
+      0,  // 5: bottle
+      10, // 6: bus
+      10, // 7: car
+      0,  // 8: cat
+      0,  // 9: chair
+      0,  // 10: cow
+      0,  // 11: diningtable
+      0,  // 12: dog
+      0,  // 13: horse
+      10, // 14: motorbike
+      4,  // 15: person
+      9,  // 16: pottedplant
+      0,  // 17: sheep
+      0,  // 18: sofa
+      10, // 19: train
+      0   // 20: tvmonitor
+  };
+
   bool is_cityscapes_19 = (c == 19);
+  bool is_voc_21 = (c == 21);
 
 // Usually output logits are [1, C, H, W]. So shape is C*H*W in memory.
 // For a specific pixel at (y,x), the array of class scores is spaced by H*W.
@@ -61,6 +89,8 @@ void ArgmaxLogitsToLabels(const float *logits, int c, int h, int w,
     uint8_t final_label = static_cast<uint8_t>(best_c);
     if (is_cityscapes_19 && best_c < 19) {
       final_label = TRAINID_TO_CARLA_RAW[best_c];
+    } else if (is_voc_21 && best_c < 21) {
+      final_label = VOC21_TO_CARLA_RAW[best_c];
     }
 
     out_labels[i] = final_label;

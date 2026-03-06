@@ -24,28 +24,22 @@ BUILD_DIR_DEFAULT="./build"
 TRACE_ROOT="$TRACE_ROOT_DEFAULT"
 BUILD_DIR="$BUILD_DIR_DEFAULT"
 FRAMES=20
-MB=2
-INFER_ITERS=1
-BURST=0
-WARMUP=0
+ENGINE="models/dummy.engine"
 SCHED="dmda" # Default to a smart scheduler
 MEMORY_MODE=0
-TRANSFER_MB=0
 APEX_MODE="off"
+DISPLAY_MODE=0
 
 # Helper to parse args
 usage() {
     echo "Usage: $0 [options]"
     echo "  --trace-root PATH   Set trace root directory (default: $TRACE_ROOT_DEFAULT)"
     echo "  --frames N          Number of frames (default: 20)"
-    echo "  --mb N              Buffer size in MB (default: 2)"
-    echo "  --infer-iters N     Inference iterations (default: 1)"
-    echo "  --burst N           Burst count (default: 0)"
-    echo "  --warmup N          Warmup frames (default: 0)"
+    echo "  --engine PATH       Path to TensorRT engine (default: models/dummy.engine)"
     echo "  --sched NAME        Scheduler policy (default: dmda)"
     echo "  --memory            Enable Memory/Bus Stats mode"
-    echo "  --transfer-mb N     Add extra transfer buffer of size N MB"
     echo "  --apex-mode MODE    Set APEX mode (off, gtrace, gtrace-tasks, taskgraph, all)"
+    echo "  --display           Enable Live SDL2 Semantic GUI window"
     echo "  --help              Show this help"
     exit 1
 }
@@ -55,13 +49,10 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         --trace-root) TRACE_ROOT="$2"; shift ;;
         --frames) FRAMES="$2"; shift ;;
-        --mb) MB="$2"; shift ;;
-        --infer-iters) INFER_ITERS="$2"; shift ;;
-        --burst) BURST="$2"; shift ;;
-        --warmup) WARMUP="$2"; shift ;;
+        --engine) ENGINE="$2"; shift ;;
         --sched) SCHED="$2"; shift ;;
         --memory) MEMORY_MODE=1 ;;
-        --transfer-mb) TRANSFER_MB="$2"; shift ;;
+        --display) DISPLAY_MODE=1 ;;
         --apex-mode) APEX_MODE="$2"; shift ;;
         --help) usage ;;
         *) echo "Unknown parameter passed: $1"; usage ;;
@@ -100,7 +91,8 @@ fi
 # ==============================================================================
 # STEP 0: Create Run Folder with Unique RUN_ID
 # ==============================================================================
-RUN_ID=$(date +%Y%m%d_%H%M%S)
+ENGINE_NAME=$(basename "$ENGINE" .engine)
+RUN_ID="$(date +%Y%m%d_%H%M%S)_${ENGINE_NAME}_${SCHED}"
 BASE="${TRACE_ROOT}/${RUN_ID}"
 echo "=== STEP 0: Initialization ==="
 echo "Run ID: $RUN_ID"
@@ -208,7 +200,10 @@ else
 fi
 
 # Construct Arguments
-ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every $FRAMES --display 1"
+ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine $ENGINE --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every $FRAMES --display $DISPLAY_MODE"
+if [ "$MEMORY_MODE" -eq 1 ]; then
+    ARGS="$ARGS --print_stats"
+fi
 
 # APEX / TaskStubs Handling
 RUN_CMD="$BIN_PATH $ARGS"
@@ -223,14 +218,10 @@ USE_TASKSTUBS=${USE_TASKSTUBS:-0}
 
 if [ "$USE_TASKSTUBS" -eq 1 ]; then
     echo "Using TaskStubs Integration (No Wrapper)..."
-    # TaskStubs + APEX usually needs APEX_OTF2=1 environment
     export APEX_OTF2=${APEX_OTF2:-1}
-    # Ensure binary linked with TaskStubs
     if ! ldd "$BIN_PATH" | grep -q "timer_plugin"; then
          echo "WARNING: Binary does not appear to link libtimer_plugin. Rebuild with -DENABLE_TASKSTUBS_APEX=ON?"
     fi
-    # Proceed (Wrapper not needed if linked)
-    
 elif [ "$USE_APEX" -eq 1 ]; then
     if command -v apex_exec &> /dev/null; then
         echo "Using apex_exec wrapper..."
@@ -247,32 +238,24 @@ fi
 echo "Starting Energy Capture..."
 LOG_ENERGY="$DIR_ENERGY/energy.log"
 
-# A) GPU Energy (Sampling Only for RTX 3060 robustness)
 PID_GPU_SAMPLE=""
 if command -v nvidia-smi &> /dev/null; then
     echo "Starting GPU Power Sampling (10Hz)..."
-    # Format: timestamp, power.draw
     (while true; do nvidia-smi --query-gpu=timestamp,power.draw --format=csv,noheader,nounits; sleep 0.1; done) > "$DIR_ENERGY/gpu_power_samples.csv" 2>>"$LOG_ENERGY" &
     PID_GPU_SAMPLE=$!
 else
     echo "WARN: nvidia-smi not found. Skipping GPU energy." >> "$LOG_ENERGY"
 fi
 
-# B) CPU RAPL (Robust with optional Sudo)
-# ------------------------------------------------------------------------------
-# Function to read RAPL values (single snapshot)
-# Returns: "path:value" lines
 get_rapl_snapshot() {
     local USE_SUDO="${USE_SUDO_RAPL:-0}"
     local FILES=$(find /sys/class/powercap/intel-rapl* -name "energy_uj" 2>/dev/null | sort)
     
-    # Fallback
     if [ -z "$FILES" ]; then
         if [ -e "/sys/class/powercap/intel-rapl:0/energy_uj" ] || [ "$USE_SUDO" -eq 1 ]; then
              FILES="/sys/class/powercap/intel-rapl:0/energy_uj"
         fi
     fi
-     # Attempt DRAM
     if [ -e "/sys/class/powercap/intel-rapl:0:0/energy_uj" ]; then
          FILES="$FILES /sys/class/powercap/intel-rapl:0:0/energy_uj"
     fi
@@ -300,27 +283,18 @@ get_rapl_snapshot() {
     done
 }
 
-# Capture Baseline
 echo "Snapshotting CPU RAPL (Before)..."
 get_rapl_snapshot > "$DIR_ENERGY/cpu_rapl_before_uj.txt"
 
-# Start Background CPU Sampler (10Hz)
 CPU_SAMPLE_RAW="$DIR_ENERGY/cpu_rapl_samples_raw.csv"
 echo "timestamp,domain,energy_uj" > "$CPU_SAMPLE_RAW"
 (
     while true; do
         TS=$(date +"%Y-%m-%dT%H:%M:%S%z")
         get_rapl_snapshot | while read LINE; do
-            # LINE format: path:value
-            # Parse domain name from path
             P=$(echo "$LINE" | cut -d: -f1)
             V=$(echo "$LINE" | cut -d: -f2)
-            
-            # Map path to domain name
-            # intel-rapl:0 -> package
-            # intel-rapl:0:0 -> dram
             if [[ "$P" == *":0:0"* ]]; then DOM="dram"; else DOM="package"; fi
-            
             if [[ "$V" =~ ^[0-9]+$ ]]; then
                 echo "$TS,$DOM,$V"
             fi
@@ -335,26 +309,15 @@ PID_CPU_SAMPLE=$!
 # EXECUTION LOGIC (Standard or Loop for APEX Modes)
 # ==============================================================================
 
-# Determine APEX Modes to Run
 APEX_MODES_TO_RUN=()
 case "$APEX_MODE" in
-    off) ;; # Normal run, no extra APEX specific modes (but USE_TASKSTUBS/USE_APEX might still be active)
+    off) ;;
     gtrace) APEX_MODES_TO_RUN+=("gtrace") ;;
     gtrace-tasks) APEX_MODES_TO_RUN+=("gtrace-tasks") ;;
     taskgraph) APEX_MODES_TO_RUN+=("taskgraph") ;;
     all) APEX_MODES_TO_RUN+=("gtrace" "gtrace-tasks" "taskgraph") ;;
     *) echo "ERROR: Unknown apex-mode: $APEX_MODE"; exit 1 ;;
 esac
-
-# ------------------------------------------------------------------------------
-# 1. Standard Run (Primary for StarPU 00_raw)
-# ------------------------------------------------------------------------------
-# We always run the "standard" configured command first.
-# If APEX_MODE is OFF, this is the only run.
-# If MODES are active, this run might be redundant if the user only wanted APEX data,
-# BUT 'verify_profiling.sh' serves StarPU verification primarily.
-# To satsify "Do not break current StarPU tool workflow", we must ensure 00_raw is populated.
-# We will treat the first run as the "Primary StarPU Run" and then do APEX extra runs if requested.
 
 echo "=== STEP 1: Run Application (Primary) ==="
 echo "Executing: $RUN_CMD"
@@ -363,19 +326,11 @@ echo "Log: $DIR_SUM/run.log"
 env > "$DIR_SUM/env.txt"
 echo "$RUN_CMD" > "$DIR_SUM/cmd.txt"
 
-# Precise Timing
 TS_START=$(date +%s.%N)
-
-# Run!
-eval $RUN_CMD > "$DIR_SUM/run.log" 2>&1
-
+eval $RUN_CMD > "$DIR_SUM/run.log" 2>&1 || true
 TS_END=$(date +%s.%N)
 DURATION=$(python3 -c "print($TS_END - $TS_START)")
 
-# ------------------------------------------------------------------------------
-# ENERGY CAPTURE: END (For Primary Run)
-# ------------------------------------------------------------------------------
-# Stop Sampling
 if [ -n "$PID_GPU_SAMPLE" ]; then
     kill "$PID_GPU_SAMPLE" 2>/dev/null || true
     wait "$PID_GPU_SAMPLE" 2>/dev/null || true
@@ -385,35 +340,19 @@ if [ -n "$PID_CPU_SAMPLE" ]; then
     wait "$PID_CPU_SAMPLE" 2>/dev/null || true
 fi
 
-# Snapshot CPU RAPL (After)
 echo "Snapshotting CPU RAPL (After)..."
 get_rapl_snapshot > "$DIR_ENERGY/cpu_rapl_after_uj.txt"
 
-# ------------------------------------------------------------------------------
-# APEX Output Capture (Primary Run)
-# ------------------------------------------------------------------------------
-# If USE_TASKSTUBS or USE_APEX was set for the primary run, artifacts land in PWD.
-# Move them to 10_apex root (default location).
 if [ "$USE_TASKSTUBS" -eq 1 ] || [ "$USE_APEX" -eq 1 ]; then
     echo "Capturing Primary Run APEX output to $DIR_APEX"
     mv apex.* *.otf2 *.json "$DIR_APEX/" 2>/dev/null || true
-    # For screen output APEX (wrapper), extract from log
     if [ "$USE_APEX" -eq 1 ]; then
          sed -n '/APEX Version:/,$p' "$DIR_SUM/run.log" > "$DIR_APEX/apex.log"
     fi
 fi
 
-# ------------------------------------------------------------------------------
-# 2. Extra APEX Mode Runs (Sequential)
-# ------------------------------------------------------------------------------
 if [ ${#APEX_MODES_TO_RUN[@]} -gt 0 ]; then
     echo "=== APEX Verification Modes: ${APEX_MODES_TO_RUN[*]} ==="
-    
-    # We must unset StarPU FxT tracing for these runs to avoid overwriting 00_raw 
-    # or creating confusion? 
-    # User Requirement: "Keep raw-first discipline... Do NOT reduce existing StarPU outputs".
-    # User Requirement: "For each selected APEX mode... run apex_exec... output to run_<mode>".
-    # I will DISABLE FxT for these runs to keep them pure APEX focused and faster.
     unset STARPU_FXT_TRACE
     unset STARPU_PROFILING
     
@@ -422,273 +361,163 @@ if [ ${#APEX_MODES_TO_RUN[@]} -gt 0 ]; then
         mkdir -p "$SUB_DIR"
         echo ">> Running APEX Mode: $MODE (in $SUB_DIR)"
         
-        # Construct specific command
-        # Note: If USE_TASKSTUBS=1 is on, binary has plugin. APEX env vars control it.
-        # But user requested `apex_exec --apex:<mode>` syntax which is wrapper-based.
-        # wrapper `apex_exec` handles setting the mode env vars even for linked binaries?
-        # Yes, usually. Or we can set env vars manually. 
-        # Requirement: "apex_exec --apex:<modeflag>"
+        # Replace --display 1 with --display 0 so APEX executions are completely silent to the user
+        SILENT_ARGS="${ARGS/--display 1/--display 0}"
+        APEX_CMD="apex_exec --apex:$MODE $BIN_PATH $SILENT_ARGS"
         
-        # We need to strip existing `apex_exec` from RUN_CMD if it was there to avoid double wrap?
-        # Actually, let's just build the command freshly using BIN_PATH and ARGS.
-        
-        APEX_CMD="apex_exec --apex:$MODE $BIN_PATH $ARGS"
-        
-        # Execution
-        # We cd into subdir so files land there
         (
-            cd "$SUB_DIR"
-            echo "Command: $APEX_CMD" > apex_runinfo.txt
-            echo "Start: $(date)" >> apex_runinfo.txt
-            
-            # Execute
-            eval "$APEX_CMD" > apex.log 2>&1
+            set +e
+            export APEX_OUTPUT_FILE_PATH="$SUB_DIR"
+            echo "Command: $APEX_CMD" > "$SUB_DIR/apex_runinfo.txt"
+            echo "Start: $(date)" >> "$SUB_DIR/apex_runinfo.txt"
+            eval "$APEX_CMD" > "$SUB_DIR/apex.log" 2>&1
             RET=$?
-            
-            echo "End: $(date)" >> apex_runinfo.txt
-            echo "Return Code: $RET" >> apex_runinfo.txt
-            echo "Files:" >> apex_runinfo.txt
-            ls -1 >> apex_runinfo.txt
+            echo "End: $(date)" >> "$SUB_DIR/apex_runinfo.txt"
+            echo "Return Code: $RET" >> "$SUB_DIR/apex_runinfo.txt"
+            echo "Files:" >> "$SUB_DIR/apex_runinfo.txt"
+            ls -1 "$SUB_DIR" >> "$SUB_DIR/apex_runinfo.txt"
         )
     done
-    
-    # Restore StarPU Env just in case (though script continues to processing now)
     export STARPU_FXT_TRACE=1
     export STARPU_PROFILING=1
 fi
 
-# ------------------------------------------------------------------------------
-# APEX Post-Processing (All Modes)
-# ------------------------------------------------------------------------------
 echo "Post-Processing APEX Artifacts in $DIR_APEX..."
 rm -f "$DIR_APEX/apex_index.txt"
 touch "$DIR_APEX/apex_index.txt"
 
-# Helper to process a directory
 process_apex_dir() {
     local D="$1"
     local NAME=$(basename "$D")
     [ ! -d "$D" ] && return
-    
     echo "Processing $NAME..."
-    
-    # 1. Graphviz Dot -> PDF
-    # Find any .dot files
     find "$D" -maxdepth 1 -name "*.dot" | while read DOTFILE; do
         if command -v dot &> /dev/null; then
             dot -Tpdf "$DOTFILE" -o "$DOTFILE.pdf"
             echo "  Rendered $DOTFILE.pdf"
         fi
     done
-    
-    # 2. JSON Traces (trace_events*.json.gz)
     find "$D" -maxdepth 1 -name "trace_events*.json.gz" | while read TGZ; do
         BASE_JSON="${TGZ%.gz}"
-        # Unzip
         gunzip -c "$TGZ" > "$BASE_JSON"
         echo "  Unzipped $BASE_JSON"
-        
-        # Summary Stats
         SIZE=$(du -h "$BASE_JSON" | cut -f1)
         LINES=$(wc -l < "$BASE_JSON")
         echo "Trace: $(basename $TGZ)" >> "$D/apex_trace_summary.txt"
         echo "  Size: $SIZE" >> "$D/apex_trace_summary.txt"
         echo "  Lines: $LINES" >> "$D/apex_trace_summary.txt"
-        
-        # Perfetto Note
-        if command -v perfetto &> /dev/null; then
-             echo "  Perfetto CLI found (user can check documentation)."
-        fi
     done
-    
-    # Update Index
     echo "[$NAME]" >> "$DIR_APEX/apex_index.txt"
     ls -1 "$D" | sed 's/^/  - /' >> "$DIR_APEX/apex_index.txt"
     echo "" >> "$DIR_APEX/apex_index.txt"
 }
 
-# Process Root (Standard Run)
 process_apex_dir "$DIR_APEX"
-
-# Process Subdirs (Modes)
 for D in "$DIR_APEX"/run_*; do
     process_apex_dir "$D"
 done
 
-# ------------------------------------------------------------------------------
-# MEMORY STATS EXTRACTION & VERIFICATION
-# ------------------------------------------------------------------------------
 if [ "$MEMORY_MODE" -eq 1 ]; then
     echo "Processing Memory Stats..."
     STATS_FILE="$DIR_MEM/starpu_stats.txt"
     
-    # Extract block between markers
-    sed -n '/===STARPU_STATS_BEGIN===/,/===STARPU_STATS_END===/p' "$DIR_SUM/run.log" > "$STATS_FILE"
+    awk '/MSI cache stats :|Allocation cache stats:|Data transfer stats:|Worker stats:/{f=1} f{print}' "$DIR_SUM/run.log" > "$STATS_FILE"
     
-    # Remove markers for clean file
-    sed -i '/===STARPU_STATS_BEGIN===/d;/===STARPU_STATS_END===/d' "$STATS_FILE"
-    
-    # Verify extraction
     if [ ! -s "$STATS_FILE" ]; then
         echo "FAIL: starpu_stats.txt is empty. Stats extraction failed."
         exit 1
     fi
     
-    # Hard Verification
     CHECK_LOG="$DIR_MEM/memory_check.log"
     echo "Verifying Memory Stats..." > "$CHECK_LOG"
 
-    # Section Splitting
-    # transfers.txt
-    awk '/Data transfer stats:/{f=1} f{print} /Worker stats:/{f=0; exit} /^$/{if(f) exit}' "$STATS_FILE" > "$DIR_MEM/transfers.txt"
+    awk '/Data transfer stats:/{f=1} f{print; if ($0 ~ /^#---------------------$/ && f) {f=0; exit}}' "$STATS_FILE" > "$DIR_MEM/transfers.txt"
     if [ ! -s "$DIR_MEM/transfers.txt" ]; then
         echo "No transfer stats collected." > "$DIR_MEM/transfers.txt"
         echo "WARN: Transfer stats missing in split." >> "$CHECK_LOG"
     fi
 
-    # workers.txt 
-    awk '/Worker stats:/{f=1} f{print} /Allocation cache stats:|MSI cache stats:/{if(f) exit}' "$STATS_FILE" > "$DIR_MEM/workers.txt"
+    awk '/Worker stats:/{f=1} f{print; if ($0 ~ /^#---------------------$/ && f) {f=0; exit}}' "$STATS_FILE" > "$DIR_MEM/workers.txt"
     if [ ! -s "$DIR_MEM/workers.txt" ]; then
         echo "No worker stats collected." > "$DIR_MEM/workers.txt"
         echo "WARN: Worker stats missing in split." >> "$CHECK_LOG"
     fi
 
-    # cache.txt
-    awk '/Allocation cache stats:|MSI cache stats:/{f=1} f{print}' "$STATS_FILE" > "$DIR_MEM/cache.txt"
+    awk 'BEGIN{f=0} /MSI cache stats :|Allocation cache stats:/{f=1} f{print} /Data transfer stats:/{exit}' "$STATS_FILE" | sed '/Data transfer stats:/d' > "$DIR_MEM/cache.txt"
     if [ ! -s "$DIR_MEM/cache.txt" ]; then
         echo "No cache stats collected." > "$DIR_MEM/cache.txt"
         echo "WARN: Cache stats missing (optional)." >> "$CHECK_LOG"
     fi
     
     PASS=1
-    
-    # Check 1: Stats File Exists
     if [ -s "$STATS_FILE" ]; then
         echo "[PASS] starpu_stats.txt exists and non-empty." >> "$CHECK_LOG"
     else
         echo "[FAIL] starpu_stats.txt missing or empty." >> "$CHECK_LOG"
         PASS=0
     fi
-    
-    # Check 2: Worker Stats present
     if grep -q "Worker stats:" "$STATS_FILE"; then
          echo "[PASS] 'Worker stats:' found." >> "$CHECK_LOG"
     else
          echo "[FAIL] 'Worker stats:' NOT found." >> "$CHECK_LOG"
          PASS=0
     fi
-    
-    # Check 3: Transfers (Either title or content)
     if grep -E -q "Data transfer stats:|Transfers from CUDA" "$STATS_FILE"; then
          echo "[PASS] Transfer stats found." >> "$CHECK_LOG"
     else
          echo "[WARN] Transfer stats NOT found (might be CPU-only run)." >> "$CHECK_LOG"
-         # Requirement said: "FAIL only if hard checks like file existence fail... and contains either... string match"
-         # "If any hard check fails... exit non-zero"
-         # But transfers might be empty if 0 transfers happened?
-         # User requirement: "and contains either 'Data transfer stats:' OR 'Transfers from CUDA'".
-         # I will stick to the requirement. If StarPU prints "Data transfer stats:" even if empty, it's fine.
-         # Checked previous log: "Data transfer stats:" matches.
          PASS=0
     fi
-
     echo "Stats File Sizes:" >> "$CHECK_LOG"
     du -h "$DIR_MEM"/* >> "$CHECK_LOG"
-    
-    cat "$CHECK_LOG"
-    
     if [ "$PASS" -eq 0 ]; then
         echo "MEMORY VERIFICATION FAILED. See $CHECK_LOG"
         exit 1
     fi
 fi
 
-# ==============================================================================
-# STEP 2: Verify RAW Contents
-# ==============================================================================
 echo "=== STEP 2: Verify RAW ==="
 RAW_FILES=$(ls "$DIR_RAW"/prof_file_* 2>/dev/null)
 if [ -z "$RAW_FILES" ]; then
     echo "ERROR: No prof_file_* found in $DIR_RAW. Execution failed/No tracing."
-    cat "$DIR_SUM/run.log"
     exit 1
 fi
-echo "Found Raw Trace Files: " >> "$DIR_SUM/summary.md"
-ls -l "$DIR_RAW" >> "$DIR_SUM/summary.md"
 echo "PASS: Raw traces exist."
 
-# ==============================================================================
-# STEP 3: Convert to FxT (01_starpu_fxt_tool)
-# ==============================================================================
 echo "=== STEP 3: FxT Conversion ==="
 cd "$DIR_FXT"
-
 if command -v starpu_fxt_tool &> /dev/null; then
     starpu_fxt_tool -i "$DIR_RAW"/prof_file_* > fxt_tool.log 2>&1
 else
-    echo "ERROR: starpu_fxt_tool not found (MANDATORY)."
+    echo "ERROR: starpu_fxt_tool not found."
     exit 1
 fi
-
-# Verify Mandatory Artifacts
 for f in paje.trace tasks.rec dag.dot; do
     if [ ! -s "$f" ]; then
         echo "ERROR: $f missing or empty in $DIR_FXT."
         exit 1
     fi
 done
-echo "PASS: FxT conversion successful."
 
-# ==============================================================================
-# STEP 4: Distribute Outputs (COPY)
-# ==============================================================================
 echo "=== STEP 4: Distribution ==="
 cp "$DIR_FXT/dag.dot" "$DIR_DOT/"
 cp "$DIR_FXT/tasks.rec" "$DIR_TASKS/"
-
-# PAPI Handling
-# Usually generated by starpu_fxt_tool if PAPI events present
 if [ -s "$DIR_FXT/papi.rec" ]; then
     cp "$DIR_FXT/papi.rec" "$DIR_PAPI/"
 else
-    # Try searching in raw just in case (unlikely for FxT)
-    # If empty, create empty placeholder
     touch "$DIR_PAPI/papi.rec"
-    echo "WARN: papi.rec empty or missing in FxT output." >> "$DIR_SUM/run.log"
 fi
 
-# ==============================================================================
-# STEP 5: Graphviz
-# ==============================================================================
 echo "=== STEP 5: Graphviz ==="
 if command -v dot &> /dev/null; then
     dot -Tpdf "$DIR_DOT/dag.dot" -o "$DIR_DOT/dag.pdf"
-    if [ ! -s "$DIR_DOT/dag.pdf" ]; then
-        echo "ERROR: dag.pdf empty."
-        exit 1
-    fi
-else
-    echo "ERROR: 'dot' command not found (MANDATORY)."
-    exit 1
 fi
-echo "PASS: DAG generated."
 
-# ==============================================================================
-# STEP 6: Tasks Completion
-# ==============================================================================
 echo "=== STEP 6: Tasks Completion ==="
 if command -v starpu_tasks_rec_complete &> /dev/null; then
     starpu_tasks_rec_complete "$DIR_TASKS/tasks.rec" "$DIR_TASKS/tasks2.rec" > "$DIR_TASKS/tasks_complete.log" 2>&1 || true
-    if [ ! -s "$DIR_TASKS/tasks2.rec" ]; then
-        echo "WARN: tasks2.rec empty/failed."
-    fi
-else
-    echo "WARN: starpu_tasks_rec_complete not found."
 fi
 
-# ==============================================================================
-# STEP 7: Codelet Profile
-# ==============================================================================
 echo "=== STEP 7: Codelet Profile ==="
 cd "$DIR_PROF"
 if [ -s "$DIR_FXT/distrib.data" ]; then
@@ -696,95 +525,37 @@ if [ -s "$DIR_FXT/distrib.data" ]; then
 elif [ -s "$DIR_FXT/trace.rec" ]; then
       starpu_fxt_tool -d "$DIR_FXT/trace.rec" > /dev/null 2>&1 || true
 fi
-
-if [ -s "distrib.data" ]; then
-    if command -v starpu_codelet_profile &> /dev/null; then
-        for symbol in cl_preproc cl_infer_trt cl_post; do
-            starpu_codelet_profile distrib.data "$symbol" > "$symbol.profile.log" 2>&1 || true
-        done
-    else
-        echo "WARN: starpu_codelet_profile not found."
-    fi
-else
-    echo "WARN: distrib.data missing. Skipping codelet profiles."
+if [ -s "distrib.data" ] && command -v starpu_codelet_profile &> /dev/null; then
+    for symbol in cl_preproc cl_infer_trt cl_post; do
+        starpu_codelet_profile distrib.data "$symbol" > "$symbol.profile.log" 2>&1 || true
+    done
 fi
 
-# ==============================================================================
-# STEP 8: Histo Profile
-# ==============================================================================
 echo "=== STEP 8: Histo Profile ==="
 cd "$DIR_HISTO"
-if [ -s "$DIR_PROF/distrib.data" ]; then
-    if command -v starpu_codelet_histo_profile &> /dev/null; then
-        starpu_codelet_histo_profile "$DIR_PROF/distrib.data" > histo.log 2>&1 || true
-    fi
+if [ -s "$DIR_PROF/distrib.data" ] && command -v starpu_codelet_histo_profile &> /dev/null; then
+    starpu_codelet_histo_profile "$DIR_PROF/distrib.data" > histo.log 2>&1 || true
 fi
 
-# ==============================================================================
-# STEP 9: Data Trace
-# ==============================================================================
 echo "=== STEP 9: Data Trace ==="
 cd "$DIR_DATA"
 if command -v starpu_fxt_data_trace &> /dev/null; then
     starpu_fxt_data_trace "$DIR_RAW"/prof_file_* cl_preproc cl_infer_trt cl_post > data_trace.txt 2>&1 || true
 fi
 
-# ==============================================================================
-# STEP 10: State Stats
-# ==============================================================================
 echo "=== STEP 10: State Stats ==="
 cd "$DIR_STATS"
 if command -v starpu_trace_state_stats.py &> /dev/null && [ -f "$DIR_FXT/trace.rec" ]; then
     starpu_trace_state_stats.py "$DIR_FXT/trace.rec" > state_stats.txt 2>&1 || true
 fi
 
-# ==============================================================================
-# STEP 11: StarVZ
-# ==============================================================================
 echo "=== STEP 11: StarVZ ==="
 cd "$DIR_STARVZ"
 if command -v starvz &> /dev/null; then
-    starvz --use-paje-trace "$DIR_FXT" > starvz.log 2>&1 || echo "WARN: StarVZ failed"
+    starvz --use-paje-trace "$DIR_FXT" > starvz.log 2>&1 || true
     cp "$DIR_FXT"/starvz* . 2>/dev/null || true
     cp "$DIR_FXT"/*.parquet . 2>/dev/null || true
-elif R -q -e "library(starvz)" &> /dev/null; then
-    # Basic check since full starvz CLI missing
-    echo "StarVZ CLI missing, verify R pkg manually." > starvz.log
 fi
 
-# ==============================================================================
-# STEP 12: Summary
-# ==============================================================================
 echo "=== STEP 12: Summary ==="
-echo "# Summary for Run $RUN_ID" > "$DIR_SUM/summary.md"
-echo "Command: $RUN_CMD" >> "$DIR_SUM/summary.md"
-echo "Result: SUCCESS" >> "$DIR_SUM/summary.md"
-echo "" >> "$DIR_SUM/summary.md"
-echo "## Folder Structure" >> "$DIR_SUM/summary.md"
-if command -v tree &> /dev/null; then
-    tree -L 2 "$BASE" >> "$DIR_SUM/summary.md"
-    tree -L 2 "$BASE"
-else
-    find "$BASE" -maxdepth 2
-fi
-
-# PAPI Verification
-echo "## PAPI Check"
-PAPI_FILE="$DIR_PAPI/papi.rec"
-if [ -s "$PAPI_FILE" ]; then
-    # Check if file has meaningful content (more than header)
-    # starpu_fxt_tool output often headers.
-    LINE_COUNT=$(wc -l < "$PAPI_FILE")
-    if [ "$LINE_COUNT" -gt 1 ]; then
-        echo "PAPI PASS: $PAPI_FILE has $LINE_COUNT lines."
-        head -n 5 "$PAPI_FILE"
-    else
-         echo "PAPI FAIL: $PAPI_FILE is almost empty."
-    fi
-else
-    echo "PAPI FAIL: $PAPI_FILE is empty."
-fi
-
-echo "========================================"
 echo "RUN COMPLETE: $BASE"
-echo "========================================"

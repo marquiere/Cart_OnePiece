@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, random_split
 from dataset import CarlaSegDataset
-from model import SimpleSeg
+import torchvision.models.segmentation as segmentation
 
 def train():
     data_dir = max(glob.glob("runs/*/sanity_dataset"), key=os.path.getmtime)
@@ -22,7 +22,8 @@ def train():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("Device:", device)
     
-    model = SimpleSeg(in_channels=3, out_classes=26).to(device)
+    # Initialize blank un-trained fcn_resnet50 tailored to 26 CARLA raw classes
+    model = segmentation.fcn_resnet50(num_classes=26).to(device)
     
     criterion = nn.CrossEntropyLoss(ignore_index=0) # 0 is unlabeled in CARLA mostly
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -43,7 +44,8 @@ def train():
             masks = masks.to(device)
             
             optimizer.zero_grad()
-            outputs = model(imgs) # [B, C, H, W]
+            features = model(imgs) # TorchVision returns OrderedDict
+            outputs = features['out'] # [B, 26, H, W]
             
             loss = criterion(outputs, masks)
             loss.backward()
@@ -63,7 +65,9 @@ def train():
             for imgs, masks in val_loader:
                 imgs = imgs.to(device)
                 masks = masks.to(device)
-                outputs = model(imgs) # logits
+                
+                features = model(imgs)
+                outputs = features['out'] # logits
                 
                 loss = criterion(outputs, masks)
                 val_loss += loss.item() * imgs.size(0)
@@ -79,7 +83,8 @@ def train():
         
         if val_loss < best_loss:
             best_loss = val_loss
-            torch.save(model.state_dict(), "models/carla_seg_best.pth")
+            # Save the ResNet50 state dict specifically
+            torch.save(model.state_dict(), "models/carla_resnet50_best.pth")
             print("  (*) Saved best model checkpoint.")
 
 if __name__ == "__main__":

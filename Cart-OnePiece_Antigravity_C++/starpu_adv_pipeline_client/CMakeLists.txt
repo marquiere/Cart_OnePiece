@@ -17,6 +17,26 @@ find_package(SDL2 REQUIRED)
 # Find StarPU configuration
 pkg_check_modules(STARPU REQUIRED starpu-1.4)
 
+# Find APEX configuration (Optional Native Integration)
+pkg_check_modules(APEX apex)
+if(APEX_FOUND)
+    message(STATUS "APEX found via pkg-config, enabling native API instrumentation.")
+    include_directories(${APEX_INCLUDE_DIRS})
+    link_directories(${APEX_LIBRARY_DIRS})
+    set(APEX_LIB_DEPS ${APEX_LIBRARIES})
+    add_definitions(-DENABLE_APEX)
+else()
+    set(APEX_PREFIX "$ENV{HOME}/apex/install")
+    if(EXISTS "${APEX_PREFIX}/include/apex_api.hpp")
+        message(STATUS "APEX found via manual prefix: ${APEX_PREFIX}")
+        include_directories(${APEX_PREFIX}/include)
+        link_directories(${APEX_PREFIX}/lib)
+        set(APEX_LIB_DEPS apex)
+        add_definitions(-DENABLE_APEX)
+        set(APEX_FOUND TRUE)
+    endif()
+endif()
+
 # Set CARLA_ROOT
 if(NOT DEFINED CARLA_ROOT)
     set(CARLA_ROOT "${CMAKE_SOURCE_DIR}/../reference/CppClient/libcarla-install")
@@ -164,6 +184,9 @@ target_link_libraries(pipeline_starpu PRIVATE
     vis
     ${STARPU_LIBRARIES}
 )
+if(APEX_FOUND)
+    target_link_libraries(pipeline_starpu PRIVATE ${APEX_LIB_DEPS})
+endif()
 target_link_options(pipeline_starpu PRIVATE ${STARPU_LDFLAGS})
 if(WITH_TRT)
     target_link_libraries(pipeline_starpu PRIVATE trt_runner ${NVINFER_LIB} ${CUDA_RT_LIB})

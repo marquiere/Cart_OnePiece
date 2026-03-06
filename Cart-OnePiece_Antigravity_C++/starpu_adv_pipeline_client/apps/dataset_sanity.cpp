@@ -137,14 +137,18 @@ int main(int argc, char **argv) {
     }
   }
 
-  // Setup runs foldermn
-  auto now = system_clock::now();
-  auto time_t = system_clock::to_time_t(now);
-  std::stringstream ss;
-  ss << std::put_time(std::localtime(&time_t), "%Y%m%d_%H%M%S");
-  std::string timestamp = ss.str();
-
-  std::string run_dir = "runs/" + timestamp + "/sanity_dataset";
+  // Setup runs folder respecting RUN_DIR
+  const char *env_dir = std::getenv("RUN_DIR");
+  std::string run_dir;
+  if (env_dir) {
+    run_dir = std::string(env_dir) + "/sanity_dataset";
+  } else {
+    auto now = system_clock::now();
+    auto time_t = system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&time_t), "%Y%m%d_%H%M%S");
+    run_dir = "runs/" + ss.str() + "/sanity_dataset";
+  }
   fs::create_directories(run_dir + "/rgb");
   fs::create_directories(run_dir + "/gt_raw");
   fs::create_directories(run_dir + "/gt_color");
@@ -402,7 +406,7 @@ int main(int argc, char **argv) {
   // Write meta.json
   std::ofstream meta(run_dir + "/meta.json");
   meta << "{\n";
-  meta << "  \"date_time\": \"" << timestamp << "\",\n";
+  meta << "  \"date_time\": \"" << run_dir << "\",\n";
   meta << "  \"map\": \"" << map_name << "\",\n";
   meta << "  \"w\": " << w << ",\n";
   meta << "  \"h\": " << h << ",\n";

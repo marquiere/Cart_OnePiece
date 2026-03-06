@@ -1,0 +1,37 @@
++ set -e
++ export CARLA_ROOT=/home/eric/CARLA_Latest
++ CARLA_ROOT=/home/eric/CARLA_Latest
++ FRAMES=1200
++ ENGINE=models/dummy.engine
++ EXTRA_ARGS=
++ [[ 5 -gt 0 ]]
++ case $1 in
++ ENGINE=models/dummy.engine
++ shift
++ shift
++ [[ 3 -gt 0 ]]
++ case $1 in
++ EXTRA_ARGS=' --display'
++ shift
++ [[ 2 -gt 0 ]]
++ case $1 in
++ FRAMES=200
++ shift
++ shift
++ [[ 0 -gt 0 ]]
++ echo '--- STARTING SERVER ---'
+--- STARTING SERVER ---
++ ./tools/run_server.sh --port 2000
+==========================================
+Starting CARLA Server...
+Port: 2000
+Run Directory: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_220058
+Log File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_220058/server.log
+PID File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_220058/server.pid
+==========================================
+SERVER STARTED with PID: 307303
+You can monitor logs with: tail -f /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_220058/server.log
+To stop the server, run: ./tools/kill_server.sh --run_dir /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260228_220058
++ echo 'Waiting 15 seconds for CARLA to initialize Map...'
+Waiting 15 seconds for CARLA to initialize Map...
++ sleep 15

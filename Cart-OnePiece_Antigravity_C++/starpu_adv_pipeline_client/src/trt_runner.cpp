@@ -233,14 +233,19 @@ bool TrtRunner::SetInputShapeIfDynamic(int w, int h) {
 }
 
 bool TrtRunner::Infer(const void *host_input, size_t host_input_bytes,
-                      void *host_output, size_t host_output_bytes) {
+                      void *host_output, size_t host_output_bytes,
+                      cudaStream_t stream_override) {
   if (!host_input || !host_output || !d_in_ || !d_out_)
     return false;
   if (host_input_bytes != input_bytes_ || host_output_bytes != output_bytes_)
     return false;
 
+  std::lock_guard<std::mutex> lock(infer_mutex_);
+
+  cudaStream_t active_stream = stream_override ? stream_override : stream_;
+
   if (!CHECK_CUDA(cudaMemcpyAsync(d_in_, host_input, input_bytes_,
-                                  cudaMemcpyHostToDevice, stream_)))
+                                  cudaMemcpyHostToDevice, active_stream)))
     return false;
 
   const char *in_name = engine_->getIOTensorName(input_index_);
@@ -251,15 +256,16 @@ bool TrtRunner::Infer(const void *host_input, size_t host_input_bytes,
   if (!context_->setTensorAddress(out_name, d_out_))
     return false;
 
-  if (!context_->enqueueV3(stream_)) {
+  if (!context_->enqueueV3(active_stream)) {
     std::cerr << "ERROR: TensorRT enqueueV3 failed" << std::endl;
     return false;
   }
 
   if (!CHECK_CUDA(cudaMemcpyAsync(host_output, d_out_, output_bytes_,
-                                  cudaMemcpyDeviceToHost, stream_)))
+                                  cudaMemcpyDeviceToHost, active_stream)))
     return false;
-  if (!CHECK_CUDA(cudaStreamSynchronize(stream_)))
+
+  if (!CHECK_CUDA(cudaStreamSynchronize(active_stream)))
     return false;
 
   return true;
