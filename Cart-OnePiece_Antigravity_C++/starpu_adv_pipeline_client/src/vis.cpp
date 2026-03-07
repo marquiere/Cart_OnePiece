@@ -3,6 +3,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include <cstring>
 #include <iostream>
 
 namespace vis {
@@ -85,6 +86,28 @@ void UpsampleNearest(const uint8_t *in_labels, int in_w, int in_h,
 
       out_labels[y * out_w + x] = in_labels[py * in_w + px];
     }
+  }
+}
+
+void CreateMosaic(const uint8_t *rgb_tl, const uint8_t *rgb_tr,
+                  const uint8_t *rgb_bl, const uint8_t *rgb_br, int w, int h,
+                  uint8_t *out_mosaic) {
+  int out_w = w * 2;
+  int row_bytes = w * 3;
+  int out_row_bytes = out_w * 3;
+
+  for (int y = 0; y < h; ++y) {
+    // Top half: TL and TR
+    std::memcpy(out_mosaic + y * out_row_bytes, rgb_tl + y * row_bytes,
+                row_bytes);
+    std::memcpy(out_mosaic + y * out_row_bytes + row_bytes,
+                rgb_tr + y * row_bytes, row_bytes);
+
+    // Bottom half: BL and BR
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes, rgb_bl + y * row_bytes,
+                row_bytes);
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes + row_bytes,
+                rgb_br + y * row_bytes, row_bytes);
   }
 }
 

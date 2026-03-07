@@ -155,6 +155,12 @@ int main(int argc, char **argv) {
   fs::create_directories(run_dir + "/rear_rgb");
   fs::create_directories(run_dir + "/rear_gt_raw");
   fs::create_directories(run_dir + "/rear_gt_color");
+  fs::create_directories(run_dir + "/left_rgb");
+  fs::create_directories(run_dir + "/left_gt_raw");
+  fs::create_directories(run_dir + "/left_gt_color");
+  fs::create_directories(run_dir + "/right_rgb");
+  fs::create_directories(run_dir + "/right_gt_raw");
+  fs::create_directories(run_dir + "/right_gt_color");
   if (!no_pred) {
     fs::create_directories(run_dir + "/pred_raw");
     fs::create_directories(run_dir + "/pred_color");
@@ -162,12 +168,19 @@ int main(int argc, char **argv) {
     fs::create_directories(run_dir + "/rear_pred_raw");
     fs::create_directories(run_dir + "/rear_pred_color");
     fs::create_directories(run_dir + "/rear_overlay");
+    fs::create_directories(run_dir + "/left_pred_raw");
+    fs::create_directories(run_dir + "/left_pred_color");
+    fs::create_directories(run_dir + "/left_overlay");
+    fs::create_directories(run_dir + "/right_pred_raw");
+    fs::create_directories(run_dir + "/right_pred_color");
+    fs::create_directories(run_dir + "/right_overlay");
   }
 
   std::unique_ptr<SegmentationViewerSDL2> viewer = nullptr;
   if (display) {
     viewer = std::make_unique<SegmentationViewerSDL2>();
-    if (!viewer->init(w, h, 2.0f)) {
+    // Double width and height for 2x2 mosaic
+    if (!viewer->init(w * 2, h * 2, 1.0f)) {
       std::cerr << "[Sanity Dataset] Viewer init failed.\n";
       viewer.reset();
     }
@@ -237,8 +250,20 @@ int main(int argc, char **argv) {
   auto rear_rgb_sensor = world.SpawnActor(rgb_bp, rear_tf, vehicle.get());
   auto rear_gt_sensor = world.SpawnActor(gt_bp, rear_tf, vehicle.get());
 
+  carla::geom::Transform left_tf(carla::geom::Location(0.0f, -1.0f, 1.4f),
+                                 carla::geom::Rotation(0.0f, -90.0f, 0.0f));
+  auto left_rgb_sensor = world.SpawnActor(rgb_bp, left_tf, vehicle.get());
+  auto left_gt_sensor = world.SpawnActor(gt_bp, left_tf, vehicle.get());
+
+  carla::geom::Transform right_tf(carla::geom::Location(0.0f, 1.0f, 1.4f),
+                                  carla::geom::Rotation(0.0f, 90.0f, 0.0f));
+  auto right_rgb_sensor = world.SpawnActor(rgb_bp, right_tf, vehicle.get());
+  auto right_gt_sensor = world.SpawnActor(gt_bp, right_tf, vehicle.get());
+
   FrameSync sync(10);
   FrameSync rear_sync(10);
+  FrameSync left_sync(10);
+  FrameSync right_sync(10);
 
   auto rgb_cam = boost::static_pointer_cast<carla::client::Sensor>(rgb_sensor);
   auto gt_cam = boost::static_pointer_cast<carla::client::Sensor>(gt_sensor);
@@ -246,6 +271,14 @@ int main(int argc, char **argv) {
       boost::static_pointer_cast<carla::client::Sensor>(rear_rgb_sensor);
   auto rear_gt_cam =
       boost::static_pointer_cast<carla::client::Sensor>(rear_gt_sensor);
+  auto left_rgb_cam =
+      boost::static_pointer_cast<carla::client::Sensor>(left_rgb_sensor);
+  auto left_gt_cam =
+      boost::static_pointer_cast<carla::client::Sensor>(left_gt_sensor);
+  auto right_rgb_cam =
+      boost::static_pointer_cast<carla::client::Sensor>(right_rgb_sensor);
+  auto right_gt_cam =
+      boost::static_pointer_cast<carla::client::Sensor>(right_gt_sensor);
 
   rgb_cam->Listen([&](auto data) {
     FrameIn f;
@@ -291,8 +324,54 @@ int main(int argc, char **argv) {
     rear_sync.PushGt(std::move(f));
   });
 
+  left_rgb_cam->Listen([&](auto data) {
+    FrameIn f;
+    f.frame_id = data->GetFrame();
+    f.timestamp = data->GetTimestamp();
+    f.w = w;
+    f.h = h;
+    f.carla_image =
+        boost::static_pointer_cast<carla::sensor::data::Image>(data);
+    left_sync.PushRgb(std::move(f));
+  });
+
+  left_gt_cam->Listen([&](auto data) {
+    GtFrame f;
+    f.frame_id = data->GetFrame();
+    f.timestamp = data->GetTimestamp();
+    f.w = w;
+    f.h = h;
+    f.carla_image =
+        boost::static_pointer_cast<carla::sensor::data::Image>(data);
+    left_sync.PushGt(std::move(f));
+  });
+
+  right_rgb_cam->Listen([&](auto data) {
+    FrameIn f;
+    f.frame_id = data->GetFrame();
+    f.timestamp = data->GetTimestamp();
+    f.w = w;
+    f.h = h;
+    f.carla_image =
+        boost::static_pointer_cast<carla::sensor::data::Image>(data);
+    right_sync.PushRgb(std::move(f));
+  });
+
+  right_gt_cam->Listen([&](auto data) {
+    GtFrame f;
+    f.frame_id = data->GetFrame();
+    f.timestamp = data->GetTimestamp();
+    f.w = w;
+    f.h = h;
+    f.carla_image =
+        boost::static_pointer_cast<carla::sensor::data::Image>(data);
+    right_sync.PushGt(std::move(f));
+  });
+
   std::vector<uint64_t> saved_frames;
   std::vector<uint64_t> rear_saved_frames;
+  std::vector<uint64_t> left_saved_frames;
+  std::vector<uint64_t> right_saved_frames;
 
   // Arrays for image processing
   std::vector<uint8_t> rgb_bytes(w * h * 3);
@@ -301,6 +380,12 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> rear_rgb_bytes(w * h * 3);
   std::vector<uint8_t> rear_gt_labels(w * h);
   std::vector<uint8_t> rear_gt_color(w * h * 3);
+  std::vector<uint8_t> left_rgb_bytes(w * h * 3);
+  std::vector<uint8_t> left_gt_labels(w * h);
+  std::vector<uint8_t> left_gt_color(w * h * 3);
+  std::vector<uint8_t> right_rgb_bytes(w * h * 3);
+  std::vector<uint8_t> right_gt_labels(w * h);
+  std::vector<uint8_t> right_gt_color(w * h * 3);
 
   std::vector<float> trt_in;
   std::vector<uint8_t> pred_labels;
@@ -312,6 +397,17 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> rear_pred_upsampled;
   std::vector<uint8_t> rear_pred_color;
   std::vector<uint8_t> rear_overlay;
+  std::vector<float> left_trt_in;
+  std::vector<uint8_t> left_pred_labels;
+  std::vector<uint8_t> left_pred_upsampled;
+  std::vector<uint8_t> left_pred_color;
+  std::vector<uint8_t> left_overlay;
+  std::vector<float> right_trt_in;
+  std::vector<uint8_t> right_pred_labels;
+  std::vector<uint8_t> right_pred_upsampled;
+  std::vector<uint8_t> right_pred_color;
+  std::vector<uint8_t> right_overlay;
+  std::vector<uint8_t> mosaic(w * 2 * h * 2 * 3);
 
   if (!no_pred) {
     trt_in.resize(3 * out_w * out_h);
@@ -324,6 +420,16 @@ int main(int argc, char **argv) {
     rear_pred_upsampled.resize(w * h);
     rear_pred_color.resize(w * h * 3);
     rear_overlay.resize(w * h * 3);
+    left_trt_in.resize(3 * out_w * out_h);
+    left_pred_labels.resize(out_w * out_h);
+    left_pred_upsampled.resize(w * h);
+    left_pred_color.resize(w * h * 3);
+    left_overlay.resize(w * h * 3);
+    right_trt_in.resize(3 * out_w * out_h);
+    right_pred_labels.resize(out_w * out_h);
+    right_pred_upsampled.resize(w * h);
+    right_pred_color.resize(w * h * 3);
+    right_overlay.resize(w * h * 3);
   }
 
   int total_processed = 0;
@@ -340,6 +446,11 @@ int main(int argc, char **argv) {
     bool got_pair = false;
     MatchedPair rear_pair;
     bool got_rear_pair = false;
+    MatchedPair left_pair;
+    bool got_left_pair = false;
+    MatchedPair right_pair;
+    bool got_right_pair = false;
+
     // Try for some timeout to avoid locking up totally if sensors drop a frame
     for (int t = 0; t < 100; ++t) {
       if (!got_pair && sync.TryPopMatched(pair)) {
@@ -348,13 +459,19 @@ int main(int argc, char **argv) {
       if (!got_rear_pair && rear_sync.TryPopMatched(rear_pair)) {
         got_rear_pair = true;
       }
-      if (got_pair && got_rear_pair) {
+      if (!got_left_pair && left_sync.TryPopMatched(left_pair)) {
+        got_left_pair = true;
+      }
+      if (!got_right_pair && right_sync.TryPopMatched(right_pair)) {
+        got_right_pair = true;
+      }
+      if (got_pair && got_rear_pair && got_left_pair && got_right_pair) {
         break;
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
 
-    if (!got_pair && !got_rear_pair) {
+    if (!got_pair && !got_rear_pair && !got_left_pair && !got_right_pair) {
       continue;
     }
 
@@ -533,22 +650,171 @@ int main(int argc, char **argv) {
       rear_saved_frames.push_back(r_fid);
     }
 
-    total_processed++;
+    if (got_left_pair) {
+      uint64_t l_fid = left_pair.frame_id;
+      vis::BgraToRgb(
+          reinterpret_cast<const uint8_t *>(left_pair.rgb.carla_image->data()),
+          w, h, left_rgb_bytes.data());
+      if (save_png)
+        vis::SavePng(run_dir + "/left_rgb/rgb_" + std::to_string(l_fid) +
+                         ".png",
+                     w, h, 3, left_rgb_bytes.data());
 
-    if (viewer) {
-      if (got_pair) {
-        if (!no_pred) {
-          viewer->submit_frame_rgb888(overlay.data(), w, h);
+      left_gt_labels = DecodeSemanticLabels(
+          reinterpret_cast<const uint8_t *>(left_pair.gt.carla_image->data()),
+          w, h, assume_bgra);
+      if (save_raw_bin)
+        SaveBin(run_dir + "/left_gt_raw/gt_" + std::to_string(l_fid) + ".bin",
+                left_gt_labels.data(), w * h);
+      if (save_png) {
+        vis::ColorizeCityscapes(left_gt_labels.data(), w, h,
+                                left_gt_color.data());
+        vis::SavePng(run_dir + "/left_gt_color/gt_" + std::to_string(l_fid) +
+                         ".png",
+                     w, h, 3, left_gt_color.data());
+      }
+      if (!no_pred) {
+        PreprocessConfig pre_cfg;
+        pre_cfg.out_w = out_w;
+        pre_cfg.out_h = out_h;
+        pre_cfg.resize = PreprocessConfig::ResizeMode::BILINEAR;
+        pre_cfg.assume_bgra = assume_bgra;
+        pre_cfg.to_rgb = true;
+        pre_cfg.mean[0] = 0.485f;
+        pre_cfg.mean[1] = 0.456f;
+        pre_cfg.mean[2] = 0.406f;
+        pre_cfg.std[0] = 0.229f;
+        pre_cfg.std[1] = 0.224f;
+        pre_cfg.std[2] = 0.225f;
+        PreprocessBGRAtoNCHW_F32(reinterpret_cast<const uint8_t *>(
+                                     left_pair.rgb.carla_image->data()),
+                                 w, h, pre_cfg, left_trt_in.data());
+        if (is_logits) {
+          std::vector<float> trt_out(runner->GetOutputBytes() / sizeof(float));
+          runner->Infer(left_trt_in.data(), runner->GetInputBytes(),
+                        trt_out.data(), runner->GetOutputBytes());
+          postprocess::ArgmaxLogitsToLabels(trt_out.data(), out_c, out_h, out_w,
+                                            left_pred_labels);
         } else {
-          viewer->submit_frame_rgb888(rgb_bytes.data(), w, h);
+          std::vector<int32_t> trt_out(runner->GetOutputBytes() /
+                                       sizeof(int32_t));
+          runner->Infer(left_trt_in.data(), runner->GetInputBytes(),
+                        trt_out.data(), runner->GetOutputBytes());
+          postprocess::DirectLabelsToUint8(trt_out.data(), out_h, out_w,
+                                           left_pred_labels);
         }
-      } else if (got_rear_pair) {
-        if (!no_pred) {
-          viewer->submit_frame_rgb888(rear_overlay.data(), w, h);
-        } else {
-          viewer->submit_frame_rgb888(rear_rgb_bytes.data(), w, h);
+        if (save_raw_bin)
+          SaveBin(run_dir + "/left_pred_raw/pred_" + std::to_string(l_fid) +
+                      ".bin",
+                  left_pred_labels.data(), out_w * out_h);
+        vis::UpsampleNearest(left_pred_labels.data(), out_w, out_h,
+                             left_pred_upsampled.data(), w, h);
+        if (save_png) {
+          vis::ColorizeCityscapes(left_pred_upsampled.data(), w, h,
+                                  left_pred_color.data());
+          vis::SavePng(run_dir + "/left_pred_color/pred_" +
+                           std::to_string(l_fid) + ".png",
+                       w, h, 3, left_pred_color.data());
+          vis::BlendOverlay(left_rgb_bytes.data(), left_pred_color.data(), w, h,
+                            alpha, left_overlay.data());
+          vis::SavePng(run_dir + "/left_overlay/overlay_" +
+                           std::to_string(l_fid) + ".png",
+                       w, h, 3, left_overlay.data());
         }
       }
+      left_saved_frames.push_back(l_fid);
+    }
+
+    if (got_right_pair) {
+      uint64_t ri_fid = right_pair.frame_id;
+      vis::BgraToRgb(
+          reinterpret_cast<const uint8_t *>(right_pair.rgb.carla_image->data()),
+          w, h, right_rgb_bytes.data());
+      if (save_png)
+        vis::SavePng(run_dir + "/right_rgb/rgb_" + std::to_string(ri_fid) +
+                         ".png",
+                     w, h, 3, right_rgb_bytes.data());
+
+      right_gt_labels = DecodeSemanticLabels(
+          reinterpret_cast<const uint8_t *>(right_pair.gt.carla_image->data()),
+          w, h, assume_bgra);
+      if (save_raw_bin)
+        SaveBin(run_dir + "/right_gt_raw/gt_" + std::to_string(ri_fid) + ".bin",
+                right_gt_labels.data(), w * h);
+      if (save_png) {
+        vis::ColorizeCityscapes(right_gt_labels.data(), w, h,
+                                right_gt_color.data());
+        vis::SavePng(run_dir + "/right_gt_color/gt_" + std::to_string(ri_fid) +
+                         ".png",
+                     w, h, 3, right_gt_color.data());
+      }
+      if (!no_pred) {
+        PreprocessConfig pre_cfg;
+        pre_cfg.out_w = out_w;
+        pre_cfg.out_h = out_h;
+        pre_cfg.resize = PreprocessConfig::ResizeMode::BILINEAR;
+        pre_cfg.assume_bgra = assume_bgra;
+        pre_cfg.to_rgb = true;
+        pre_cfg.mean[0] = 0.485f;
+        pre_cfg.mean[1] = 0.456f;
+        pre_cfg.mean[2] = 0.406f;
+        pre_cfg.std[0] = 0.229f;
+        pre_cfg.std[1] = 0.224f;
+        pre_cfg.std[2] = 0.225f;
+        PreprocessBGRAtoNCHW_F32(reinterpret_cast<const uint8_t *>(
+                                     right_pair.rgb.carla_image->data()),
+                                 w, h, pre_cfg, right_trt_in.data());
+        if (is_logits) {
+          std::vector<float> trt_out(runner->GetOutputBytes() / sizeof(float));
+          runner->Infer(right_trt_in.data(), runner->GetInputBytes(),
+                        trt_out.data(), runner->GetOutputBytes());
+          postprocess::ArgmaxLogitsToLabels(trt_out.data(), out_c, out_h, out_w,
+                                            right_pred_labels);
+        } else {
+          std::vector<int32_t> trt_out(runner->GetOutputBytes() /
+                                       sizeof(int32_t));
+          runner->Infer(right_trt_in.data(), runner->GetInputBytes(),
+                        trt_out.data(), runner->GetOutputBytes());
+          postprocess::DirectLabelsToUint8(trt_out.data(), out_h, out_w,
+                                           right_pred_labels);
+        }
+        if (save_raw_bin)
+          SaveBin(run_dir + "/right_pred_raw/pred_" + std::to_string(ri_fid) +
+                      ".bin",
+                  right_pred_labels.data(), out_w * out_h);
+        vis::UpsampleNearest(right_pred_labels.data(), out_w, out_h,
+                             right_pred_upsampled.data(), w, h);
+        if (save_png) {
+          vis::ColorizeCityscapes(right_pred_upsampled.data(), w, h,
+                                  right_pred_color.data());
+          vis::SavePng(run_dir + "/right_pred_color/pred_" +
+                           std::to_string(ri_fid) + ".png",
+                       w, h, 3, right_pred_color.data());
+          vis::BlendOverlay(right_rgb_bytes.data(), right_pred_color.data(), w,
+                            h, alpha, right_overlay.data());
+          vis::SavePng(run_dir + "/right_overlay/overlay_" +
+                           std::to_string(ri_fid) + ".png",
+                       w, h, 3, right_overlay.data());
+        }
+      }
+      right_saved_frames.push_back(ri_fid);
+    }
+
+    total_processed++;
+
+    if (viewer && got_pair && got_rear_pair && got_left_pair &&
+        got_right_pair) {
+      const uint8_t *f_ptr = no_pred ? rgb_bytes.data() : overlay.data();
+      const uint8_t *r_ptr =
+          no_pred ? rear_rgb_bytes.data() : rear_overlay.data();
+      const uint8_t *l_ptr =
+          no_pred ? left_rgb_bytes.data() : left_overlay.data();
+      const uint8_t *ri_ptr =
+          no_pred ? right_rgb_bytes.data() : right_overlay.data();
+
+      vis::CreateMosaic(f_ptr, r_ptr, l_ptr, ri_ptr, w, h, mosaic.data());
+
+      viewer->submit_frame_rgb888(mosaic.data(), w * 2, h * 2);
       viewer->render_latest();
     }
 
@@ -592,6 +858,22 @@ int main(int argc, char **argv) {
     if ((i + 1) % 10 == 0 && i < rear_saved_frames.size() - 1)
       meta << "\n    ";
   }
+  meta << "\n  ],\n";
+  meta << "  \"left_frames\": [\n    ";
+  for (size_t i = 0; i < left_saved_frames.size(); ++i) {
+    meta << left_saved_frames[i]
+         << (i < left_saved_frames.size() - 1 ? ", " : "");
+    if ((i + 1) % 10 == 0 && i < left_saved_frames.size() - 1)
+      meta << "\n    ";
+  }
+  meta << "\n  ],\n";
+  meta << "  \"right_frames\": [\n    ";
+  for (size_t i = 0; i < right_saved_frames.size(); ++i) {
+    meta << right_saved_frames[i]
+         << (i < right_saved_frames.size() - 1 ? ", " : "");
+    if ((i + 1) % 10 == 0 && i < right_saved_frames.size() - 1)
+      meta << "\n    ";
+  }
   meta << "\n  ]\n";
   meta << "}\n";
 
@@ -603,6 +885,14 @@ int main(int argc, char **argv) {
     rear_gt_sensor->Destroy();
   if (rear_rgb_sensor)
     rear_rgb_sensor->Destroy();
+  if (left_gt_sensor)
+    left_gt_sensor->Destroy();
+  if (left_rgb_sensor)
+    left_rgb_sensor->Destroy();
+  if (right_gt_sensor)
+    right_gt_sensor->Destroy();
+  if (right_rgb_sensor)
+    right_rgb_sensor->Destroy();
   if (vehicle)
     vehicle->Destroy();
 
