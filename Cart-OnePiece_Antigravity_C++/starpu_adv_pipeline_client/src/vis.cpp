@@ -111,6 +111,38 @@ void CreateMosaic(const uint8_t *rgb_tl, const uint8_t *rgb_tr,
   }
 }
 
+void CreateMosaic8(const uint8_t *rgb_tl, const uint8_t *rgb_tml,
+                   const uint8_t *rgb_tmr, const uint8_t *rgb_tr,
+                   const uint8_t *rgb_bl, const uint8_t *rgb_bml,
+                   const uint8_t *rgb_bmr, const uint8_t *rgb_br, int w, int h,
+                   uint8_t *out_mosaic) {
+  int out_w = w * 4;
+  int row_bytes = w * 3;
+  int out_row_bytes = out_w * 3;
+
+  for (int y = 0; y < h; ++y) {
+    // Top Row: TL, TML, TMR, TR
+    std::memcpy(out_mosaic + y * out_row_bytes, rgb_tl + y * row_bytes,
+                row_bytes);
+    std::memcpy(out_mosaic + y * out_row_bytes + row_bytes,
+                rgb_tml + y * row_bytes, row_bytes);
+    std::memcpy(out_mosaic + y * out_row_bytes + row_bytes * 2,
+                rgb_tmr + y * row_bytes, row_bytes);
+    std::memcpy(out_mosaic + y * out_row_bytes + row_bytes * 3,
+                rgb_tr + y * row_bytes, row_bytes);
+
+    // Bottom Row: BL, BML, BMR, BR
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes, rgb_bl + y * row_bytes,
+                row_bytes);
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes + row_bytes,
+                rgb_bml + y * row_bytes, row_bytes);
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes + row_bytes * 2,
+                rgb_bmr + y * row_bytes, row_bytes);
+    std::memcpy(out_mosaic + (y + h) * out_row_bytes + row_bytes * 3,
+                rgb_br + y * row_bytes, row_bytes);
+  }
+}
+
 bool SavePng(const std::string &filepath, int w, int h, int channels,
              const uint8_t *data) {
   int res =

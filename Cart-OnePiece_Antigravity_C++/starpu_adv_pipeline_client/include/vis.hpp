@@ -30,6 +30,15 @@ void CreateMosaic(const uint8_t *rgb_tl, const uint8_t *rgb_tr,
                   const uint8_t *rgb_bl, const uint8_t *rgb_br, int w, int h,
                   uint8_t *out_mosaic);
 
+// Arrange eight separate RGB buffers (w x h) into a single 4x2 grid (4*w x
+// 2*h). Layout Top Row: tl (-45), tml (0), tmr (45), tr (90) Layout Bottom Row:
+// bl (-90), bml (-135), bmr (180), br (135)
+void CreateMosaic8(const uint8_t *rgb_tl, const uint8_t *rgb_tml,
+                   const uint8_t *rgb_tmr, const uint8_t *rgb_tr,
+                   const uint8_t *rgb_bl, const uint8_t *rgb_bml,
+                   const uint8_t *rgb_bmr, const uint8_t *rgb_br, int w, int h,
+                   uint8_t *out_mosaic);
+
 // Save Image as PNG wrapper
 bool SavePng(const std::string &filepath, int w, int h, int channels,
              const uint8_t *data);

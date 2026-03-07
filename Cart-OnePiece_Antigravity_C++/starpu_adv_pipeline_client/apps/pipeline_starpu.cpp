@@ -61,7 +61,16 @@ void signal_handler(int signum) {
 // Types & Queues
 // ---------------------------------------------------------
 
-enum class CameraView { Front, Rear, Left, Right };
+enum class CameraView {
+  Front,
+  Rear,
+  Left,
+  Right,
+  FrontLeft,
+  FrontRight,
+  RearLeft,
+  RearRight
+};
 
 struct EvalPayload {
   CameraView view = CameraView::Front;
@@ -199,11 +208,27 @@ void evaluate_thread(const EvalConfig &cfg) {
   int count_right = 0;
   double sum_pa_right = 0.0;
   double sum_miou_right = 0.0;
+  int count_fl = 0;
+  double sum_pa_fl = 0.0;
+  double sum_miou_fl = 0.0;
+  int count_fr = 0;
+  double sum_pa_fr = 0.0;
+  double sum_miou_fr = 0.0;
+  int count_rl = 0;
+  double sum_pa_rl = 0.0;
+  double sum_miou_rl = 0.0;
+  int count_rr = 0;
+  double sum_pa_rr = 0.0;
+  double sum_miou_rr = 0.0;
 
   std::vector<uint8_t> latest_front;
   std::vector<uint8_t> latest_rear;
   std::vector<uint8_t> latest_left;
   std::vector<uint8_t> latest_right;
+  std::vector<uint8_t> latest_fl;
+  std::vector<uint8_t> latest_fr;
+  std::vector<uint8_t> latest_rl;
+  std::vector<uint8_t> latest_rr;
   std::vector<uint8_t> mosaic;
   int view_w = 0;
 
@@ -239,7 +264,11 @@ void evaluate_thread(const EvalConfig &cfg) {
         latest_rear.resize(w * h * 3, 0);
         latest_left.resize(w * h * 3, 0);
         latest_right.resize(w * h * 3, 0);
-        mosaic.resize(w * 2 * h * 2 * 3, 0);
+        latest_fl.resize(w * h * 3, 0);
+        latest_fr.resize(w * h * 3, 0);
+        latest_rl.resize(w * h * 3, 0);
+        latest_rr.resize(w * h * 3, 0);
+        mosaic.resize(w * 4 * h * 2 * 3, 0);
       }
 
       std::vector<uint8_t> rgb_bytes(w * h * 3);
@@ -266,13 +295,22 @@ void evaluate_thread(const EvalConfig &cfg) {
         std::memcpy(latest_left.data(), overlay.data(), w * h * 3);
       } else if (payload.view == CameraView::Right) {
         std::memcpy(latest_right.data(), overlay.data(), w * h * 3);
+      } else if (payload.view == CameraView::FrontLeft) {
+        std::memcpy(latest_fl.data(), overlay.data(), w * h * 3);
+      } else if (payload.view == CameraView::FrontRight) {
+        std::memcpy(latest_fr.data(), overlay.data(), w * h * 3);
+      } else if (payload.view == CameraView::RearLeft) {
+        std::memcpy(latest_rl.data(), overlay.data(), w * h * 3);
+      } else if (payload.view == CameraView::RearRight) {
+        std::memcpy(latest_rr.data(), overlay.data(), w * h * 3);
       }
 
-      vis::CreateMosaic(latest_front.data(), latest_rear.data(),
-                        latest_left.data(), latest_right.data(), w, h,
-                        mosaic.data());
+      vis::CreateMosaic8(
+          latest_fl.data(), latest_front.data(), latest_fr.data(),
+          latest_right.data(), latest_left.data(), latest_rl.data(),
+          latest_rear.data(), latest_rr.data(), w, h, mosaic.data());
 
-      cfg.viewer->submit_frame_rgb888(mosaic.data(), w * 2, h * 2);
+      cfg.viewer->submit_frame_rgb888(mosaic.data(), w * 4, h * 2);
     }
 
     if (cfg.enabled) {
@@ -321,6 +359,42 @@ void evaluate_thread(const EvalConfig &cfg) {
                     << " | Avg PA: " << (sum_pa_right / count_right)
                     << " | Avg mIoU: " << (sum_miou_right / count_right)
                     << "\n";
+      } else if (payload.view == CameraView::FrontLeft) {
+        sum_pa_fl += pa;
+        sum_miou_fl += miou;
+        count_fl++;
+        view_str = "FLeft";
+        if (count_fl % cfg.print_every == 0)
+          std::cout << "[Eval] " << view_str << " Frames: " << count_fl
+                    << " | Avg PA: " << (sum_pa_fl / count_fl)
+                    << " | Avg mIoU: " << (sum_miou_fl / count_fl) << "\n";
+      } else if (payload.view == CameraView::FrontRight) {
+        sum_pa_fr += pa;
+        sum_miou_fr += miou;
+        count_fr++;
+        view_str = "FRight";
+        if (count_fr % cfg.print_every == 0)
+          std::cout << "[Eval] " << view_str << " Frames: " << count_fr
+                    << " | Avg PA: " << (sum_pa_fr / count_fr)
+                    << " | Avg mIoU: " << (sum_miou_fr / count_fr) << "\n";
+      } else if (payload.view == CameraView::RearLeft) {
+        sum_pa_rl += pa;
+        sum_miou_rl += miou;
+        count_rl++;
+        view_str = "RLeft";
+        if (count_rl % cfg.print_every == 0)
+          std::cout << "[Eval] " << view_str << " Frames: " << count_rl
+                    << " | Avg PA: " << (sum_pa_rl / count_rl)
+                    << " | Avg mIoU: " << (sum_miou_rl / count_rl) << "\n";
+      } else if (payload.view == CameraView::RearRight) {
+        sum_pa_rr += pa;
+        sum_miou_rr += miou;
+        count_rr++;
+        view_str = "RRight";
+        if (count_rr % cfg.print_every == 0)
+          std::cout << "[Eval] " << view_str << " Frames: " << count_rr
+                    << " | Avg PA: " << (sum_pa_rr / count_rr)
+                    << " | Avg mIoU: " << (sum_miou_rr / count_rr) << "\n";
       }
     }
 
@@ -328,11 +402,15 @@ void evaluate_thread(const EvalConfig &cfg) {
     {
       std::lock_guard<std::mutex> lck(g_csv_mu);
       if (g_csv_file.is_open()) {
-        std::string view_prefix = (payload.view == CameraView::Front)  ? "front"
-                                  : (payload.view == CameraView::Rear) ? "rear"
-                                  : (payload.view == CameraView::Left)
-                                      ? "left"
-                                      : "right";
+        std::string view_prefix =
+            (payload.view == CameraView::Front)        ? "front"
+            : (payload.view == CameraView::Rear)       ? "rear"
+            : (payload.view == CameraView::Left)       ? "left"
+            : (payload.view == CameraView::Right)      ? "right"
+            : (payload.view == CameraView::FrontLeft)  ? "front_left"
+            : (payload.view == CameraView::FrontRight) ? "front_right"
+            : (payload.view == CameraView::RearLeft)   ? "rear_left"
+                                                       : "rear_right";
         g_csv_file << view_prefix << "," << payload.frame_id << ","
                    << payload.rgb_ts << "," << payload.gt_ts << ","
                    << payload.total_ms << "," << payload.dropped_before_process
@@ -610,7 +688,9 @@ int main(int argc, char **argv) {
   std::unique_ptr<SegmentationViewerSDL2> viewer;
   if (display) {
     viewer = std::make_unique<SegmentationViewerSDL2>();
-    if (!viewer->init(w * 2, h * 2, 1.0f)) {
+    // Quadruple width and double height for 4x2 mosaic, scale down to 50% for
+    // display
+    if (!viewer->init(w * 4, h * 2, 0.5f)) {
       std::cerr << "[Pipeline] Viewer init failed, running headless.\n";
       viewer.reset();
     }
@@ -655,6 +735,14 @@ int main(int argc, char **argv) {
                         cg::Rotation(0.0f, -90.0f, 0.0f));
   cg::Transform right_tf(cg::Location(0.0f, 1.0f, 2.0f),
                          cg::Rotation(0.0f, 90.0f, 0.0f));
+  cg::Transform fl_tf(cg::Location(0.0f, -1.0f, 2.0f),
+                      cg::Rotation(0.0f, -45.0f, 0.0f));
+  cg::Transform fr_tf(cg::Location(0.0f, 1.0f, 2.0f),
+                      cg::Rotation(0.0f, 45.0f, 0.0f));
+  cg::Transform rl_tf(cg::Location(-2.0f, -1.0f, 2.0f),
+                      cg::Rotation(0.0f, -135.0f, 0.0f));
+  cg::Transform rr_tf(cg::Location(-2.0f, 1.0f, 2.0f),
+                      cg::Rotation(0.0f, 135.0f, 0.0f));
 
   auto rgb_bp = *(blueprint_library->Find("sensor.camera.rgb"));
   rgb_bp.SetAttribute("image_size_x", std::to_string(w));
@@ -665,6 +753,10 @@ int main(int argc, char **argv) {
   auto rear_rgb = world.SpawnActor(rgb_bp, rear_tf, vehicle.get());
   auto left_rgb = world.SpawnActor(rgb_bp, left_tf, vehicle.get());
   auto right_rgb = world.SpawnActor(rgb_bp, right_tf, vehicle.get());
+  auto fl_rgb = world.SpawnActor(rgb_bp, fl_tf, vehicle.get());
+  auto fr_rgb = world.SpawnActor(rgb_bp, fr_tf, vehicle.get());
+  auto rl_rgb = world.SpawnActor(rgb_bp, rl_tf, vehicle.get());
+  auto rr_rgb = world.SpawnActor(rgb_bp, rr_tf, vehicle.get());
 
   auto gt_bp =
       *(blueprint_library->Find("sensor.camera.semantic_segmentation"));
@@ -676,11 +768,19 @@ int main(int argc, char **argv) {
   auto rear_gt = world.SpawnActor(gt_bp, rear_tf, vehicle.get());
   auto left_gt = world.SpawnActor(gt_bp, left_tf, vehicle.get());
   auto right_gt = world.SpawnActor(gt_bp, right_tf, vehicle.get());
+  auto fl_gt = world.SpawnActor(gt_bp, fl_tf, vehicle.get());
+  auto fr_gt = world.SpawnActor(gt_bp, fr_tf, vehicle.get());
+  auto rl_gt = world.SpawnActor(gt_bp, rl_tf, vehicle.get());
+  auto rr_gt = world.SpawnActor(gt_bp, rr_tf, vehicle.get());
 
   FrameSync front_sync(sync_window);
   FrameSync rear_sync(sync_window);
   FrameSync left_sync(sync_window);
   FrameSync right_sync(sync_window);
+  FrameSync fl_sync(sync_window);
+  FrameSync fr_sync(sync_window);
+  FrameSync rl_sync(sync_window);
+  FrameSync rr_sync(sync_window);
 
   auto on_rgb = [](FrameSync &s, auto data) {
     if (g_stop_requested)
@@ -716,6 +816,14 @@ int main(int argc, char **argv) {
       [&left_sync, on_rgb](auto data) { on_rgb(left_sync, data); });
   boost::static_pointer_cast<cc::Sensor>(right_rgb)->Listen(
       [&right_sync, on_rgb](auto data) { on_rgb(right_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(fl_rgb)->Listen(
+      [&fl_sync, on_rgb](auto data) { on_rgb(fl_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(fr_rgb)->Listen(
+      [&fr_sync, on_rgb](auto data) { on_rgb(fr_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(rl_rgb)->Listen(
+      [&rl_sync, on_rgb](auto data) { on_rgb(rl_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(rr_rgb)->Listen(
+      [&rr_sync, on_rgb](auto data) { on_rgb(rr_sync, data); });
 
   boost::static_pointer_cast<cc::Sensor>(front_gt)->Listen(
       [&front_sync, on_gt](auto data) { on_gt(front_sync, data); });
@@ -725,6 +833,14 @@ int main(int argc, char **argv) {
       [&left_sync, on_gt](auto data) { on_gt(left_sync, data); });
   boost::static_pointer_cast<cc::Sensor>(right_gt)->Listen(
       [&right_sync, on_gt](auto data) { on_gt(right_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(fl_gt)->Listen(
+      [&fl_sync, on_gt](auto data) { on_gt(fl_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(fr_gt)->Listen(
+      [&fr_sync, on_gt](auto data) { on_gt(fr_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(rl_gt)->Listen(
+      [&rl_sync, on_gt](auto data) { on_gt(rl_sync, data); });
+  boost::static_pointer_cast<cc::Sensor>(rr_gt)->Listen(
+      [&rr_sync, on_gt](auto data) { on_gt(rr_sync, data); });
 
   // Sensors registered!
   auto settings = world.GetSettings();
@@ -860,10 +976,14 @@ int main(int argc, char **argv) {
 
         processed_counter++;
         if (processed_counter % print_every == 0) {
-          std::string l = (view_tag == CameraView::Front)  ? "front"
-                          : (view_tag == CameraView::Rear) ? "rear"
-                          : (view_tag == CameraView::Left) ? "left"
-                                                           : "right";
+          std::string l = (view_tag == CameraView::Front)        ? "front"
+                          : (view_tag == CameraView::Rear)       ? "rear"
+                          : (view_tag == CameraView::Left)       ? "left"
+                          : (view_tag == CameraView::Right)      ? "right"
+                          : (view_tag == CameraView::FrontLeft)  ? "front_left"
+                          : (view_tag == CameraView::FrontRight) ? "front_right"
+                          : (view_tag == CameraView::RearLeft)   ? "rear_left"
+                                                                 : "rear_right";
           std::cout << "[Pipeline] Dispatched " << l << " Frame "
                     << processed_counter << "/" << max_frames << "\n";
         }
@@ -889,9 +1009,30 @@ int main(int argc, char **argv) {
     int dummy_right_processed = 0;
     process_camera(right_sync, CameraView::Right, dummy_right_dropped,
                    dummy_right_processed);
+
+    int dummy_fl_dropped = 0;
+    int dummy_fl_processed = 0;
+    process_camera(fl_sync, CameraView::FrontLeft, dummy_fl_dropped,
+                   dummy_fl_processed);
+
+    int dummy_fr_dropped = 0;
+    int dummy_fr_processed = 0;
+    process_camera(fr_sync, CameraView::FrontRight, dummy_fr_dropped,
+                   dummy_fr_processed);
+
+    int dummy_rl_dropped = 0;
+    int dummy_rl_processed = 0;
+    process_camera(rl_sync, CameraView::RearLeft, dummy_rl_dropped,
+                   dummy_rl_processed);
+
+    int dummy_rr_dropped = 0;
+    int dummy_rr_processed = 0;
+    process_camera(rr_sync, CameraView::RearRight, dummy_rr_dropped,
+                   dummy_rr_processed);
   }
 
   std::cout << "[Pipeline] Loop exit. Waiting for StarPU to drain...\n";
+
   starpu_task_wait_for_all();
 
   g_stop_requested = true;
@@ -929,6 +1070,14 @@ int main(int argc, char **argv) {
   stop_cam(left_gt);
   stop_cam(right_rgb);
   stop_cam(right_gt);
+  stop_cam(fl_rgb);
+  stop_cam(fl_gt);
+  stop_cam(fr_rgb);
+  stop_cam(fr_gt);
+  stop_cam(rl_rgb);
+  stop_cam(rl_gt);
+  stop_cam(rr_rgb);
+  stop_cam(rr_gt);
 
   if (vehicle) {
     vehicle->Destroy();
