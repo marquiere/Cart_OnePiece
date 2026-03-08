@@ -66,16 +66,48 @@ If you prefer a visual interface to rapidly sweep architectures without typing c
 ```bash
 python3 tools/gui_launcher.py
 ```
-This requires `pip install customtkinter` and gives you sliders/dropdowns for Schedulers, APEX Tracing, Cameras, and Memory tracking, while natively piping standard output directly into its own embedded console!
+This requires `pip install customtkinter` and provides a tabbed UI to configure and run the entire pipeline seamlessly. It natively pipes standard output directly into its own embedded console.
 
-**Supported Internal Options (`run_pipeline.sh`):**
-- `--frames N`: Set the simulation loop length (Default: 200)
-- `--engine PATH`: Provide a custom `.engine`
-- `--deeplabv3` / `--resnet50`: Instantly swap to pre-compiled FP16 TorchVision tensor cores
-- `--memory`: Extract StarPU structural node Bus/Worker telemetry memory metrics into the active logs
-- `--display`: Toggle the live SDL2 Semantic rendering GUI window ON during extraction and profiling sequences
-- `--sched`: Specify a single targeted scheduler behavior `dmda`, `eager`, `ws` etc.
-- `--run-dataset` | `--run-sweep` | `--run-split` | `--run-profiling`: Execution selection flags.
+#### GUI Configuration Tabs
+
+**Tab 1: Simulation & Engine**
+- **CARLA Host / Port**: Define the connection targeting your CARLA simulator instance.
+- **Total Frames**: The number of simulation steps to run before terminating.
+- **Target FPS**: The simulated camera capture rate (synchronizes with CARLA's `fixed_delta_seconds`).
+- **TensorRT Engine**: Select from built-in compiled engines (e.g., `models/dummy.engine`, `models/fcn_resnet50.engine`) or provide a custom `.engine` absolute path.
+
+**Tab 2: StarPU & Analyzers**
+- **StarPU Parameters**:
+  - **Scheduler**: Choose from 14 native algorithms (e.g., `dmda`, `ws`, `eager`, `heteroprio`).
+  - **Run Scheduler Sweep**: Automatically iterates profiling runs across 4 core schedulers (`dmda`, `rr_workers`, `ws`, `eager`).
+  - **In-flight tasks**: Controls the pipeline's maximum asynchronous task depth.
+  - **CPU Workers**: Explicitly constrain StarPU's multi-core host mapping.
+- **Trace Analyzers**:
+  - **Record Memory / Bus Stats**: Logs Data Transfer and RAM allocations telemetry.
+  - **APEX Profiling Mode**: Deep runtime structural tracing (`all`, `gtrace`, `gtrace-tasks`, `taskgraph`).
+
+**Tab 3: Camera & Output**
+- **Resolution & Format**:
+  - **Input W / H**: Base focal resolutions captured directly from CARLA.
+  - **Model W / H**: Downscaled NCHW array dimensions fed sequentially into TensorRT.
+  - **Force --assume_bgra 1**: Architectural optimization bypassing slower RGBA extraction memory-logic.
+- **Display / Dataset**:
+  - **Live SDL2 Semantic Viewer**: Renders the 8-camera 360-degree composite inference loop directly on your host screen.
+  - **Skip Inference**: Disables TensorRT prediction (`--no_pred`) generating pure ground-truth semantic mask outputs exclusively.
+
+#### Execution Controls (Always visible bottom strip)
+- **Run Dataset Extraction Mode**: Generates strictly synchronized pure images into `runs/` bypassing StarPU structural overhead.
+- **Multi-Process Splitting**: Wraps the execution to separate client and server CPU/GPU telemetry tracking.
+- **Preview Command**: Prints the exact underlying `./tools/run_pipeline.sh` execution string to the GUI console.
+- **Run Pipeline**: Executes the configuration securely on an isolated background thread to prevent UI freezing.
+- **Force Stop**: Sends explicit `pkill -9` sequences systematically resolving hanging UE4 engines or C++ binaries.
+
+**Underlying Bash Overrides (`run_pipeline.sh`):**
+- `--frames N`: Modify execution length.
+- `--engine PATH` / `--deeplabv3` / `--resnet50`: Swap loaded models inline.
+- `--memory` / `--display`: Switch live evaluation triggers securely.
+- `--apex-mode MODE`: Wrap execution natively in `apex_exec`.
+- Execution selection flags: `--run-dataset`, `--run-sweep`, `--run-split`, `--run-profiling`.
 
 ---
 
