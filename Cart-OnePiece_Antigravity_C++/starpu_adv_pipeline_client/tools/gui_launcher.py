@@ -17,123 +17,143 @@ class LauncherApp(ctk.CTk):
         super().__init__()
 
         self.title("Cart_OnePiece: StarPU Pipeline Launcher")
-        self.geometry("900x750")
+        self.geometry("900x800")
         
         # Grid layout
         self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         # ----------------------------------------------------------------------
-        # Section 1: SIMULATION
+        # Tab View
         # ----------------------------------------------------------------------
-        self.frame_sim = ctk.CTkFrame(self)
-        self.frame_sim.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_sim, text="Section 1 — Simulation", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.tabview = ctk.CTkTabview(self)
+        self.tabview.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
-        self.entry_host = self.create_input(self.frame_sim, "Host:", "127.0.0.1")
-        self.entry_port = self.create_input(self.frame_sim, "Port:", "2000")
-        self.entry_map = self.create_input(self.frame_sim, "Map (Optional):", "")
-        self.entry_frames = self.create_input(self.frame_sim, "Frames:", "200")
+        self.tab_sim = self.tabview.add("Simulation & Engine")
+        self.tab_starpu = self.tabview.add("StarPU & Analyzers")
+        self.tab_visual = self.tabview.add("Camera & Output")
+        
+        # --- TAB 1: Simulation ---
+        self.tab_sim.grid_columnconfigure(0, weight=1)
+        self.tab_sim.grid_columnconfigure(1, weight=1)
 
-        # ----------------------------------------------------------------------
-        # Section 2: SCHEDULER
-        # ----------------------------------------------------------------------
-        self.frame_sched = ctk.CTkFrame(self)
-        self.frame_sched.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_sched, text="Section 2 — Scheduler", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        # Simulation Sub-Frame
+        frm_sim = ctk.CTkFrame(self.tab_sim)
+        frm_sim.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_sim, text="Simulation Config", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.entry_host = self.create_input(frm_sim, "CARLA Host:", "127.0.0.1")
+        self.entry_port = self.create_input(frm_sim, "CARLA Port:", "2000")
+        self.entry_frames = self.create_input(frm_sim, "Total Frames:", "200")
+        self.entry_fps = self.create_input(frm_sim, "Target FPS:", "20")
 
+        # Engine Sub-Frame
+        frm_engine = ctk.CTkFrame(self.tab_sim)
+        frm_engine.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_engine, text="TensorRT Engine", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.engine_var = tk.StringVar(value="models/dummy.engine")
+        self.engine_dropdown = ctk.CTkOptionMenu(frm_engine, variable=self.engine_var, 
+                                                 values=["models/dummy.engine", "models/deeplabv3_mobilenet.engine", "models/fcn_resnet50.engine", "models/carla_resnet50_best.engine"])
+        self.engine_dropdown.pack(pady=5, padx=10, fill="x")
+        self.entry_custom_engine = self.create_input(frm_engine, "Custom Path:", "")
+
+        # --- TAB 2: StarPU ---
+        self.tab_starpu.grid_columnconfigure(0, weight=1)
+        self.tab_starpu.grid_columnconfigure(1, weight=1)
+
+        # Sched Sub-Frame
+        frm_sched = ctk.CTkFrame(self.tab_starpu)
+        frm_sched.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_sched, text="StarPU Parameters", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        
+        # All available schedulers
+        schedulers = ["dmda", "eager", "prio", "random", "ws", "lws", "dm", "dmdap", "dmdar", "dmdas", "dmdasd", "peager", "heteroprio", "rr_workers"]
         self.sched_var = tk.StringVar(value="dmda")
-        self.sched_dropdown = ctk.CTkOptionMenu(self.frame_sched, variable=self.sched_var, 
-                                                values=["dmda", "rr_workers", "ws", "eager", "custom"])
+        self.sched_dropdown = ctk.CTkOptionMenu(frm_sched, variable=self.sched_var, values=schedulers)
         self.sched_dropdown.pack(pady=5, padx=10, fill="x")
 
         self.sweep_var = tk.BooleanVar(value=False)
-        self.sweep_cb = ctk.CTkCheckBox(self.frame_sched, text="Run scheduler sweep (All modes)", variable=self.sweep_var)
+        self.sweep_cb = ctk.CTkCheckBox(frm_sched, text="Run Scheduler Sweep (4 Core Scheds)", variable=self.sweep_var)
         self.sweep_cb.pack(pady=5, padx=10, anchor="w")
 
-        # ----------------------------------------------------------------------
-        # Section 3: CAMERA DEPLOYMENT
-        # ----------------------------------------------------------------------
-        self.frame_cam = ctk.CTkFrame(self)
-        self.frame_cam.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_cam, text="Section 3 — Camera Deployment", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.entry_inflight = self.create_input(frm_sched, "In-flight tasks:", "2")
+        self.entry_cpu = self.create_input(frm_sched, "CPU Workers:", "8")
 
-        self.cam_var = tk.StringVar(value="8 cameras")
-        self.cam_dropdown = ctk.CTkOptionMenu(self.frame_cam, variable=self.cam_var, 
-                                              values=["2 cameras", "4 cameras", "8 cameras"])
-        self.cam_dropdown.pack(pady=5, padx=10, fill="x")
-        self.cam_dropdown.configure(state="disabled")
-        ctk.CTkLabel(self.frame_cam, text="(backend camera selection not exposed yet)", text_color="gray").pack()
-
-        # ----------------------------------------------------------------------
-        # Section 4: STARPU ANALYSES
-        # ----------------------------------------------------------------------
-        self.frame_starpu = ctk.CTkFrame(self)
-        self.frame_starpu.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_starpu, text="Section 4 — StarPU Analyses", font=ctk.CTkFont(weight="bold")).pack(pady=5)
-
-        # Traces are mostly generated automatically by verify_profiling.sh
-        # We only expose what is controllable
+        # Analysis Sub-Frame
+        frm_analysis = ctk.CTkFrame(self.tab_starpu)
+        frm_analysis.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_analysis, text="Trace Analyzers", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        
         self.mem_var = tk.BooleanVar(value=True)
-        ctk.CTkCheckBox(self.frame_starpu, text="Memory / Bus Stats (--memory)", variable=self.mem_var).pack(pady=2, padx=10, anchor="w")
+        ctk.CTkCheckBox(frm_analysis, text="Record Memory / Bus Stats", variable=self.mem_var).pack(pady=2, padx=10, anchor="w")
 
-        self.display_var = tk.BooleanVar(value=True)
-        ctk.CTkCheckBox(self.frame_starpu, text="Show Semantic Viewer (--display)", variable=self.display_var).pack(pady=2, padx=10, anchor="w")
-
-        ctk.CTkLabel(self.frame_starpu, text="APEX Mode:").pack(pady=(5,0), padx=10, anchor="w")
-        self.apex_var = tk.StringVar(value="all")
-        self.apex_dropdown = ctk.CTkOptionMenu(self.frame_starpu, variable=self.apex_var, 
+        ctk.CTkLabel(frm_analysis, text="APEX Profiling Mode:").pack(pady=(5,0), padx=10, anchor="w")
+        self.apex_var = tk.StringVar(value="off")
+        self.apex_dropdown = ctk.CTkOptionMenu(frm_analysis, variable=self.apex_var, 
                                                values=["off", "all", "gtrace", "gtrace-tasks", "taskgraph"])
         self.apex_dropdown.pack(pady=2, padx=10, fill="x")
 
-        ctk.CTkLabel(self.frame_starpu, text="(FxT, Graphviz, Codelet, StarVZ always run)", text_color="gray").pack(pady=2)
+        # --- TAB 3: Visual & Format ---
+        self.tab_visual.grid_columnconfigure(0, weight=1)
+        self.tab_visual.grid_columnconfigure(1, weight=1)
+
+        frm_cam = ctk.CTkFrame(self.tab_visual)
+        frm_cam.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_cam, text="Resolution & Format", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.entry_w = self.create_input(frm_cam, "Input W:", "800")
+        self.entry_h = self.create_input(frm_cam, "Input H:", "600")
+        self.entry_out_w = self.create_input(frm_cam, "Model W:", "512")
+        self.entry_out_h = self.create_input(frm_cam, "Model H:", "256")
+        
+        self.bgra_var = tk.BooleanVar(value=True)
+        ctk.CTkCheckBox(frm_cam, text="Force --assume_bgra 1", variable=self.bgra_var).pack(pady=5, padx=10, anchor="w")
+
+        frm_disp = ctk.CTkFrame(self.tab_visual)
+        frm_disp.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_disp, text="Display / Dataset", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        
+        self.display_var = tk.BooleanVar(value=True)
+        ctk.CTkCheckBox(frm_disp, text="Live SDL2 Semantic Viewer (--display)", variable=self.display_var).pack(pady=5, padx=10, anchor="w")
+
+        self.nopred_var = tk.BooleanVar(value=False)
+        ctk.CTkCheckBox(frm_disp, text="Skip Inference (--no_pred)", variable=self.nopred_var).pack(pady=5, padx=10, anchor="w")
 
         # ----------------------------------------------------------------------
-        # Section 5: GENERIC ANALYSES
+        # Action Buttons (Always Visible)
         # ----------------------------------------------------------------------
-        self.frame_gen = ctk.CTkFrame(self)
-        self.frame_gen.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_gen, text="Section 5 — Generic Analyses", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        frm_actions = ctk.CTkFrame(self)
+        frm_actions.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
+        frm_actions.grid_columnconfigure(0, weight=1)
+        frm_actions.grid_columnconfigure(1, weight=1)
+        frm_actions.grid_columnconfigure(2, weight=1)
+        frm_actions.grid_columnconfigure(3, weight=1)
+        frm_actions.grid_columnconfigure(4, weight=1)
 
         self.dataset_var = tk.BooleanVar(value=False)
-        ctk.CTkCheckBox(self.frame_gen, text="Run Dataset Generation (Full Demo)", variable=self.dataset_var, command=self.on_dataset_toggle).pack(pady=2, padx=10, anchor="w")
-        
-        self.summary_var = tk.BooleanVar(value=True)
-        cb = ctk.CTkCheckBox(self.frame_gen, text="Summarize Metrics", variable=self.summary_var)
-        cb.pack(pady=2, padx=10, anchor="w")
-        cb.configure(state="disabled")
-        ctk.CTkLabel(self.frame_gen, text="(Summary implicitly ran by wrappers)", text_color="gray").pack(pady=0)
+        self.cb_dataset = ctk.CTkCheckBox(frm_actions, text="Run Dataset Extraction Mode", variable=self.dataset_var, command=self.on_dataset_toggle)
+        self.cb_dataset.grid(row=0, column=0, padx=10, pady=10)
 
-        # ----------------------------------------------------------------------
-        # Section 6: EXECUTION
-        # ----------------------------------------------------------------------
-        self.frame_exec = ctk.CTkFrame(self)
-        self.frame_exec.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
-        ctk.CTkLabel(self.frame_exec, text="Section 6 — Execution", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.split_var = tk.BooleanVar(value=False)
+        self.cb_split = ctk.CTkCheckBox(frm_actions, text="Multi-Process Splitting", variable=self.split_var)
+        self.cb_split.grid(row=0, column=1, padx=10, pady=10)
 
-        self.btn_preview = ctk.CTkButton(self.frame_exec, text="Preview Command", command=self.preview_cmd)
-        self.btn_preview.pack(pady=5, padx=10, fill="x")
-
-        self.btn_run = ctk.CTkButton(self.frame_exec, text="Run Target Sequence", fg_color="green", hover_color="darkgreen", command=self.run_pipeline)
-        self.btn_run.pack(pady=5, padx=10, fill="x")
-
-        self.btn_stop = ctk.CTkButton(self.frame_exec, text="Stop Any Running Process", fg_color="red", hover_color="darkred", command=self.stop_process)
-        self.btn_stop.pack(pady=5, padx=10, fill="x")
+        ctk.CTkButton(frm_actions, text="Preview Command", command=self.preview_cmd).grid(row=0, column=2, padx=5, pady=10)
+        ctk.CTkButton(frm_actions, text="Run Pipeline", fg_color="green", hover_color="darkgreen", command=self.run_pipeline).grid(row=0, column=3, padx=5, pady=10)
+        ctk.CTkButton(frm_actions, text="Force Stop", fg_color="red", hover_color="darkred", command=self.stop_process).grid(row=0, column=4, padx=5, pady=10)
 
         # ----------------------------------------------------------------------
         # Console Window
         # ----------------------------------------------------------------------
         self.console = ctk.CTkTextbox(self, wrap="word", font=("Courier", 12))
-        self.console.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.console.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        self.grid_rowconfigure(2, weight=1)
         
         self.current_process = None
-        self.log_msg("GUI Initialized. Working Directory: " + PROJ_ROOT)
+        self.log_msg("GUI v2 Initialized. Integrated all arguments.")
 
     def create_input(self, parent, label_text, default_val):
         frame = ctk.CTkFrame(parent, fg_color="transparent")
         frame.pack(fill="x", padx=10, pady=2)
-        ctk.CTkLabel(frame, text=label_text, width=100, anchor="w").pack(side="left")
+        ctk.CTkLabel(frame, text=label_text, width=110, anchor="w").pack(side="left")
         entry = ctk.CTkEntry(frame)
         entry.pack(side="right", fill="x", expand=True)
         entry.insert(0, default_val)
@@ -144,9 +164,12 @@ class LauncherApp(ctk.CTk):
             self.sweep_cb.deselect()
             self.sweep_cb.configure(state="disabled")
             self.sched_dropdown.configure(state="disabled")
+            self.split_var.set(False)
+            self.cb_split.configure(state="disabled")
         else:
             self.sweep_cb.configure(state="normal")
             self.sched_dropdown.configure(state="normal")
+            self.cb_split.configure(state="normal")
             
     def log_msg(self, text):
         self.console.insert("end", text + "\n")
@@ -155,9 +178,37 @@ class LauncherApp(ctk.CTk):
     def build_command(self):
         cmd = ["./tools/run_pipeline.sh"]
         
-        frames = self.entry_frames.get().strip() or "200"
-        cmd.extend(["--frames", frames])
+        cmd.extend(["--frames", self.entry_frames.get().strip() or "200"])
+        cmd.extend(["--host", self.entry_host.get().strip() or "127.0.0.1"])
+        cmd.extend(["--port", self.entry_port.get().strip() or "2000"])
+        cmd.extend(["--fps", self.entry_fps.get().strip() or "20"])
+        cmd.extend(["--w", self.entry_w.get().strip() or "800"])
+        cmd.extend(["--h", self.entry_h.get().strip() or "600"])
+        cmd.extend(["--out_w", self.entry_out_w.get().strip() or "512"])
+        cmd.extend(["--out_h", self.entry_out_h.get().strip() or "256"])
+        cmd.extend(["--inflight", self.entry_inflight.get().strip() or "2"])
+        cmd.extend(["--cpu_workers", self.entry_cpu.get().strip() or "8"])
         
+        eng_custom = self.entry_custom_engine.get().strip()
+        eng_selected = self.engine_var.get()
+        if eng_custom:
+            cmd.extend(["--engine", eng_custom])
+        else:
+            if eng_selected == "models/deeplabv3_mobilenet.engine":
+                cmd.append("--deeplabv3")
+            elif eng_selected == "models/fcn_resnet50.engine":
+                cmd.append("--resnet50")
+            else:
+                cmd.extend(["--engine", eng_selected])
+        
+        if self.bgra_var.get():
+            cmd.extend(["--assume_bgra", "1"])
+        else:
+            cmd.extend(["--assume_bgra", "0"])
+
+        if self.nopred_var.get():
+            cmd.extend(["--no_pred", "1"])
+            
         if self.mem_var.get():
             cmd.append("--memory")
         if self.display_var.get():
@@ -170,12 +221,14 @@ class LauncherApp(ctk.CTk):
         # Behavior Flags
         if self.dataset_var.get():
             cmd.append("--run-dataset")
-            cmd.append("--run-split")
         elif self.sweep_var.get():
             cmd.append("--run-sweep")
         else:
             cmd.extend(["--sched", self.sched_var.get()])
             cmd.append("--run-profiling")
+            
+        if self.split_var.get():
+            cmd.append("--run-split")
             
         return " ".join(cmd)
 
@@ -205,7 +258,6 @@ class LauncherApp(ctk.CTk):
         cmd = self.build_command()
         self.log_msg(f"\n====================================\n[Exec] Starting Subprocess Route:\n{cmd}\n")
 
-        # Clear output box
         self.console.delete("1.0", "end")
         self.log_msg(f"[Exec] Initializing sequence:\n{cmd}\n")
         
@@ -213,18 +265,15 @@ class LauncherApp(ctk.CTk):
 
     def _exec_thread(self, cmd):
         try:
-            # We strictly route through Bash so ampersand and sleep chains evaluate
             self.current_process = subprocess.Popen(
                 ["bash", "-c", cmd],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1 # Line buffered
+                bufsize=1
             )
 
             for line in self.current_process.stdout:
-                # Need to use after() to thread-safely update tkinter text
-                # It evaluates smoothly for Python 3.10+
                 self.console.after(0, self.log_msg, line.strip('\n'))
 
             self.current_process.wait()
@@ -233,7 +282,6 @@ class LauncherApp(ctk.CTk):
             self.console.after(0, self.log_msg, f"\n[Error] Failed to execute safely: {str(e)}")
         finally:
             self.current_process = None
-            # Enforce clean shutdown sequentially after failure
             subprocess.run(["./tools/kill_server.sh"], capture_output=True)
 
 if __name__ == "__main__":

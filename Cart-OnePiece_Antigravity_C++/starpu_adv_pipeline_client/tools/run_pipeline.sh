@@ -30,6 +30,19 @@ MEMORY_MODE=0
 APEX_MODE="off"
 DISPLAY_MODE=0
 
+# New dynamic parameters
+HOST="127.0.0.1"
+PORT="2000"
+FPS=20
+W=800
+H=600
+OUT_W=512
+OUT_H=256
+INFLIGHT=2
+CPU_WORKERS=8
+ASSUME_BGRA=1
+NO_PRED=0
+
 RUN_DATASET=0
 RUN_SWEEP=0
 RUN_SPLIT=0
@@ -65,6 +78,17 @@ while [[ "$#" -gt 0 ]]; do
         --trace-root) TRACE_ROOT="$2"; shift ;;
         --memory) MEMORY_MODE=1 ;;
         --display) DISPLAY_MODE=1 ;;
+        --host) HOST="$2"; shift ;;
+        --port) PORT="$2"; shift ;;
+        --fps) FPS="$2"; shift ;;
+        --w) W="$2"; shift ;;
+        --h) H="$2"; shift ;;
+        --out_w) OUT_W="$2"; shift ;;
+        --out_h) OUT_H="$2"; shift ;;
+        --inflight) INFLIGHT="$2"; shift ;;
+        --cpu_workers) CPU_WORKERS="$2"; shift ;;
+        --assume_bgra) ASSUME_BGRA="$2"; shift ;;
+        --no_pred) NO_PRED="$2"; shift ;;
         --apex-mode)
             APEX_MODE="$2"
             if [ -z "$APEX_MODE" ] || [[ "$APEX_MODE" == --* ]]; then
@@ -105,7 +129,7 @@ trap cleanup EXIT
 echo "--- STARTING SERVER ---"
 pkill -9 -f CarlaUE4 || true
 pkill -9 -f pipeline_starpu || true
-./tools/run_server.sh --port 2000 --run_dir "$RUN_DIR"
+./tools/run_server.sh --port "$PORT" --run_dir "$RUN_DIR"
 SERVER_STARTED=1
 
 echo "Waiting 15 seconds for CARLA to initialize Map..."
@@ -117,7 +141,13 @@ sleep 15
 if [ "$RUN_DATASET" -eq 1 ]; then
     echo "--- RUNNING DATASET EXTRACTION ---"
     DATASET_FRAMES=$FRAMES
-    ./build/dataset_sanity --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 10 --frames $DATASET_FRAMES --engine "$ENGINE" --out_w 512 --out_h 256 --assume_bgra 1 --display "$DISPLAY_MODE" || echo "Extraction Failed!"
+    DATASET_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $DATASET_FRAMES --out_w $OUT_W --out_h $OUT_H --assume_bgra $ASSUME_BGRA --display $DISPLAY_MODE"
+    if [ "$NO_PRED" -eq 1 ]; then
+        DATASET_ARGS="$DATASET_ARGS --no_pred 1"
+    else
+        DATASET_ARGS="$DATASET_ARGS --engine $ENGINE"
+    fi
+    ./build/dataset_sanity $DATASET_ARGS || echo "Extraction Failed!"
 fi
 
 # ==============================================================================
@@ -128,12 +158,12 @@ if [ "$RUN_SPLIT" -eq 1 ]; then
     PRINT_EVERY=$((FRAMES / 5))
     if [ "$PRINT_EVERY" -lt 1 ]; then PRINT_EVERY=1; fi
 
-    PIPELINE_ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine $ENGINE --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every $PRINT_EVERY --eval_every $FRAMES --display $DISPLAY_MODE"
+    PIPELINE_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every $PRINT_EVERY --eval_every $FRAMES --display $DISPLAY_MODE"
     if [ "$MEMORY_MODE" -eq 1 ]; then
         PIPELINE_ARGS="$PIPELINE_ARGS --print_stats"
     fi
 
-    SERVER_CORES="0-9" CLIENT_CORES="10-19" ./tools/run_profiled_single_machine.sh --port 2000 --run_dir "$RUN_DIR" --client ./build/pipeline_starpu --client_args "$PIPELINE_ARGS" &
+    SERVER_CORES="0-9" CLIENT_CORES="10-19" ./tools/run_profiled_single_machine.sh --port "$PORT" --run_dir "$RUN_DIR" --client ./build/pipeline_starpu --client_args "$PIPELINE_ARGS" &
     CLIENT_PID=$!
     sleep 5
     ./tools/monitor_split.sh --duration 20 --run_dir "$RUN_DIR"
@@ -290,7 +320,7 @@ else
 fi
 
 # Construct Arguments
-ARGS="--host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames $FRAMES --engine $ENGINE --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every $FRAMES --display $DISPLAY_MODE"
+ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every 20 --eval_every $FRAMES --display $DISPLAY_MODE"
 if [ "$MEMORY_MODE" -eq 1 ]; then
     ARGS="$ARGS --print_stats"
 fi
