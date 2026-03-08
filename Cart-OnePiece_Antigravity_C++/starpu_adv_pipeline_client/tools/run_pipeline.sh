@@ -43,6 +43,12 @@ CPU_WORKERS=8
 ASSUME_BGRA=1
 NO_PRED=0
 
+# Environment Controls
+OVERRIDE_OUT_DIR=""
+MAP="Town03_Opt"
+VEHICLES=30
+PEDESTRIANS=10
+
 RUN_DATASET=0
 RUN_SWEEP=0
 RUN_SPLIT=0
@@ -64,6 +70,10 @@ usage() {
     echo "  --run-sweep         Override scheduler and run sweep (dmda, rr_workers, ws, eager)"
     echo "  --run-split         Run multi-process split monitor (run_profiled_single_machine + monitor)"
     echo "  --run-profiling     Run the single-node starpu profiler using the selected --sched"
+    echo "  --out_dir PATH      Custom Output Directory (default: generated timestamp in runs/)"
+    echo "  --map NAME          CARLA Map string (default: Town03_Opt)"
+    echo "  --vehicles N        Vehicles to spawn (default: 30)"
+    echo "  --pedestrians N     Pedestrians to spawn (default: 10)"
     echo "  --help              Show this help"
     exit 1
 }
@@ -89,6 +99,10 @@ while [[ "$#" -gt 0 ]]; do
         --cpu_workers) CPU_WORKERS="$2"; shift ;;
         --assume_bgra) ASSUME_BGRA="$2"; shift ;;
         --no_pred) NO_PRED="$2"; shift ;;
+        --out_dir) OVERRIDE_OUT_DIR="$2"; shift ;;
+        --map) MAP="$2"; shift ;;
+        --vehicles) VEHICLES="$2"; shift ;;
+        --pedestrians) PEDESTRIANS="$2"; shift ;;
         --apex-mode)
             APEX_MODE="$2"
             if [ -z "$APEX_MODE" ] || [[ "$APEX_MODE" == --* ]]; then
@@ -113,7 +127,12 @@ done
 # ==============================================================================
 ENGINE_NAME=$(basename "$ENGINE" .engine)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-export RUN_DIR="$(pwd)/runs/${TIMESTAMP}_${ENGINE_NAME}"
+
+if [ -n "$OVERRIDE_OUT_DIR" ]; then
+    export RUN_DIR="$OVERRIDE_OUT_DIR"
+else
+    export RUN_DIR="$(pwd)/runs/${TIMESTAMP}_${ENGINE_NAME}"
+fi
 mkdir -p "$RUN_DIR"
 
 SERVER_STARTED=0
@@ -132,8 +151,21 @@ pkill -9 -f pipeline_starpu || true
 ./tools/run_server.sh --port "$PORT" --run_dir "$RUN_DIR"
 SERVER_STARTED=1
 
-echo "Waiting 15 seconds for CARLA to initialize Map..."
+echo "Waiting 15 seconds for CARLA to initialize..."
 sleep 15
+
+# ==============================================================================
+# ENVIRONMENT & TRAFFIC GENERATION
+# ==============================================================================
+if [ -z "$CARLA_ROOT" ]; then
+    echo "WARNING: CARLA_ROOT is not set! Skipping environment configuration."
+else
+    echo "--- CONFIGURING MAP AND TRAFFIC ---"
+    python3 "$CARLA_ROOT/PythonAPI/util/config.py" --host "$HOST" --port "$PORT" --map "$MAP"
+    sleep 5 # Wait for map to reload
+    python3 "$CARLA_ROOT/PythonAPI/examples/generate_traffic.py" --host "$HOST" --port "$PORT" -n "$VEHICLES" -w "$PEDESTRIANS" --asynch &
+    sleep 3
+fi
 
 # ==============================================================================
 # DATASET GENERATION

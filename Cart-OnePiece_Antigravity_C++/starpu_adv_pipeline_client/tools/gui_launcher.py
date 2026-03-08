@@ -30,6 +30,7 @@ class LauncherApp(ctk.CTk):
         self.tabview.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         
         self.tab_sim = self.tabview.add("Simulation & Engine")
+        self.tab_env = self.tabview.add("Environment & Output")
         self.tab_starpu = self.tabview.add("StarPU & Analyzers")
         self.tab_visual = self.tabview.add("Camera & Output")
         
@@ -55,6 +56,30 @@ class LauncherApp(ctk.CTk):
                                                  values=["models/dummy.engine", "models/deeplabv3_mobilenet.engine", "models/fcn_resnet50.engine", "models/carla_resnet50_best.engine"])
         self.engine_dropdown.pack(pady=5, padx=10, fill="x")
         self.entry_custom_engine = self.create_input(frm_engine, "Custom Path:", "")
+
+        # --- TAB 1.5: Environment ---
+        self.tab_env.grid_columnconfigure(0, weight=1)
+        self.tab_env.grid_columnconfigure(1, weight=1)
+
+        # Output Sub-Frame
+        frm_out = ctk.CTkFrame(self.tab_env)
+        frm_out.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_out, text="Output Control", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        self.entry_out_dir = self.create_input(frm_out, "Custom Output Dir:", "")
+        ctk.CTkLabel(frm_out, text="(Leave blank for default: runs/<TIMESTAMP>...)", text_color="gray").pack()
+
+        # Traffic Sub-Frame
+        frm_traffic = ctk.CTkFrame(self.tab_env)
+        frm_traffic.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        ctk.CTkLabel(frm_traffic, text="Map & Traffic Generation", font=ctk.CTkFont(weight="bold")).pack(pady=5)
+        
+        self.map_var = tk.StringVar(value="Town03_Opt")
+        maps = ["Town01_Opt", "Town02_Opt", "Town03_Opt", "Town04_Opt", "Town05_Opt", "Town06_Opt", "Town07_Opt", "Town10HD_Opt"]
+        self.map_dropdown = ctk.CTkOptionMenu(frm_traffic, variable=self.map_var, values=maps)
+        self.map_dropdown.pack(pady=5, padx=10, fill="x")
+        
+        self.entry_veh = self.create_input(frm_traffic, "Vehicles Spawn:", "30")
+        self.entry_ped = self.create_input(frm_traffic, "Pedestrians Spawn:", "10")
 
         # --- TAB 2: StarPU ---
         self.tab_starpu.grid_columnconfigure(0, weight=1)
@@ -124,21 +149,21 @@ class LauncherApp(ctk.CTk):
         frm_actions.grid(row=1, column=0, padx=10, pady=5, sticky="ew")
         frm_actions.grid_columnconfigure(0, weight=1)
         frm_actions.grid_columnconfigure(1, weight=1)
-        frm_actions.grid_columnconfigure(2, weight=1)
-        frm_actions.grid_columnconfigure(3, weight=1)
-        frm_actions.grid_columnconfigure(4, weight=1)
 
         self.dataset_var = tk.BooleanVar(value=False)
         self.cb_dataset = ctk.CTkCheckBox(frm_actions, text="Run Dataset Extraction Mode", variable=self.dataset_var, command=self.on_dataset_toggle)
-        self.cb_dataset.grid(row=0, column=0, padx=10, pady=10)
+        self.cb_dataset.grid(row=0, column=0, padx=5, pady=10, sticky="e")
 
         self.split_var = tk.BooleanVar(value=False)
         self.cb_split = ctk.CTkCheckBox(frm_actions, text="Multi-Process Splitting", variable=self.split_var)
-        self.cb_split.grid(row=0, column=1, padx=10, pady=10)
+        self.cb_split.grid(row=0, column=1, padx=5, pady=10, sticky="w")
 
-        ctk.CTkButton(frm_actions, text="Preview Command", command=self.preview_cmd).grid(row=0, column=2, padx=5, pady=10)
-        ctk.CTkButton(frm_actions, text="Run Pipeline", fg_color="green", hover_color="darkgreen", command=self.run_pipeline).grid(row=0, column=3, padx=5, pady=10)
-        ctk.CTkButton(frm_actions, text="Force Stop", fg_color="red", hover_color="darkred", command=self.stop_process).grid(row=0, column=4, padx=5, pady=10)
+        frm_btns = ctk.CTkFrame(frm_actions, fg_color="transparent")
+        frm_btns.grid(row=1, column=0, columnspan=2, pady=(0, 10))
+
+        ctk.CTkButton(frm_btns, text="Preview Command", command=self.preview_cmd).pack(side="left", padx=10)
+        ctk.CTkButton(frm_btns, text="Run Pipeline", fg_color="green", hover_color="darkgreen", command=self.run_pipeline).pack(side="left", padx=10)
+        ctk.CTkButton(frm_btns, text="Force Stop", fg_color="red", hover_color="darkred", command=self.stop_process).pack(side="left", padx=10)
 
         # ----------------------------------------------------------------------
         # Console Window
@@ -188,6 +213,14 @@ class LauncherApp(ctk.CTk):
         cmd.extend(["--out_h", self.entry_out_h.get().strip() or "256"])
         cmd.extend(["--inflight", self.entry_inflight.get().strip() or "2"])
         cmd.extend(["--cpu_workers", self.entry_cpu.get().strip() or "8"])
+        
+        out_dir = self.entry_out_dir.get().strip()
+        if out_dir:
+            cmd.extend(["--out_dir", out_dir])
+            
+        cmd.extend(["--map", self.map_var.get()])
+        cmd.extend(["--vehicles", self.entry_veh.get().strip() or "30"])
+        cmd.extend(["--pedestrians", self.entry_ped.get().strip() or "10"])
         
         eng_custom = self.entry_custom_engine.get().strip()
         eng_selected = self.engine_var.get()
