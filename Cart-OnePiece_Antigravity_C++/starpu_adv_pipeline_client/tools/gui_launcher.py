@@ -153,39 +153,31 @@ class LauncherApp(ctk.CTk):
         self.console.see("end")
 
     def build_command(self):
+        cmd = ["./tools/run_pipeline.sh"]
+        
         frames = self.entry_frames.get().strip() or "200"
+        cmd.extend(["--frames", frames])
         
-        cmd = []
-        host = self.entry_host.get().strip()
-        port = self.entry_port.get().strip()
-        mem = "--memory" if self.mem_var.get() else ""
-        disp = "--display" if self.display_var.get() else ""
-        apex = f"--apex-mode {self.apex_var.get()}" if self.apex_var.get() != "off" else ""
-        
+        if self.mem_var.get():
+            cmd.append("--memory")
+        if self.display_var.get():
+            cmd.append("--display")
+            
+        apex = self.apex_var.get()
+        if apex != "off":
+            cmd.extend(["--apex-mode", apex])
+
+        # Behavior Flags
         if self.dataset_var.get():
-            cmd = ["./tools/run_full_demo.sh", "--frames", frames]
-            if self.mem_var.get(): cmd.append("--memory")
-            if self.display_var.get(): cmd.append("--display")
-            return " ".join(cmd)
-            
+            cmd.append("--run-dataset")
+            cmd.append("--run-split")
         elif self.sweep_var.get():
-            cmd = ["./tools/run_verify_demo.sh", "--frames", frames]
-            if self.mem_var.get(): cmd.append("--memory")
-            if self.display_var.get(): cmd.append("--display")
-            if self.apex_var.get() != "off": 
-                cmd.append("--apex-mode")
-                cmd.append(self.apex_var.get())
-            return " ".join(cmd)
-            
+            cmd.append("--run-sweep")
         else:
-            sched = self.sched_var.get()
-            seq = (
-                f"./tools/run_server.sh --port {port} && "
-                f"sleep 12 && "
-                f"./tools/verify_profiling.sh --frames {frames} --sched {sched} {mem} {disp} {apex} ; "
-                f"./tools/kill_server.sh"
-            )
-            return seq
+            cmd.extend(["--sched", self.sched_var.get()])
+            cmd.append("--run-profiling")
+            
+        return " ".join(cmd)
 
     def preview_cmd(self):
         cmd = self.build_command()
