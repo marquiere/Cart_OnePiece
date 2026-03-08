@@ -48,23 +48,34 @@ Logs will be written to `runs/<timestamp>/server.log`.
 ```
 
 ### Full Automated Evaluation (All-in-One)
-To run the complete demonstration pipeline—which safely boots the CARLA server, waits for the map to load, extracts a visual sanity dataset, runs the profiled StarPU pipeline for 120 frames with background telemetry tracking, generates the workload summary reports, and cleans up the background server automatically—use:
+To run the complete demonstration pipeline—which safely boots the CARLA server, waits for the map to load, extracts a visual sanity dataset, runs the profiled StarPU pipeline for 120 frames with background telemetry tracking, generates the workload summary reports, and cleans up the background server automatically—use the unified script:
 
 ```bash
-# Basic run with the default Dummy Model
-./tools/run_full_demo.sh --frames 200
+# Basic run with the default Dummy Model generating a dataset and validating inference
+./tools/run_pipeline.sh --frames 200 --run-dataset
+
+# Advanced run sweeping through all schedulers
+./tools/run_pipeline.sh --frames 200 --run-sweep
 
 # Advanced run with TorchVision ResNet50, Memory Profiling, and a Live Desktop Output viewer!
-./tools/run_full_demo.sh --frames 400 --resnet50 --memory --display
+./tools/run_pipeline.sh --frames 400 --resnet50 --memory --display --sched rr_workers --run-profiling
 ```
 
-**Supported Options (`run_full_demo.sh`):**
+### 🖥️ Built-In GUI Launcher (Recommended)
+If you prefer a visual interface to rapidly sweep architectures without typing complex bash commands, you can use the built-in desktop app:
+```bash
+python3 tools/gui_launcher.py
+```
+This requires `pip install customtkinter` and gives you sliders/dropdowns for Schedulers, APEX Tracing, Cameras, and Memory tracking, while natively piping standard output directly into its own embedded console!
+
+**Supported Internal Options (`run_pipeline.sh`):**
 - `--frames N`: Set the simulation loop length (Default: 200)
 - `--engine PATH`: Provide a custom `.engine`
 - `--deeplabv3` / `--resnet50`: Instantly swap to pre-compiled FP16 TorchVision tensor cores
 - `--memory`: Extract StarPU structural node Bus/Worker telemetry memory metrics into the active logs
 - `--display`: Toggle the live SDL2 Semantic rendering GUI window ON during extraction and profiling sequences
-- `--no_display`: Actively disable GUI rendering (Default, optimized for headless tracing)
+- `--sched`: Specify a single targeted scheduler behavior `dmda`, `eager`, `ws` etc.
+- `--run-dataset` | `--run-sweep` | `--run-split` | `--run-profiling`: Execution selection flags.
 
 ---
 
@@ -73,24 +84,19 @@ To run the complete demonstration pipeline—which safely boots the CARLA server
 The pipeline connects to CARLA, extracts high-frequency RGB and semantic Ground Truth frames, preprocesses them (BGRA to NCHW), runs TensorRT inference, and calculates metrics (mIoU, Pixel Accuracy) asynchronously.
 
 ### Automated APEX Tracing & Verification Demo
-The recommended way to test the StarPU framework is using the unified verification script. This script automatically launches CARLA, runs the `DMDA` scheduler, runs the `RR_WORKERS` scheduler, and generates rich trace artifacts (APEX Taskgraphs, Memory Stats, Graphviz PDFs) natively in `/tmp/starpu_traces_adv`.
+The recommended way to test the StarPU framework is using the unified verification script. This script automatically launches CARLA, generates datasets or traces, and guarantees server teardown even on failures.
 
 ```bash
-# Basic run with the default Dummy Model
-./tools/run_verify_demo.sh --frames 200
+# Basic sweep through all schedulers
+./tools/run_pipeline.sh --frames 200 --run-sweep
 
 # Advanced run with APEX Tracing, Memory Bus profiling, and a TorchVision DeepLabV3 engine!
-./tools/run_verify_demo.sh --frames 400 --deeplabv3 --memory --apex-mode taskgraph --display
+./tools/run_pipeline.sh --frames 400 --deeplabv3 --memory --apex-mode taskgraph --display --run-profiling --sched dmda
 ```
 
-**Supported Options (`run_verify_demo.sh`):**
-- `--frames N`: Set the simulation loop length (Default: 1200)
-- `--engine PATH`: Provide a custom `.engine`
-- `--deeplabv3` / `--resnet50`: Instantly swap to heavyweight pre-compiled TorchVision models
-- `--memory`: Injects `--print_stats` into StarPU to natively extract Bus/Worker memory transfer logs into `starpu_stats.txt`
+**Supported Options (`run_pipeline.sh` APEX flags):**
 - `--apex-mode MODE`: Wrap execution natively in `apex_exec` (`taskgraph`, `gtrace`, `all`)
-- `--trace-root PATH`: Redirect where traces are stored
-- `--display`: Toggle the live SDL2 Semantic rendering GUI window ON
+- `--trace-root PATH`: Redirect where traces are stored natively from `/tmp/starpu_traces_adv`.
 
 ### Live Semantic Visualization
 The `pipeline_starpu` binary now natively supports a decoupled, lock-free **SDL2 Real-Time Viewer**! By passing `--display 1`, an external window will render the inference outputs. 
