@@ -52,8 +52,17 @@ class LauncherApp(ctk.CTk):
         frm_engine.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
         ctk.CTkLabel(frm_engine, text="TensorRT Engine", font=ctk.CTkFont(weight="bold")).pack(pady=5)
         self.engine_var = tk.StringVar(value="models/dummy.engine")
-        self.engine_dropdown = ctk.CTkOptionMenu(frm_engine, variable=self.engine_var, 
-                                                 values=["models/dummy.engine", "models/deeplabv3_mobilenet.engine", "models/fcn_resnet50.engine", "models/carla_resnet50_best.engine"])
+        engines = [
+            "models/dummy.engine", 
+            "models/carla_resnet50_best.engine",
+            "models/carla_seg_fp16.engine",
+            "models/cityscapes_hrnet_direct.engine",
+            "models/deeplabv3_mobilenet.engine", 
+            "models/deeplabv3_resnet50.engine",
+            "models/fcn_resnet50.engine",
+            "models/fcn_resnet101.engine"
+        ]
+        self.engine_dropdown = ctk.CTkOptionMenu(frm_engine, variable=self.engine_var, values=engines)
         self.engine_dropdown.pack(pady=5, padx=10, fill="x")
         self.entry_custom_engine = self.create_input(frm_engine, "Custom Path:", "")
 
