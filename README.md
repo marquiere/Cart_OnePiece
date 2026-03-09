@@ -40,6 +40,18 @@ Example profile and dataset runs included in this repository can be found in the
 - **Dataset Generation Run**: Extracted sensor arrays without performance analytics.
 - **StarPU Profiles**: Comprehensive tracing graphs, FxT metrics, DAG analysis, and dashboards utilizing `dmda`, `rr_workers`, and `eager` schedulers.
 
+### StarVZ Visualization
+Interactive application dashboards highlighting task distribution across CPU/GPU metrics natively in the UI.
+![StarVZ Example](Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/result_example/example_starvz.png)
+
+### APEX TaskGraph Analysis
+Fine-grained APEX workflow visualization outlining task queues and runtime dependency graphs.
+![APEX Graph Example](Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/result_example/example_apex.png)
+
+### GraphViz Codelet DAG
+Extensive direct acyclic graphs exported automatically showcasing task parallelism.
+![Graphviz DAG Example](Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/result_example/example_dag.png)
+
 ## 🛠 Getting Started
 
 Launch the configuration interface by running:
