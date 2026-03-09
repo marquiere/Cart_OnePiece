@@ -39,6 +39,13 @@ void CreateMosaic8(const uint8_t *rgb_tl, const uint8_t *rgb_tml,
                    const uint8_t *rgb_bmr, const uint8_t *rgb_br, int w, int h,
                    uint8_t *out_mosaic);
 
+// Dynamically arrange an arbitrary number of RGB buffers into an N x M grid.
+// `frames` should contain pointers to the individual w x h RGB arrays.
+// Empty grid slots (if frames.size() < cols * rows) are left untouched
+// (expected to be zero-initialized).
+void CreateDynamicMosaic(const std::vector<const uint8_t *> &frames, int cols,
+                         int rows, int w, int h, uint8_t *out_mosaic);
+
 // Save Image as PNG wrapper
 bool SavePng(const std::string &filepath, int w, int h, int channels,
              const uint8_t *data);

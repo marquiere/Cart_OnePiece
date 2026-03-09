@@ -20,9 +20,25 @@ bool SegmentationViewerSDL2::init(int width, int height, float window_scale) {
   int win_w = static_cast<int>(width * window_scale);
   int win_h = static_cast<int>(height * window_scale);
 
-  window_ =
-      SDL_CreateWindow("Real-Time Segmentation Viewer", SDL_WINDOWPOS_UNDEFINED,
-                       SDL_WINDOWPOS_UNDEFINED, win_w, win_h, SDL_WINDOW_SHOWN);
+  const char *env_window_id = std::getenv("SDL_WINDOWID");
+  if (env_window_id && std::strlen(env_window_id) > 0) {
+    try {
+      void *win_handle = reinterpret_cast<void *>(std::stoul(env_window_id));
+      window_ = SDL_CreateWindowFrom(win_handle);
+      if (window_) {
+        std::cout << "[Viewer] Successfully attached to native window handle "
+                  << env_window_id << "\n";
+      }
+    } catch (...) {
+      std::cerr << "[Viewer] Failed to parse SDL_WINDOWID\n";
+    }
+  }
+
+  if (!window_) {
+    window_ = SDL_CreateWindow("Real-Time Segmentation Viewer",
+                               SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+                               win_w, win_h, SDL_WINDOW_SHOWN);
+  }
   if (!window_) {
     std::cerr << "[Viewer] Window could not be created! SDL_Error: "
               << SDL_GetError() << "\n";

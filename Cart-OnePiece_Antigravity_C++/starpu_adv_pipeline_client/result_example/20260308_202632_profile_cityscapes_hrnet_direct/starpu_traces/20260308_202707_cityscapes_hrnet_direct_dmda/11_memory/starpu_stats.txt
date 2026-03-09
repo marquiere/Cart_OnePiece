@@ -1,0 +1,53 @@
+Data transfer stats:
+	NUMA 0 -> CUDA 0	0.0000 GB	0.0000 MB/s	(transfers : 0 - avg -nan MB)
+	CUDA 0 -> NUMA 0	0.0000 GB	0.0000 MB/s	(transfers : 0 - avg -nan MB)
+Total transfers: 0.0000 GB
+#---------------------
+
+#---------------------
+Worker stats:
+CUDA 0.0 (NVIDIA GeForce RTX 3060 10.5 GiB 01:00.0)
+	0 task(s)
+CPU 0                           
+	1597 task(s)
+CPU 1                           
+	1172 task(s)
+CPU 2                           
+	1056 task(s)
+CPU 3                           
+	975 task(s)
+#---------------------
+===STARPU_STATS_END===
+
+#---------------------
+MSI cache stats :
+TOTAL MSI stats	hit 19197 (100.00 %)	miss 0 (0.00 %)
+memory node NUMA 0
+	hit : 19197 (100.00 %)
+	miss : 0 (0.00 %)
+#---------------------
+
+#---------------------
+Allocation cache stats:
+#---------------------
+
+#---------------------
+Data transfer stats:
+	NUMA 0 -> CUDA 0	0.0000 GB	0.0000 MB/s	(transfers : 0 - avg -nan MB)
+	CUDA 0 -> NUMA 0	0.0000 GB	0.0000 MB/s	(transfers : 0 - avg -nan MB)
+Total transfers: 0.0000 GB
+#---------------------
+
+#---------------------
+Worker stats:
+CUDA 0.0 (NVIDIA GeForce RTX 3060 10.5 GiB 01:00.0)
+	0 task(s)
+CPU 0                           
+	0 task(s)
+CPU 1                           
+	0 task(s)
+CPU 2                           
+	0 task(s)
+CPU 3                           
+	0 task(s)
+#---------------------

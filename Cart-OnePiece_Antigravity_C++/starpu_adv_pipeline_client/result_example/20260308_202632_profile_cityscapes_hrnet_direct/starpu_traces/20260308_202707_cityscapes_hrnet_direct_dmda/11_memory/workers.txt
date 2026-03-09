@@ -1,0 +1,12 @@
+Worker stats:
+CUDA 0.0 (NVIDIA GeForce RTX 3060 10.5 GiB 01:00.0)
+	0 task(s)
+CPU 0                           
+	1597 task(s)
+CPU 1                           
+	1172 task(s)
+CPU 2                           
+	1056 task(s)
+CPU 3                           
+	975 task(s)
+#---------------------

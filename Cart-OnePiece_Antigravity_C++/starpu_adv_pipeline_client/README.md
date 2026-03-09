@@ -74,7 +74,7 @@ This requires `pip install customtkinter` and provides a tabbed UI to configure 
 - **CARLA Host / Port**: Define the connection targeting your CARLA simulator instance.
 - **Total Frames**: The number of simulation steps to run before terminating.
 - **Target FPS**: The simulated camera capture rate (synchronizes with CARLA's `fixed_delta_seconds`).
-- **TensorRT Engine**: Select from built-in compiled engines (e.g., `models/dummy.engine`, `models/fcn_resnet50.engine`) or provide a custom `.engine` absolute path.
+- **TensorRT Engine**: Dynamic dropdown enumerating all 8+ pre-compiled inference cores detected inside the `models/` directory (e.g., `carla_resnet50_best.engine`, `cityscapes_hrnet_direct.engine`, `deeplabv3_mobilenet.engine`). Also supports manual `.engine` path overrides.
 
 **Tab 2: StarPU & Analyzers**
 - **StarPU Parameters**:
@@ -91,8 +91,9 @@ This requires `pip install customtkinter` and provides a tabbed UI to configure 
   - **Input W / H**: Base focal resolutions captured directly from CARLA.
   - **Model W / H**: Downscaled NCHW array dimensions fed sequentially into TensorRT.
   - **Force --assume_bgra 1**: Architectural optimization bypassing slower RGBA extraction memory-logic.
+  - **Active Cameras**: Dynamic checkboxes permitting selective enabling of up to 8 surrounding multi-cameras: Front (0), Rear (1), Left (2), Right (3), Front Left (4), Front Right (5), Rear Left (6), Rear Right (7). Unselected cameras are natively skipped in simulation to save CARLA CPU resources.
 - **Display / Dataset**:
-  - **Live SDL2 Semantic Viewer**: Renders the 8-camera 360-degree composite inference loop directly on your host screen.
+  - **Live SDL2 Semantic Viewer**: Renders precisely the selected active cameras explicitly wrapping its dynamic bounding logic embedded *natively* into the Tkinter application UI. Completely circumvents drawing empty static black voids!
   - **Skip Inference**: Disables TensorRT prediction (`--no_pred`) generating pure ground-truth semantic mask outputs exclusively.
 
 #### Execution Controls (Always visible bottom strip)
@@ -104,6 +105,7 @@ This requires `pip install customtkinter` and provides a tabbed UI to configure 
 
 **Underlying Bash Overrides (`run_pipeline.sh`):**
 - `--frames N`: Modify execution length.
+- `--cameras 0,1,2,3`: Comma-separated indices picking physical ego-sensors to actively spawn (e.g. 0=Front, 1=Rear).
 - `--engine PATH` / `--deeplabv3` / `--resnet50`: Swap loaded models inline.
 - `--memory` / `--display`: Switch live evaluation triggers securely.
 - `--apex-mode MODE`: Wrap execution natively in `apex_exec`.
@@ -137,7 +139,7 @@ The `pipeline_starpu` binary now natively supports a decoupled, lock-free **SDL2
 ### StarPU Pipeline (Recommended)
 This version uses StarPU to intelligently schedule CPU and GPU tasks.
 ```bash
-./build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 200 --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 50
+./build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 200 --cameras 0,1,2,3 --engine models/dummy.engine --out_w 512 --out_h 256 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 50
 ```
 
 ### Direct Pipeline (No StarPU)
@@ -187,7 +189,7 @@ To debug your TensorRT outputs visually, generate bounded "Sanity Datasets" whic
 
 **Generate Full Overlay (With TensorRT Inference):**
 ```bash
-./build/dataset_sanity --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 10 --frames 30 --engine models/dummy.engine --out_w 512 --out_h 256 --assume_bgra 1
+./build/dataset_sanity --host 127.0.0.1 --port 2000 --w 800 --h 600 --cameras 0,3 --fps 10 --frames 30 --engine models/dummy.engine --out_w 512 --out_h 256 --assume_bgra 1
 ```
 *Outputs are saved in `runs/<timestamp>/sanity_dataset/`.*
 
@@ -217,3 +219,4 @@ If you encounter issues or are extending the framework, utilize the targeted smo
 - **NaN Preprocess Outputs**: Standard deviation variants `[0.0, 0.0, 0.0]` were supplied to the normalizer, or tensor dimensions are physically zero.
 - **Low Match Rate (FrameSync)**: Ensure `--sync 1` is applied. In asynchronous server execution, match rates drop to 60-70% due to CARLA phase jitter.
 - **CUDA Out of Memory**: VRAM fragmentation from simultaneous headless CARLA rendering and deep generic TensorRT contexts. Decrease `w` and `h` resolution or limit `--inflight` tasks.
+- **Hero Vehicle Freezes / Does Not Move**: The pipeline utilizes a dedicated Traffic Manager instance explicitly bound to `Port 8050` to isolate the synchronous C++ Hero vehicle from the asynchronous background Python `generate_traffic.py` manager occupying `Port 8000`. If you encounter freezing problems, ensure `Port 8050` is successfully opening and the `TrySpawnActor` loop isn't immediately trapping your vehicle in a blocked parking coordinate.

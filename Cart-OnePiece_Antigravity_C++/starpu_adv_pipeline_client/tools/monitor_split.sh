@@ -45,8 +45,8 @@ if ! kill -0 "$SERVER_PID" 2>/dev/null; then
 fi
 
 if ! kill -0 "$CLIENT_PID" 2>/dev/null; then
-    echo "ERROR: Client PID $CLIENT_PID is not running. It might have finished."
-    exit 1
+    echo "WARNING: Client PID $CLIENT_PID is not running. It might have finished."
+    exit 0
 fi
 
 echo "Monitoring SERVER_PID=$SERVER_PID and CLIENT_PID=$CLIENT_PID for ${DURATION}s..."

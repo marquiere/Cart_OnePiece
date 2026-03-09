@@ -17,7 +17,7 @@ class LauncherApp(ctk.CTk):
         super().__init__()
 
         self.title("Cart_OnePiece: StarPU Pipeline Launcher")
-        self.geometry("900x800")
+        self.geometry("900x1000")
         
         # Grid layout
         self.grid_columnconfigure(0, weight=1)
@@ -145,6 +145,18 @@ class LauncherApp(ctk.CTk):
         frm_disp.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
         ctk.CTkLabel(frm_disp, text="Display / Dataset", font=ctk.CTkFont(weight="bold")).pack(pady=5)
         
+        self.camera_names = ["Front", "Rear", "Left", "Right", "Front Left", "Front Right", "Rear Left", "Rear Right"]
+        ctk.CTkLabel(frm_disp, text="Active Cameras:", anchor="w").pack(fill="x", padx=10, pady=(5,0))
+        frm_cam_checks = ctk.CTkFrame(frm_disp, fg_color="transparent")
+        frm_cam_checks.pack(fill="x", padx=10, pady=2)
+        
+        self.camera_vars = []
+        for i, cam_name in enumerate(self.camera_names):
+            var = tk.BooleanVar(value=(i == 0)) # Front ON by default
+            self.camera_vars.append(var)
+            cb = ctk.CTkCheckBox(frm_cam_checks, text=cam_name, variable=var)
+            cb.grid(row=i//2, column=i%2, padx=5, pady=2, sticky="w")
+        
         self.display_var = tk.BooleanVar(value=True)
         ctk.CTkCheckBox(frm_disp, text="Live SDL2 Semantic Viewer (--display)", variable=self.display_var).pack(pady=5, padx=10, anchor="w")
 
@@ -178,9 +190,19 @@ class LauncherApp(ctk.CTk):
         # Console Window
         # ----------------------------------------------------------------------
         self.console = ctk.CTkTextbox(self, wrap="word", font=("Courier", 12))
-        self.console.grid(row=2, column=0, padx=10, pady=10, sticky="nsew")
+        self.console.grid(row=2, column=0, padx=10, pady=(10, 5), sticky="nsew")
         self.grid_rowconfigure(2, weight=1)
         
+        # ----------------------------------------------------------------------
+        # Embedded Viewer Bounding Box
+        # ----------------------------------------------------------------------
+        self.frm_viewer_container = ctk.CTkFrame(self)
+        self.frm_viewer_container.grid(row=3, column=0, padx=10, pady=(5, 10), sticky="nsew")
+        self.grid_rowconfigure(3, weight=3)
+        
+        self.frm_viewer = tk.Frame(self.frm_viewer_container, bg="black")
+        self.frm_viewer.pack(fill="both", expand=True)
+
         self.current_process = None
         self.log_msg("GUI v2 Initialized. Integrated all arguments.")
 
@@ -220,6 +242,12 @@ class LauncherApp(ctk.CTk):
         cmd.extend(["--h", self.entry_h.get().strip() or "600"])
         cmd.extend(["--out_w", self.entry_out_w.get().strip() or "512"])
         cmd.extend(["--out_h", self.entry_out_h.get().strip() or "256"])
+        
+        checked_indices = [str(i) for i, var in enumerate(self.camera_vars) if var.get()]
+        if not checked_indices:
+            checked_indices = ["0"]
+        cmd.extend(["--cameras", ",".join(checked_indices)])
+        
         cmd.extend(["--inflight", self.entry_inflight.get().strip() or "2"])
         cmd.extend(["--cpu_workers", self.entry_cpu.get().strip() or "8"])
         
@@ -297,6 +325,15 @@ class LauncherApp(ctk.CTk):
             self.log_msg("A process is already running! Stop it first.")
             return
 
+        # SDL_DestroyWindow cleanly terminates the native X11 window when the C++ process exits.
+        # We must explicitly recreate the tk.Frame to generate a fresh X11 Window ID for the next run.
+        if hasattr(self, 'frm_viewer') and self.frm_viewer.winfo_exists():
+            self.frm_viewer.destroy()
+        
+        self.frm_viewer = tk.Frame(self.frm_viewer_container, bg="black")
+        self.frm_viewer.pack(fill="both", expand=True)
+        self.update_idletasks() # Ensure the X11 ID is allocated before executing subprocess
+
         cmd = self.build_command()
         self.log_msg(f"\n====================================\n[Exec] Starting Subprocess Route:\n{cmd}\n")
 
@@ -306,13 +343,18 @@ class LauncherApp(ctk.CTk):
         threading.Thread(target=self._exec_thread, args=(cmd,), daemon=True).start()
 
     def _exec_thread(self, cmd):
+        env = os.environ.copy()
+        if self.display_var.get():
+            env["SDL_WINDOWID"] = str(self.frm_viewer.winfo_id())
+
         try:
             self.current_process = subprocess.Popen(
                 ["bash", "-c", cmd],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                bufsize=1
+                bufsize=1,
+                env=env
             )
 
             for line in self.current_process.stdout:

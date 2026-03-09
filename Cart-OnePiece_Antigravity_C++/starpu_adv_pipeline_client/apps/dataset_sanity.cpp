@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -58,6 +59,7 @@ int main(int argc, char **argv) {
   bool save_png = true;
   int print_every = 5;
   bool display = false;
+  std::set<int> active_cameras = {0};
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -95,6 +97,14 @@ int main(int argc, char **argv) {
       print_every = std::stoi(argv[++i]);
     else if (arg == "--display" && i + 1 < argc)
       display = (std::stoi(argv[++i]) != 0);
+    else if (arg == "--cameras" && i + 1 < argc) {
+      active_cameras.clear();
+      std::stringstream ss(argv[++i]);
+      std::string item;
+      while (std::getline(ss, item, ',')) {
+        active_cameras.insert(std::stoi(item));
+      }
+    }
   }
 
   if (!no_pred && engine_path.empty()) {
@@ -149,66 +159,112 @@ int main(int argc, char **argv) {
     ss << std::put_time(std::localtime(&time_t), "%Y%m%d_%H%M%S");
     run_dir = "runs/" + ss.str() + "/sanity_dataset";
   }
-  fs::create_directories(run_dir + "/rgb");
-  fs::create_directories(run_dir + "/gt_raw");
-  fs::create_directories(run_dir + "/gt_color");
-  fs::create_directories(run_dir + "/rear_rgb");
-  fs::create_directories(run_dir + "/rear_gt_raw");
-  fs::create_directories(run_dir + "/rear_gt_color");
-  fs::create_directories(run_dir + "/left_rgb");
-  fs::create_directories(run_dir + "/left_gt_raw");
-  fs::create_directories(run_dir + "/left_gt_color");
-  fs::create_directories(run_dir + "/right_rgb");
-  fs::create_directories(run_dir + "/right_gt_raw");
-  fs::create_directories(run_dir + "/right_gt_color");
-  // 8-Camera Additions
-  fs::create_directories(run_dir + "/front_left_rgb");
-  fs::create_directories(run_dir + "/front_left_gt_raw");
-  fs::create_directories(run_dir + "/front_left_gt_color");
-  fs::create_directories(run_dir + "/front_right_rgb");
-  fs::create_directories(run_dir + "/front_right_gt_raw");
-  fs::create_directories(run_dir + "/front_right_gt_color");
-  fs::create_directories(run_dir + "/rear_left_rgb");
-  fs::create_directories(run_dir + "/rear_left_gt_raw");
-  fs::create_directories(run_dir + "/rear_left_gt_color");
-  fs::create_directories(run_dir + "/rear_right_rgb");
-  fs::create_directories(run_dir + "/rear_right_gt_raw");
-  fs::create_directories(run_dir + "/rear_right_gt_color");
+  if (active_cameras.count(0)) {
+    fs::create_directories(run_dir + "/rgb");
+    fs::create_directories(run_dir + "/gt_raw");
+    fs::create_directories(run_dir + "/gt_color");
+  }
+  if (active_cameras.count(1)) {
+    fs::create_directories(run_dir + "/rear_rgb");
+    fs::create_directories(run_dir + "/rear_gt_raw");
+    fs::create_directories(run_dir + "/rear_gt_color");
+  }
+  if (active_cameras.count(2)) {
+    fs::create_directories(run_dir + "/left_rgb");
+    fs::create_directories(run_dir + "/left_gt_raw");
+    fs::create_directories(run_dir + "/left_gt_color");
+  }
+  if (active_cameras.count(3)) {
+    fs::create_directories(run_dir + "/right_rgb");
+    fs::create_directories(run_dir + "/right_gt_raw");
+    fs::create_directories(run_dir + "/right_gt_color");
+  }
+  if (active_cameras.count(4)) {
+    fs::create_directories(run_dir + "/front_left_rgb");
+    fs::create_directories(run_dir + "/front_left_gt_raw");
+    fs::create_directories(run_dir + "/front_left_gt_color");
+  }
+  if (active_cameras.count(5)) {
+    fs::create_directories(run_dir + "/front_right_rgb");
+    fs::create_directories(run_dir + "/front_right_gt_raw");
+    fs::create_directories(run_dir + "/front_right_gt_color");
+  }
+  if (active_cameras.count(6)) {
+    fs::create_directories(run_dir + "/rear_left_rgb");
+    fs::create_directories(run_dir + "/rear_left_gt_raw");
+    fs::create_directories(run_dir + "/rear_left_gt_color");
+  }
+  if (active_cameras.count(7)) {
+    fs::create_directories(run_dir + "/rear_right_rgb");
+    fs::create_directories(run_dir + "/rear_right_gt_raw");
+    fs::create_directories(run_dir + "/rear_right_gt_color");
+  }
 
   if (!no_pred) {
-    fs::create_directories(run_dir + "/pred_raw");
-    fs::create_directories(run_dir + "/pred_color");
-    fs::create_directories(run_dir + "/overlay");
-    fs::create_directories(run_dir + "/rear_pred_raw");
-    fs::create_directories(run_dir + "/rear_pred_color");
-    fs::create_directories(run_dir + "/rear_overlay");
-    fs::create_directories(run_dir + "/left_pred_raw");
-    fs::create_directories(run_dir + "/left_pred_color");
-    fs::create_directories(run_dir + "/left_overlay");
-    fs::create_directories(run_dir + "/right_pred_raw");
-    fs::create_directories(run_dir + "/right_pred_color");
-    fs::create_directories(run_dir + "/right_overlay");
-    // 8-Camera Additions
-    fs::create_directories(run_dir + "/front_left_pred_raw");
-    fs::create_directories(run_dir + "/front_left_pred_color");
-    fs::create_directories(run_dir + "/front_left_overlay");
-    fs::create_directories(run_dir + "/front_right_pred_raw");
-    fs::create_directories(run_dir + "/front_right_pred_color");
-    fs::create_directories(run_dir + "/front_right_overlay");
-    fs::create_directories(run_dir + "/rear_left_pred_raw");
-    fs::create_directories(run_dir + "/rear_left_pred_color");
-    fs::create_directories(run_dir + "/rear_left_overlay");
-    fs::create_directories(run_dir + "/rear_right_pred_raw");
-    fs::create_directories(run_dir + "/rear_right_pred_color");
-    fs::create_directories(run_dir + "/rear_right_overlay");
+    if (active_cameras.count(0)) {
+      fs::create_directories(run_dir + "/pred_raw");
+      fs::create_directories(run_dir + "/pred_color");
+      fs::create_directories(run_dir + "/overlay");
+    }
+    if (active_cameras.count(1)) {
+      fs::create_directories(run_dir + "/rear_pred_raw");
+      fs::create_directories(run_dir + "/rear_pred_color");
+      fs::create_directories(run_dir + "/rear_overlay");
+    }
+    if (active_cameras.count(2)) {
+      fs::create_directories(run_dir + "/left_pred_raw");
+      fs::create_directories(run_dir + "/left_pred_color");
+      fs::create_directories(run_dir + "/left_overlay");
+    }
+    if (active_cameras.count(3)) {
+      fs::create_directories(run_dir + "/right_pred_raw");
+      fs::create_directories(run_dir + "/right_pred_color");
+      fs::create_directories(run_dir + "/right_overlay");
+    }
+    if (active_cameras.count(4)) {
+      fs::create_directories(run_dir + "/front_left_pred_raw");
+      fs::create_directories(run_dir + "/front_left_pred_color");
+      fs::create_directories(run_dir + "/front_left_overlay");
+    }
+    if (active_cameras.count(5)) {
+      fs::create_directories(run_dir + "/front_right_pred_raw");
+      fs::create_directories(run_dir + "/front_right_pred_color");
+      fs::create_directories(run_dir + "/front_right_overlay");
+    }
+    if (active_cameras.count(6)) {
+      fs::create_directories(run_dir + "/rear_left_pred_raw");
+      fs::create_directories(run_dir + "/rear_left_pred_color");
+      fs::create_directories(run_dir + "/rear_left_overlay");
+    }
+    if (active_cameras.count(7)) {
+      fs::create_directories(run_dir + "/rear_right_pred_raw");
+      fs::create_directories(run_dir + "/rear_right_pred_color");
+      fs::create_directories(run_dir + "/rear_right_overlay");
+    }
   }
 
   std::unique_ptr<SegmentationViewerSDL2> viewer = nullptr;
   if (display) {
     viewer = std::make_unique<SegmentationViewerSDL2>();
-    // Quadruple width and double height for 4x2 mosaic, scale down to 50% for
-    // display
-    if (!viewer->init(w * 4, h * 2, 0.5f)) {
+    int num_cams = active_cameras.size();
+    if (num_cams == 0)
+      num_cams = 1;
+    int cols = 1, rows = 1;
+    if (num_cams == 2) {
+      cols = 2;
+      rows = 1;
+    } else if (num_cams == 3 || num_cams == 4) {
+      cols = 2;
+      rows = 2;
+    } else if (num_cams == 5 || num_cams == 6) {
+      cols = 3;
+      rows = 2;
+    } else if (num_cams >= 7) {
+      cols = 4;
+      rows = 2;
+    }
+
+    if (!viewer->init(w * cols, h * rows, 0.5f)) {
       std::cerr << "[Sanity Dataset] Viewer init failed.\n";
       viewer.reset();
     }
@@ -216,8 +272,18 @@ int main(int argc, char **argv) {
 
   // Connect
   auto client = carla::client::Client(host, port);
-  client.SetTimeout(std::chrono::seconds(10));
-  auto world = client.GetWorld();
+  client.SetTimeout(std::chrono::seconds(60));
+
+  std::optional<carla::client::World> world_opt;
+  while (!world_opt) {
+    try {
+      world_opt = client.GetWorld();
+    } catch (const std::exception &e) {
+      std::cerr << "Timeout waiting for CARLA world. Retrying...\n";
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+  }
+  auto world = *world_opt;
 
   if (!map_name.empty()) {
     world = client.LoadWorld(map_name);
@@ -270,44 +336,77 @@ int main(int argc, char **argv) {
   carla::geom::Transform cam_tf(carla::geom::Location(2.0f, 0.0f, 1.4f),
                                 carla::geom::Rotation(0.0f, 0.0f, 0.0f));
 
-  auto rgb_sensor = world.SpawnActor(rgb_bp, cam_tf, vehicle.get());
-  auto gt_sensor = world.SpawnActor(gt_bp, cam_tf, vehicle.get());
+  auto rgb_sensor = (active_cameras.count(0))
+                        ? world.SpawnActor(rgb_bp, cam_tf, vehicle.get())
+                        : nullptr;
+  auto gt_sensor = (active_cameras.count(0))
+                       ? world.SpawnActor(gt_bp, cam_tf, vehicle.get())
+                       : nullptr;
 
   carla::geom::Transform rear_tf(carla::geom::Location(-2.0f, 0.0f, 1.4f),
                                  carla::geom::Rotation(0.0f, 180.0f, 0.0f));
-  auto rear_rgb_sensor = world.SpawnActor(rgb_bp, rear_tf, vehicle.get());
-  auto rear_gt_sensor = world.SpawnActor(gt_bp, rear_tf, vehicle.get());
+  auto rear_rgb_sensor = (active_cameras.count(1))
+                             ? world.SpawnActor(rgb_bp, rear_tf, vehicle.get())
+                             : nullptr;
+  auto rear_gt_sensor = (active_cameras.count(1))
+                            ? world.SpawnActor(gt_bp, rear_tf, vehicle.get())
+                            : nullptr;
 
   carla::geom::Transform left_tf(carla::geom::Location(0.0f, -1.0f, 1.4f),
                                  carla::geom::Rotation(0.0f, -90.0f, 0.0f));
-  auto left_rgb_sensor = world.SpawnActor(rgb_bp, left_tf, vehicle.get());
-  auto left_gt_sensor = world.SpawnActor(gt_bp, left_tf, vehicle.get());
+  auto left_rgb_sensor = (active_cameras.count(2))
+                             ? world.SpawnActor(rgb_bp, left_tf, vehicle.get())
+                             : nullptr;
+  auto left_gt_sensor = (active_cameras.count(2))
+                            ? world.SpawnActor(gt_bp, left_tf, vehicle.get())
+                            : nullptr;
 
   carla::geom::Transform right_tf(carla::geom::Location(0.0f, 1.0f, 1.4f),
                                   carla::geom::Rotation(0.0f, 90.0f, 0.0f));
-  auto right_rgb_sensor = world.SpawnActor(rgb_bp, right_tf, vehicle.get());
-  auto right_gt_sensor = world.SpawnActor(gt_bp, right_tf, vehicle.get());
+  auto right_rgb_sensor =
+      (active_cameras.count(3))
+          ? world.SpawnActor(rgb_bp, right_tf, vehicle.get())
+          : nullptr;
+  auto right_gt_sensor = (active_cameras.count(3))
+                             ? world.SpawnActor(gt_bp, right_tf, vehicle.get())
+                             : nullptr;
 
   // 8-Camera Additions
   carla::geom::Transform fl_tf(carla::geom::Location(1.4f, -1.0f, 1.4f),
                                carla::geom::Rotation(0.0f, -45.0f, 0.0f));
-  auto fl_rgb_sensor = world.SpawnActor(rgb_bp, fl_tf, vehicle.get());
-  auto fl_gt_sensor = world.SpawnActor(gt_bp, fl_tf, vehicle.get());
+  auto fl_rgb_sensor = (active_cameras.count(4))
+                           ? world.SpawnActor(rgb_bp, fl_tf, vehicle.get())
+                           : nullptr;
+  auto fl_gt_sensor = (active_cameras.count(4))
+                          ? world.SpawnActor(gt_bp, fl_tf, vehicle.get())
+                          : nullptr;
 
   carla::geom::Transform fr_tf(carla::geom::Location(1.4f, 1.0f, 1.4f),
                                carla::geom::Rotation(0.0f, 45.0f, 0.0f));
-  auto fr_rgb_sensor = world.SpawnActor(rgb_bp, fr_tf, vehicle.get());
-  auto fr_gt_sensor = world.SpawnActor(gt_bp, fr_tf, vehicle.get());
+  auto fr_rgb_sensor = (active_cameras.count(5))
+                           ? world.SpawnActor(rgb_bp, fr_tf, vehicle.get())
+                           : nullptr;
+  auto fr_gt_sensor = (active_cameras.count(5))
+                          ? world.SpawnActor(gt_bp, fr_tf, vehicle.get())
+                          : nullptr;
 
   carla::geom::Transform rl_tf(carla::geom::Location(-1.4f, -1.0f, 1.4f),
                                carla::geom::Rotation(0.0f, -135.0f, 0.0f));
-  auto rl_rgb_sensor = world.SpawnActor(rgb_bp, rl_tf, vehicle.get());
-  auto rl_gt_sensor = world.SpawnActor(gt_bp, rl_tf, vehicle.get());
+  auto rl_rgb_sensor = (active_cameras.count(6))
+                           ? world.SpawnActor(rgb_bp, rl_tf, vehicle.get())
+                           : nullptr;
+  auto rl_gt_sensor = (active_cameras.count(6))
+                          ? world.SpawnActor(gt_bp, rl_tf, vehicle.get())
+                          : nullptr;
 
   carla::geom::Transform rr_tf(carla::geom::Location(-1.4f, 1.0f, 1.4f),
                                carla::geom::Rotation(0.0f, 135.0f, 0.0f));
-  auto rr_rgb_sensor = world.SpawnActor(rgb_bp, rr_tf, vehicle.get());
-  auto rr_gt_sensor = world.SpawnActor(gt_bp, rr_tf, vehicle.get());
+  auto rr_rgb_sensor = (active_cameras.count(7))
+                           ? world.SpawnActor(rgb_bp, rr_tf, vehicle.get())
+                           : nullptr;
+  auto rr_gt_sensor = (active_cameras.count(7))
+                          ? world.SpawnActor(gt_bp, rr_tf, vehicle.get())
+                          : nullptr;
 
   FrameSync sync(10);
   FrameSync rear_sync(10);
@@ -349,178 +448,194 @@ int main(int argc, char **argv) {
   auto rr_gt_cam =
       boost::static_pointer_cast<carla::client::Sensor>(rr_gt_sensor);
 
-  rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    sync.PushRgb(std::move(f));
-  });
+  if (rgb_cam)
+    rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      sync.PushRgb(std::move(f));
+    });
 
-  gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    sync.PushGt(std::move(f));
-  });
+  if (gt_cam)
+    gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      sync.PushGt(std::move(f));
+    });
 
-  rear_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rear_sync.PushRgb(std::move(f));
-  });
+  if (rear_rgb_cam)
+    rear_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rear_sync.PushRgb(std::move(f));
+    });
 
-  rear_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rear_sync.PushGt(std::move(f));
-  });
+  if (rear_gt_cam)
+    rear_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rear_sync.PushGt(std::move(f));
+    });
 
-  left_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    left_sync.PushRgb(std::move(f));
-  });
+  if (left_rgb_cam)
+    left_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      left_sync.PushRgb(std::move(f));
+    });
 
-  left_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    left_sync.PushGt(std::move(f));
-  });
+  if (left_gt_cam)
+    left_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      left_sync.PushGt(std::move(f));
+    });
 
-  right_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    right_sync.PushRgb(std::move(f));
-  });
+  if (right_rgb_cam)
+    right_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      right_sync.PushRgb(std::move(f));
+    });
 
-  right_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    right_sync.PushGt(std::move(f));
-  });
+  if (right_gt_cam)
+    right_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      right_sync.PushGt(std::move(f));
+    });
 
   // 8-Camera Additions
-  fl_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    fl_sync.PushRgb(std::move(f));
-  });
-  fl_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    fl_sync.PushGt(std::move(f));
-  });
+  if (fl_rgb_cam)
+    fl_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      fl_sync.PushRgb(std::move(f));
+    });
+  if (fl_gt_cam)
+    fl_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      fl_sync.PushGt(std::move(f));
+    });
 
-  fr_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    fr_sync.PushRgb(std::move(f));
-  });
-  fr_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    fr_sync.PushGt(std::move(f));
-  });
+  if (fr_rgb_cam)
+    fr_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      fr_sync.PushRgb(std::move(f));
+    });
+  if (fr_gt_cam)
+    fr_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      fr_sync.PushGt(std::move(f));
+    });
 
-  rl_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rl_sync.PushRgb(std::move(f));
-  });
-  rl_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rl_sync.PushGt(std::move(f));
-  });
+  if (rl_rgb_cam)
+    rl_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rl_sync.PushRgb(std::move(f));
+    });
+  if (rl_gt_cam)
+    rl_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rl_sync.PushGt(std::move(f));
+    });
 
-  rr_rgb_cam->Listen([&](auto data) {
-    FrameIn f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rr_sync.PushRgb(std::move(f));
-  });
-  rr_gt_cam->Listen([&](auto data) {
-    GtFrame f;
-    f.frame_id = data->GetFrame();
-    f.timestamp = data->GetTimestamp();
-    f.w = w;
-    f.h = h;
-    f.carla_image =
-        boost::static_pointer_cast<carla::sensor::data::Image>(data);
-    rr_sync.PushGt(std::move(f));
-  });
+  if (rr_rgb_cam)
+    rr_rgb_cam->Listen([&](auto data) {
+      FrameIn f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rr_sync.PushRgb(std::move(f));
+    });
+  if (rr_gt_cam)
+    rr_gt_cam->Listen([&](auto data) {
+      GtFrame f;
+      f.frame_id = data->GetFrame();
+      f.timestamp = data->GetTimestamp();
+      f.w = w;
+      f.h = h;
+      f.carla_image =
+          boost::static_pointer_cast<carla::sensor::data::Image>(data);
+      rr_sync.PushGt(std::move(f));
+    });
 
   std::vector<uint64_t> saved_frames;
   std::vector<uint64_t> rear_saved_frames;
@@ -597,7 +712,26 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> rr_pred_upsampled;
   std::vector<uint8_t> rr_pred_color;
   std::vector<uint8_t> rr_overlay;
-  std::vector<uint8_t> mosaic(w * 4 * h * 2 * 3);
+
+  int num_cams = active_cameras.size();
+  if (num_cams == 0)
+    num_cams = 1;
+  int mosaic_cols = 1, mosaic_rows = 1;
+  if (num_cams == 2) {
+    mosaic_cols = 2;
+    mosaic_rows = 1;
+  } else if (num_cams == 3 || num_cams == 4) {
+    mosaic_cols = 2;
+    mosaic_rows = 2;
+  } else if (num_cams == 5 || num_cams == 6) {
+    mosaic_cols = 3;
+    mosaic_rows = 2;
+  } else if (num_cams >= 7) {
+    mosaic_cols = 4;
+    mosaic_rows = 2;
+  }
+
+  std::vector<uint8_t> mosaic(w * mosaic_cols * h * mosaic_rows * 3, 0);
 
   if (!no_pred) {
     trt_in.resize(3 * out_w * out_h);
@@ -1319,26 +1453,67 @@ int main(int argc, char **argv) {
 
     total_processed++;
 
-    if (viewer && got_pair && got_rear_pair && got_left_pair &&
-        got_right_pair && got_fl_pair && got_fr_pair && got_rl_pair &&
-        got_rr_pair) {
-      const uint8_t *f_ptr = no_pred ? rgb_bytes.data() : overlay.data();
-      const uint8_t *r_ptr =
-          no_pred ? rear_rgb_bytes.data() : rear_overlay.data();
-      const uint8_t *l_ptr =
-          no_pred ? left_rgb_bytes.data() : left_overlay.data();
-      const uint8_t *ri_ptr =
-          no_pred ? right_rgb_bytes.data() : right_overlay.data();
-      const uint8_t *fl_ptr = no_pred ? fl_rgb_bytes.data() : fl_overlay.data();
-      const uint8_t *fr_ptr = no_pred ? fr_rgb_bytes.data() : fr_overlay.data();
-      const uint8_t *rl_ptr = no_pred ? rl_rgb_bytes.data() : rl_overlay.data();
-      const uint8_t *rr_ptr = no_pred ? rr_rgb_bytes.data() : rr_overlay.data();
+    if (viewer) {
+      bool all_ready = true;
+      if (active_cameras.count(0) && !got_pair)
+        all_ready = false;
+      if (active_cameras.count(1) && !got_rear_pair)
+        all_ready = false;
+      if (active_cameras.count(2) && !got_left_pair)
+        all_ready = false;
+      if (active_cameras.count(3) && !got_right_pair)
+        all_ready = false;
+      if (active_cameras.count(4) && !got_fl_pair)
+        all_ready = false;
+      if (active_cameras.count(5) && !got_fr_pair)
+        all_ready = false;
+      if (active_cameras.count(6) && !got_rl_pair)
+        all_ready = false;
+      if (active_cameras.count(7) && !got_rr_pair)
+        all_ready = false;
 
-      vis::CreateMosaic8(fl_ptr, f_ptr, fr_ptr, ri_ptr, l_ptr, rl_ptr, r_ptr,
-                         rr_ptr, w, h, mosaic.data());
+      if (all_ready) {
+        const uint8_t *f_ptr = no_pred ? rgb_bytes.data() : overlay.data();
+        const uint8_t *r_ptr =
+            no_pred ? rear_rgb_bytes.data() : rear_overlay.data();
+        const uint8_t *l_ptr =
+            no_pred ? left_rgb_bytes.data() : left_overlay.data();
+        const uint8_t *ri_ptr =
+            no_pred ? right_rgb_bytes.data() : right_overlay.data();
+        const uint8_t *fl_ptr =
+            no_pred ? fl_rgb_bytes.data() : fl_overlay.data();
+        const uint8_t *fr_ptr =
+            no_pred ? fr_rgb_bytes.data() : fr_overlay.data();
+        const uint8_t *rl_ptr =
+            no_pred ? rl_rgb_bytes.data() : rl_overlay.data();
+        const uint8_t *rr_ptr =
+            no_pred ? rr_rgb_bytes.data() : rr_overlay.data();
 
-      viewer->submit_frame_rgb888(mosaic.data(), w * 4, h * 2);
-      viewer->render_latest();
+        std::vector<const uint8_t *> frames;
+        if (active_cameras.count(0))
+          frames.push_back(f_ptr);
+        if (active_cameras.count(1))
+          frames.push_back(r_ptr);
+        if (active_cameras.count(2))
+          frames.push_back(l_ptr);
+        if (active_cameras.count(3))
+          frames.push_back(ri_ptr);
+        if (active_cameras.count(4))
+          frames.push_back(fl_ptr);
+        if (active_cameras.count(5))
+          frames.push_back(fr_ptr);
+        if (active_cameras.count(6))
+          frames.push_back(rl_ptr);
+        if (active_cameras.count(7))
+          frames.push_back(rr_ptr);
+
+        vis::CreateDynamicMosaic(frames, mosaic_cols, mosaic_rows, w, h,
+                                 mosaic.data());
+
+        viewer->submit_frame_rgb888(mosaic.data(), w * mosaic_cols,
+                                    h * mosaic_rows);
+        viewer->render_latest();
+      }
     }
 
     if (total_processed % print_every == 0) {

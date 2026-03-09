@@ -143,6 +143,37 @@ void CreateMosaic8(const uint8_t *rgb_tl, const uint8_t *rgb_tml,
   }
 }
 
+void CreateDynamicMosaic(const std::vector<const uint8_t *> &frames, int cols,
+                         int rows, int w, int h, uint8_t *out_mosaic) {
+  int out_w = w * cols;
+  int row_bytes = w * 3;
+  int out_row_bytes = out_w * 3;
+
+  for (int r = 0; r < rows; ++r) {
+    for (int c = 0; c < cols; ++c) {
+      int frame_idx = r * cols + c;
+      if (frame_idx >= static_cast<int>(frames.size())) {
+        continue; // Frame index exceeds available inputs, leave padded zero
+                  // spaces
+      }
+
+      const uint8_t *current_frame = frames[frame_idx];
+      if (!current_frame)
+        continue; // Skip if null pointer was passed
+
+      // Calculate start y offset in the output mosaic
+      int y_offset = r * h;
+      for (int y = 0; y < h; ++y) {
+        // Copy pixel row 'y' from the individual frame into the stitched
+        // location
+        std::memcpy(out_mosaic + (y + y_offset) * out_row_bytes +
+                        (c * row_bytes),
+                    current_frame + y * row_bytes, row_bytes);
+      }
+    }
+  }
+}
+
 bool SavePng(const std::string &filepath, int w, int h, int channels,
              const uint8_t *data) {
   int res =

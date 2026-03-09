@@ -1,0 +1,1 @@
+Gnuplot file <./data_trace.gp> has been successfully created.

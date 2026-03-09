@@ -1,0 +1,9 @@
+STARPU_SCHED=dmda
+STARPU_BUS_STATS=1
+STARPU_ENABLE_STATS=1
+STARPU_WORKER_STATS=1
+STARPU_SCHED_LIB=/home/eric/Antigravity_Starpu_UsageTest/custom_sched_rr_workers/build/libstarpu_sched_rr_workers.so
+STARPU_FXT_PREFIX=/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/runs/20260308_202632_profile_cityscapes_hrnet_direct/starpu_traces/20260308_202707_cityscapes_hrnet_direct_dmda/00_raw
+STARPU_MEMORY_STATS=1
+STARPU_PROFILING=1
+STARPU_FXT_TRACE=1

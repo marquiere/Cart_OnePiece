@@ -1,0 +1,10 @@
+[10_apex]
+  - apex_index.txt
+  - run_taskgraph
+
+[run_taskgraph]
+  - apex.log
+  - apex_runinfo.txt
+  - taskgraph.0.dot
+  - taskgraph.0.dot.pdf
+

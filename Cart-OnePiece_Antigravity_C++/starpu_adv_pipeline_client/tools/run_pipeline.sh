@@ -17,11 +17,10 @@ fi
 # ==============================================================================
 # Configuration & Defaults
 # ==============================================================================
-TRACE_ROOT_DEFAULT="/tmp/starpu_traces_adv"
+PROJ_ROOT="$(pwd)"
 BUILD_DIR_DEFAULT="./build"
 
 # Arguments with defaults
-TRACE_ROOT="$TRACE_ROOT_DEFAULT"
 BUILD_DIR="$BUILD_DIR_DEFAULT"
 FRAMES=200
 ENGINE="models/dummy.engine"
@@ -40,6 +39,7 @@ OUT_W=512
 OUT_H=256
 INFLIGHT=2
 CPU_WORKERS=8
+CAMERAS="0"
 ASSUME_BGRA=1
 NO_PRED=0
 
@@ -61,7 +61,7 @@ usage() {
     echo "  --engine PATH       Path to TensorRT engine (default: models/dummy.engine)"
     echo "  --deeplabv3         Use models/deeplabv3_mobilenet.engine"
     echo "  --resnet50          Use models/fcn_resnet50.engine"
-    echo "  --trace-root PATH   Set trace root directory (default: $TRACE_ROOT_DEFAULT)"
+    echo "  --trace-root PATH   Set trace root directory (default: \$RUN_DIR/starpu_traces)"
     echo "  --memory            Enable Memory/Bus Stats mode"
     echo "  --apex-mode MODE    Set APEX mode (off, gtrace, gtrace-tasks, taskgraph, all)"
     echo "  --display           Enable Live SDL2 Semantic GUI window"
@@ -95,6 +95,7 @@ while [[ "$#" -gt 0 ]]; do
         --h) H="$2"; shift ;;
         --out_w) OUT_W="$2"; shift ;;
         --out_h) OUT_H="$2"; shift ;;
+        --cameras) CAMERAS="$2"; shift ;;
         --inflight) INFLIGHT="$2"; shift ;;
         --cpu_workers) CPU_WORKERS="$2"; shift ;;
         --assume_bgra) ASSUME_BGRA="$2"; shift ;;
@@ -128,19 +129,38 @@ done
 ENGINE_NAME=$(basename "$ENGINE" .engine)
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 
+MODE_STR="standard"
+if [ "$RUN_DATASET" -eq 1 ]; then
+    MODE_STR="dataset"
+elif [ "$RUN_SWEEP" -eq 1 ]; then
+    MODE_STR="sweep"
+elif [ "$RUN_SPLIT" -eq 1 ]; then
+    MODE_STR="split"
+elif [ "$RUN_PROFILING" -eq 1 ]; then
+    MODE_STR="profile"
+fi
+
 if [ -n "$OVERRIDE_OUT_DIR" ]; then
     export RUN_DIR="$OVERRIDE_OUT_DIR"
 else
-    export RUN_DIR="$(pwd)/runs/${TIMESTAMP}_${ENGINE_NAME}"
+    export RUN_DIR="$(pwd)/runs/${TIMESTAMP}_${MODE_STR}_${ENGINE_NAME}"
 fi
 mkdir -p "$RUN_DIR"
 
+if [ -z "$TRACE_ROOT" ]; then
+    TRACE_ROOT="$RUN_DIR/starpu_traces"
+fi
+
 SERVER_STARTED=0
+TRAFFIC_PID=""
 
 cleanup() {
     if [ "$SERVER_STARTED" -eq 1 ]; then
         echo "--- KILLING SERVER AND CLEANING UP ---"
-        ./tools/kill_server.sh --run_dir "$RUN_DIR" || true
+        "$PROJ_ROOT/tools/kill_server.sh" --run_dir "$RUN_DIR" || true
+    fi
+    if [ -n "$TRAFFIC_PID" ]; then
+        kill -9 "$TRAFFIC_PID" 2>/dev/null || true
     fi
 }
 trap cleanup EXIT
@@ -148,7 +168,7 @@ trap cleanup EXIT
 echo "--- STARTING SERVER ---"
 pkill -9 -f CarlaUE4 || true
 pkill -9 -f pipeline_starpu || true
-./tools/run_server.sh --port "$PORT" --run_dir "$RUN_DIR"
+"$PROJ_ROOT/tools/run_server.sh" --port "$PORT" --run_dir "$RUN_DIR"
 SERVER_STARTED=1
 
 echo "Waiting 15 seconds for CARLA to initialize..."
@@ -163,8 +183,9 @@ else
     echo "--- CONFIGURING MAP AND TRAFFIC ---"
     python3 "$CARLA_ROOT/PythonAPI/util/config.py" --host "$HOST" --port "$PORT" --map "$MAP"
     sleep 5 # Wait for map to reload
-    python3 "$CARLA_ROOT/PythonAPI/examples/generate_traffic.py" --host "$HOST" --port "$PORT" -n "$VEHICLES" -w "$PEDESTRIANS" --asynch &
-    sleep 3
+    python3 "$CARLA_ROOT/PythonAPI/examples/generate_traffic.py" --host "$HOST" --port "$PORT" --tm-port 8050 -n "$VEHICLES" -w "$PEDESTRIANS" --asynch > /dev/null 2>&1 &
+    TRAFFIC_PID=$!
+    sleep 15
 fi
 
 # ==============================================================================
@@ -173,7 +194,7 @@ fi
 if [ "$RUN_DATASET" -eq 1 ]; then
     echo "--- RUNNING DATASET EXTRACTION ---"
     DATASET_FRAMES=$FRAMES
-    DATASET_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $DATASET_FRAMES --out_w $OUT_W --out_h $OUT_H --assume_bgra $ASSUME_BGRA --display $DISPLAY_MODE"
+    DATASET_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $DATASET_FRAMES --out_w $OUT_W --out_h $OUT_H --cameras $CAMERAS --assume_bgra $ASSUME_BGRA --display $DISPLAY_MODE"
     if [ "$NO_PRED" -eq 1 ]; then
         DATASET_ARGS="$DATASET_ARGS --no_pred 1"
     else
@@ -181,6 +202,8 @@ if [ "$RUN_DATASET" -eq 1 ]; then
     fi
     ./build/dataset_sanity $DATASET_ARGS || echo "Extraction Failed!"
 fi
+
+
 
 # ==============================================================================
 # MULTI-PROCESS SPLIT EXECUTION
@@ -190,7 +213,7 @@ if [ "$RUN_SPLIT" -eq 1 ]; then
     PRINT_EVERY=$((FRAMES / 5))
     if [ "$PRINT_EVERY" -lt 1 ]; then PRINT_EVERY=1; fi
 
-    PIPELINE_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every $PRINT_EVERY --eval_every $FRAMES --display $DISPLAY_MODE"
+    PIPELINE_ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --cameras $CAMERAS --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every $PRINT_EVERY --eval_every $FRAMES --display $DISPLAY_MODE"
     if [ "$MEMORY_MODE" -eq 1 ]; then
         PIPELINE_ARGS="$PIPELINE_ARGS --print_stats"
     fi
@@ -210,6 +233,8 @@ fi
 # ==============================================================================
 run_profiling_internal() {
     local SCHED="$1"
+    local INIT_DIR="$PWD"
+    trap 'cd "$INIT_DIR"' RETURN
     echo "====================================================================="
     echo "--- RUNNING PROFILING HARNESS (SCHEDULER: $SCHED) ---"
     echo "====================================================================="
@@ -239,7 +264,6 @@ if [ "$PARANOID" != "UNKNOWN" ] && [ "$PARANOID" -gt 2 ]; then
     echo "  sudo sysctl -w kernel.perf_event_paranoid=1"
     echo "----------------------------------------------------------------"
 fi
-
 # ==============================================================================
 # STEP 0: Create Run Folder with Unique RUN_ID
 # ==============================================================================
@@ -300,7 +324,7 @@ if [ "$SCHED" = "rr_workers" ]; then
     export STARPU_NCPU=8
     export STARPU_NCUDA=1
     
-    PLUGIN_DIR="$(pwd)/custom_sched_rr_workers"
+    PLUGIN_DIR="$PROJ_ROOT/custom_sched_rr_workers"
     PLUGIN_BUILD="$PLUGIN_DIR/build"
     PLUGIN_LIB="$PLUGIN_BUILD/libstarpu_sched_rr_workers.so"
     
@@ -352,7 +376,7 @@ else
 fi
 
 # Construct Arguments
-ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every 20 --eval_every $FRAMES --display $DISPLAY_MODE"
+ARGS="--host $HOST --port $PORT --w $W --h $H --fps $FPS --frames $FRAMES --engine $ENGINE --out_w $OUT_W --out_h $OUT_H --cameras $CAMERAS --inflight $INFLIGHT --cpu_workers $CPU_WORKERS --print_every 20 --eval_every $FRAMES --display $DISPLAY_MODE"
 if [ "$MEMORY_MODE" -eq 1 ]; then
     ARGS="$ARGS --print_stats"
 fi
@@ -725,13 +749,13 @@ echo "RUN COMPLETE: $BASE"
 
 if [ "$RUN_PROFILING" -eq 1 ]; then
     if [ "$RUN_SWEEP" -eq 1 ]; then
-        echo "--- RUNNING PROFILING HARNESS (SWEEP) ---"
-        run_profiling_internal "dmda"
-        run_profiling_internal "rr_workers"
-        run_profiling_internal "ws"
-        run_profiling_internal "eager"
+        echo "--- RUNNING SCHEDULER SWEEP ---"
+        SCHEDS=("dmda" "rr_workers" "ws" "eager")
+        for s in "${SCHEDS[@]}"; do
+            TRACE_ROOT="$RUN_DIR/starpu_traces" run_profiling_internal "$s"
+        done
     else
-        run_profiling_internal "$SCHED"
+        TRACE_ROOT="$RUN_DIR/starpu_traces" run_profiling_internal "$SCHED"
     fi
 fi
 

@@ -1,0 +1,21 @@
+digraph prof {
+ label = "Start Date/Time: 08/03/2026 20:28:07\lElapsed Time: 53.1676 seconds\lCores detected: 20\lWorker threads observed: 6\lAvailable CPU time: 319.006 seconds\l"
+ labelloc = "t";
+ labeljust = "l";
+ overlap = false;
+ splines = true;
+ rankdir = "LR";
+ node [shape=box];
+  "APEX MAIN" -> "UNRESOLVED ADDR (nil)" [ label="  count: 1600" ]; 
+  "APEX MAIN" -> "int apex_preload_main(int, char **, char **)" [ label="  count: 1" ]; 
+  "UNRESOLVED ADDR (nil)" -> "cl_post" [ label="  count: 1600" ]; 
+  "UNRESOLVED ADDR (nil)" -> "UNRESOLVED ADDR (nil)" [ label="  count: 3200" ]; 
+  "UNRESOLVED ADDR (nil)" -> "cl_infer_trt" [ label="  count: 1600" ]; 
+  "UNRESOLVED ADDR (nil)" -> "cl_preproc" [ label="  count: 1600" ]; 
+  "int apex_preload_main(int, char **, char **)" [shape=box; color=firebrick; style=filled; fontcolor=white; fillcolor="#ff0000"; label="int apex_preload_main(int, char **, char **)\lcalls: 1\ltime: 53.1672s\linclusive: 53.1672s\lper call: 53.1672s\l" ];
+  "cl_post" [shape=box; color=firebrick; style=filled; fontcolor=black; fillcolor="#fffefe"; label="cl_post\lcalls: 1600\ltime: 0.167536s\linclusive: 0.167543s\lper call: 0.00010471s\l" ];
+  "cl_infer_trt" [shape=box; color=firebrick; style=filled; fontcolor=black; fillcolor="#ffb8b8"; label="cl_infer_trt\lcalls: 1600\ltime: 14.754s\linclusive: 14.754s\lper call: 0.00922123s\l" ];
+  "APEX MAIN" [shape=box; color=firebrick; style=filled; fontcolor=white; fillcolor="#ff0000"; label="APEX MAIN\lcalls: 1\ltime: 53.1676s\linclusive: 53.1676s\lper call: 53.1676s\l" ];
+  "cl_preproc" [shape=box; color=firebrick; style=filled; fontcolor=black; fillcolor="#ffebeb"; label="cl_preproc\lcalls: 1600\ltime: 4.16416s\linclusive: 4.16417s\lper call: 0.0026026s\l" ];
+  "UNRESOLVED ADDR (nil)" [shape=box; color=firebrick; style=filled; fontcolor=black; fillcolor="#ffa3a3"; label="UNRESOLVED ADDR (nil)\lcalls: 4800\ltime: 19.1235s\linclusive: 19.1235s\lper call: 0.00398407s\l" ];
+}

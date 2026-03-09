@@ -1,0 +1,8 @@
+Command: apex_exec --apex:taskgraph /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 400 --engine models/cityscapes_hrnet_direct.engine --out_w 512 --out_h 256 --cameras 0,3,4,5 --inflight 200 --cpu_workers 4 --print_every 20 --eval_every 400 --display 0 --print_stats
+Start: dom 08 mar 2026 20:28:06 -03
+End: dom 08 mar 2026 20:29:00 -03
+Return Code: 0
+Files:
+apex.log
+apex_runinfo.txt
+taskgraph.0.dot

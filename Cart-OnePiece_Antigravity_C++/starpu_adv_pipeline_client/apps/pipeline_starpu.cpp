@@ -8,7 +8,9 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
+#include <set>
 #include <sstream>
 #include <string>
 #include <thread>
@@ -130,6 +132,7 @@ struct EvalConfig {
   int out_w = 0;
   int out_h = 0;
   SegmentationViewerSDL2 *viewer = nullptr;
+  std::set<int> active_cameras;
 };
 
 static void ResizeLabelsNearest(const uint8_t *src, int in_w, int in_h,
@@ -268,7 +271,23 @@ void evaluate_thread(const EvalConfig &cfg) {
         latest_fr.resize(w * h * 3, 0);
         latest_rl.resize(w * h * 3, 0);
         latest_rr.resize(w * h * 3, 0);
-        mosaic.resize(w * 4 * h * 2 * 3, 0);
+
+        int num_cams = cfg.active_cameras.size();
+        int cols = 1, rows = 1;
+        if (num_cams == 2) {
+          cols = 2;
+          rows = 1;
+        } else if (num_cams == 3 || num_cams == 4) {
+          cols = 2;
+          rows = 2;
+        } else if (num_cams == 5 || num_cams == 6) {
+          cols = 3;
+          rows = 2;
+        } else if (num_cams >= 7) {
+          cols = 4;
+          rows = 2;
+        }
+        mosaic.resize(w * cols * h * rows * 3, 0);
       }
 
       std::vector<uint8_t> rgb_bytes(w * h * 3);
@@ -305,12 +324,43 @@ void evaluate_thread(const EvalConfig &cfg) {
         std::memcpy(latest_rr.data(), overlay.data(), w * h * 3);
       }
 
-      vis::CreateMosaic8(
-          latest_fl.data(), latest_front.data(), latest_fr.data(),
-          latest_right.data(), latest_left.data(), latest_rl.data(),
-          latest_rear.data(), latest_rr.data(), w, h, mosaic.data());
+      int num_cams = cfg.active_cameras.size();
+      int cols = 1, rows = 1;
+      if (num_cams == 2) {
+        cols = 2;
+        rows = 1;
+      } else if (num_cams == 3 || num_cams == 4) {
+        cols = 2;
+        rows = 2;
+      } else if (num_cams == 5 || num_cams == 6) {
+        cols = 3;
+        rows = 2;
+      } else if (num_cams >= 7) {
+        cols = 4;
+        rows = 2;
+      }
 
-      cfg.viewer->submit_frame_rgb888(mosaic.data(), w * 4, h * 2);
+      std::vector<const uint8_t *> frames;
+      // Gather active frames specifically mapping to the integer indices 0-7
+      if (cfg.active_cameras.count(0))
+        frames.push_back(latest_front.data());
+      if (cfg.active_cameras.count(1))
+        frames.push_back(latest_rear.data());
+      if (cfg.active_cameras.count(2))
+        frames.push_back(latest_left.data());
+      if (cfg.active_cameras.count(3))
+        frames.push_back(latest_right.data());
+      if (cfg.active_cameras.count(4))
+        frames.push_back(latest_fl.data());
+      if (cfg.active_cameras.count(5))
+        frames.push_back(latest_fr.data());
+      if (cfg.active_cameras.count(6))
+        frames.push_back(latest_rl.data());
+      if (cfg.active_cameras.count(7))
+        frames.push_back(latest_rr.data());
+
+      vis::CreateDynamicMosaic(frames, cols, rows, w, h, mosaic.data());
+      cfg.viewer->submit_frame_rgb888(mosaic.data(), w * cols, h * rows);
     }
 
     if (cfg.enabled) {
@@ -584,6 +634,7 @@ int main(int argc, char **argv) {
   float std_vals[3] = {0.229f, 0.224f, 0.225f};
   bool display = false;
   bool print_stats = false;
+  std::set<int> active_cameras = {0};
 
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
@@ -627,6 +678,14 @@ int main(int argc, char **argv) {
       do_eval = false;
     else if (arg == "--print_stats")
       print_stats = true;
+    else if (arg == "--cameras" && i + 1 < argc) {
+      active_cameras.clear();
+      std::stringstream ss(argv[++i]);
+      std::string item;
+      while (std::getline(ss, item, ',')) {
+        active_cameras.insert(std::stoi(item));
+      }
+    }
   }
 
   std::cout << "[Pipeline] StarPU pipeline starting.\n";
@@ -688,9 +747,25 @@ int main(int argc, char **argv) {
   std::unique_ptr<SegmentationViewerSDL2> viewer;
   if (display) {
     viewer = std::make_unique<SegmentationViewerSDL2>();
-    // Quadruple width and double height for 4x2 mosaic, scale down to 50% for
-    // display
-    if (!viewer->init(w * 4, h * 2, 0.5f)) {
+    int num_cams = active_cameras.size();
+    if (num_cams == 0)
+      num_cams = 1;
+    int cols = 1, rows = 1;
+    if (num_cams == 2) {
+      cols = 2;
+      rows = 1;
+    } else if (num_cams == 3 || num_cams == 4) {
+      cols = 2;
+      rows = 2;
+    } else if (num_cams == 5 || num_cams == 6) {
+      cols = 3;
+      rows = 2;
+    } else if (num_cams >= 7) {
+      cols = 4;
+      rows = 2;
+    }
+
+    if (!viewer->init(w * cols, h * rows, 0.5f)) {
       std::cerr << "[Pipeline] Viewer init failed, running headless.\n";
       viewer.reset();
     }
@@ -704,14 +779,25 @@ int main(int argc, char **argv) {
   ecfg.out_h = out_h;
   ecfg.print_every = eval_every;
   ecfg.viewer = viewer.get();
+  ecfg.active_cameras = active_cameras;
   std::thread eval_t(evaluate_thread, ecfg);
 
   // CARLA setup
   auto client = cc::Client(host, port);
-  client.SetTimeout(std::chrono::seconds(10));
+  client.SetTimeout(std::chrono::seconds(60));
   if (!map_name.empty())
     client.LoadWorld(map_name);
-  auto world = client.GetWorld();
+
+  std::optional<cc::World> world_opt;
+  while (!world_opt) {
+    try {
+      world_opt = client.GetWorld();
+    } catch (const std::exception &e) {
+      std::cerr << "Timeout waiting for CARLA world. Retrying...\n";
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+    }
+  }
+  auto world = *world_opt;
   auto map = world.GetMap();
 
   auto tm = client.GetInstanceTM();
@@ -721,9 +807,18 @@ int main(int argc, char **argv) {
   auto blueprint_library = world.GetBlueprintLibrary();
   auto vehicle_bp = *(blueprint_library->Find("vehicle.tesla.model3"));
   auto spawn_points = map->GetRecommendedSpawnPoints();
-  auto spawn_point = spawn_points[0];
-  spawn_point.location.z += 1.0f;
-  auto vehicle = world.SpawnActor(vehicle_bp, spawn_point);
+  boost::shared_ptr<cc::Actor> vehicle = nullptr;
+  for (auto sp : spawn_points) {
+    sp.location.z += 1.0f;
+    vehicle = world.TrySpawnActor(vehicle_bp, sp);
+    if (vehicle)
+      break;
+  }
+
+  if (!vehicle) {
+    std::cerr << "Failed to spawn vehicle anywhere!\n";
+    return 1;
+  }
   vehicle->SetSimulatePhysics(true);
   boost::static_pointer_cast<cc::Vehicle>(vehicle)->SetAutopilot(true, tm_port);
 
@@ -749,14 +844,30 @@ int main(int argc, char **argv) {
   rgb_bp.SetAttribute("image_size_y", std::to_string(h));
   rgb_bp.SetAttribute("sensor_tick", std::to_string(1.0f / fps));
 
-  auto front_rgb = world.SpawnActor(rgb_bp, front_tf, vehicle.get());
-  auto rear_rgb = world.SpawnActor(rgb_bp, rear_tf, vehicle.get());
-  auto left_rgb = world.SpawnActor(rgb_bp, left_tf, vehicle.get());
-  auto right_rgb = world.SpawnActor(rgb_bp, right_tf, vehicle.get());
-  auto fl_rgb = world.SpawnActor(rgb_bp, fl_tf, vehicle.get());
-  auto fr_rgb = world.SpawnActor(rgb_bp, fr_tf, vehicle.get());
-  auto rl_rgb = world.SpawnActor(rgb_bp, rl_tf, vehicle.get());
-  auto rr_rgb = world.SpawnActor(rgb_bp, rr_tf, vehicle.get());
+  auto front_rgb = (active_cameras.count(0))
+                       ? world.SpawnActor(rgb_bp, front_tf, vehicle.get())
+                       : nullptr;
+  auto rear_rgb = (active_cameras.count(1))
+                      ? world.SpawnActor(rgb_bp, rear_tf, vehicle.get())
+                      : nullptr;
+  auto left_rgb = (active_cameras.count(2))
+                      ? world.SpawnActor(rgb_bp, left_tf, vehicle.get())
+                      : nullptr;
+  auto right_rgb = (active_cameras.count(3))
+                       ? world.SpawnActor(rgb_bp, right_tf, vehicle.get())
+                       : nullptr;
+  auto fl_rgb = (active_cameras.count(4))
+                    ? world.SpawnActor(rgb_bp, fl_tf, vehicle.get())
+                    : nullptr;
+  auto fr_rgb = (active_cameras.count(5))
+                    ? world.SpawnActor(rgb_bp, fr_tf, vehicle.get())
+                    : nullptr;
+  auto rl_rgb = (active_cameras.count(6))
+                    ? world.SpawnActor(rgb_bp, rl_tf, vehicle.get())
+                    : nullptr;
+  auto rr_rgb = (active_cameras.count(7))
+                    ? world.SpawnActor(rgb_bp, rr_tf, vehicle.get())
+                    : nullptr;
 
   auto gt_bp =
       *(blueprint_library->Find("sensor.camera.semantic_segmentation"));
@@ -764,14 +875,30 @@ int main(int argc, char **argv) {
   gt_bp.SetAttribute("image_size_y", std::to_string(h));
   gt_bp.SetAttribute("sensor_tick", std::to_string(1.0f / fps));
 
-  auto front_gt = world.SpawnActor(gt_bp, front_tf, vehicle.get());
-  auto rear_gt = world.SpawnActor(gt_bp, rear_tf, vehicle.get());
-  auto left_gt = world.SpawnActor(gt_bp, left_tf, vehicle.get());
-  auto right_gt = world.SpawnActor(gt_bp, right_tf, vehicle.get());
-  auto fl_gt = world.SpawnActor(gt_bp, fl_tf, vehicle.get());
-  auto fr_gt = world.SpawnActor(gt_bp, fr_tf, vehicle.get());
-  auto rl_gt = world.SpawnActor(gt_bp, rl_tf, vehicle.get());
-  auto rr_gt = world.SpawnActor(gt_bp, rr_tf, vehicle.get());
+  auto front_gt = (active_cameras.count(0))
+                      ? world.SpawnActor(gt_bp, front_tf, vehicle.get())
+                      : nullptr;
+  auto rear_gt = (active_cameras.count(1))
+                     ? world.SpawnActor(gt_bp, rear_tf, vehicle.get())
+                     : nullptr;
+  auto left_gt = (active_cameras.count(2))
+                     ? world.SpawnActor(gt_bp, left_tf, vehicle.get())
+                     : nullptr;
+  auto right_gt = (active_cameras.count(3))
+                      ? world.SpawnActor(gt_bp, right_tf, vehicle.get())
+                      : nullptr;
+  auto fl_gt = (active_cameras.count(4))
+                   ? world.SpawnActor(gt_bp, fl_tf, vehicle.get())
+                   : nullptr;
+  auto fr_gt = (active_cameras.count(5))
+                   ? world.SpawnActor(gt_bp, fr_tf, vehicle.get())
+                   : nullptr;
+  auto rl_gt = (active_cameras.count(6))
+                   ? world.SpawnActor(gt_bp, rl_tf, vehicle.get())
+                   : nullptr;
+  auto rr_gt = (active_cameras.count(7))
+                   ? world.SpawnActor(gt_bp, rr_tf, vehicle.get())
+                   : nullptr;
 
   FrameSync front_sync(sync_window);
   FrameSync rear_sync(sync_window);
@@ -808,39 +935,55 @@ int main(int argc, char **argv) {
     s.PushGt(std::move(g));
   };
 
-  boost::static_pointer_cast<cc::Sensor>(front_rgb)->Listen(
-      [&front_sync, on_rgb](auto data) { on_rgb(front_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rear_rgb)->Listen(
-      [&rear_sync, on_rgb](auto data) { on_rgb(rear_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(left_rgb)->Listen(
-      [&left_sync, on_rgb](auto data) { on_rgb(left_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(right_rgb)->Listen(
-      [&right_sync, on_rgb](auto data) { on_rgb(right_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(fl_rgb)->Listen(
-      [&fl_sync, on_rgb](auto data) { on_rgb(fl_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(fr_rgb)->Listen(
-      [&fr_sync, on_rgb](auto data) { on_rgb(fr_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rl_rgb)->Listen(
-      [&rl_sync, on_rgb](auto data) { on_rgb(rl_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rr_rgb)->Listen(
-      [&rr_sync, on_rgb](auto data) { on_rgb(rr_sync, data); });
+  if (front_rgb)
+    boost::static_pointer_cast<cc::Sensor>(front_rgb)->Listen(
+        [&front_sync, on_rgb](auto data) { on_rgb(front_sync, data); });
+  if (rear_rgb)
+    boost::static_pointer_cast<cc::Sensor>(rear_rgb)->Listen(
+        [&rear_sync, on_rgb](auto data) { on_rgb(rear_sync, data); });
+  if (left_rgb)
+    boost::static_pointer_cast<cc::Sensor>(left_rgb)->Listen(
+        [&left_sync, on_rgb](auto data) { on_rgb(left_sync, data); });
+  if (right_rgb)
+    boost::static_pointer_cast<cc::Sensor>(right_rgb)->Listen(
+        [&right_sync, on_rgb](auto data) { on_rgb(right_sync, data); });
+  if (fl_rgb)
+    boost::static_pointer_cast<cc::Sensor>(fl_rgb)->Listen(
+        [&fl_sync, on_rgb](auto data) { on_rgb(fl_sync, data); });
+  if (fr_rgb)
+    boost::static_pointer_cast<cc::Sensor>(fr_rgb)->Listen(
+        [&fr_sync, on_rgb](auto data) { on_rgb(fr_sync, data); });
+  if (rl_rgb)
+    boost::static_pointer_cast<cc::Sensor>(rl_rgb)->Listen(
+        [&rl_sync, on_rgb](auto data) { on_rgb(rl_sync, data); });
+  if (rr_rgb)
+    boost::static_pointer_cast<cc::Sensor>(rr_rgb)->Listen(
+        [&rr_sync, on_rgb](auto data) { on_rgb(rr_sync, data); });
 
-  boost::static_pointer_cast<cc::Sensor>(front_gt)->Listen(
-      [&front_sync, on_gt](auto data) { on_gt(front_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rear_gt)->Listen(
-      [&rear_sync, on_gt](auto data) { on_gt(rear_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(left_gt)->Listen(
-      [&left_sync, on_gt](auto data) { on_gt(left_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(right_gt)->Listen(
-      [&right_sync, on_gt](auto data) { on_gt(right_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(fl_gt)->Listen(
-      [&fl_sync, on_gt](auto data) { on_gt(fl_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(fr_gt)->Listen(
-      [&fr_sync, on_gt](auto data) { on_gt(fr_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rl_gt)->Listen(
-      [&rl_sync, on_gt](auto data) { on_gt(rl_sync, data); });
-  boost::static_pointer_cast<cc::Sensor>(rr_gt)->Listen(
-      [&rr_sync, on_gt](auto data) { on_gt(rr_sync, data); });
+  if (front_gt)
+    boost::static_pointer_cast<cc::Sensor>(front_gt)->Listen(
+        [&front_sync, on_gt](auto data) { on_gt(front_sync, data); });
+  if (rear_gt)
+    boost::static_pointer_cast<cc::Sensor>(rear_gt)->Listen(
+        [&rear_sync, on_gt](auto data) { on_gt(rear_sync, data); });
+  if (left_gt)
+    boost::static_pointer_cast<cc::Sensor>(left_gt)->Listen(
+        [&left_sync, on_gt](auto data) { on_gt(left_sync, data); });
+  if (right_gt)
+    boost::static_pointer_cast<cc::Sensor>(right_gt)->Listen(
+        [&right_sync, on_gt](auto data) { on_gt(right_sync, data); });
+  if (fl_gt)
+    boost::static_pointer_cast<cc::Sensor>(fl_gt)->Listen(
+        [&fl_sync, on_gt](auto data) { on_gt(fl_sync, data); });
+  if (fr_gt)
+    boost::static_pointer_cast<cc::Sensor>(fr_gt)->Listen(
+        [&fr_sync, on_gt](auto data) { on_gt(fr_sync, data); });
+  if (rl_gt)
+    boost::static_pointer_cast<cc::Sensor>(rl_gt)->Listen(
+        [&rl_sync, on_gt](auto data) { on_gt(rl_sync, data); });
+  if (rr_gt)
+    boost::static_pointer_cast<cc::Sensor>(rr_gt)->Listen(
+        [&rr_sync, on_gt](auto data) { on_gt(rr_sync, data); });
 
   // Sensors registered!
   auto settings = world.GetSettings();
@@ -965,6 +1108,14 @@ int main(int argc, char **argv) {
         t3->callback_func = post_finish_callback;
         t3->callback_arg = s;
         t3->callback_arg_free = 0; // The slot manager manages this pointer
+
+        if (s->view == CameraView::Front) {
+          auto loc = vehicle->GetLocation();
+          std::cout << "[Pipeline] Frame " << s->match.frame_id
+                    << " Vehicle Loc: (" << loc.x << ", " << loc.y << ", "
+                    << loc.z << ")\n";
+        }
+
         starpu_task_submit(t3);
 
         {
@@ -991,44 +1142,59 @@ int main(int argc, char **argv) {
       return true;
     };
 
-    if (!process_camera(front_sync, CameraView::Front, dropped,
-                        frames_processed))
-      break;
+    auto discard_camera = [&](FrameSync &sync_instance) {
+      MatchedPair pair;
+      while (sync_instance.TryPopMatched(pair)) {
+        // Just discard
+      }
+    };
 
-    int dummy_rear_dropped = 0;
-    int dummy_rear_processed = 0;
-    process_camera(rear_sync, CameraView::Rear, dummy_rear_dropped,
-                   dummy_rear_processed);
+    if (active_cameras.count(0)) {
+      if (!process_camera(front_sync, CameraView::Front, dropped,
+                          frames_processed)) {
+        break;
+      }
+    } else {
+      discard_camera(front_sync);
+      // Wait to match the primary camera throttle
+      std::this_thread::sleep_for(std::chrono::milliseconds(25));
+    }
 
-    int dummy_left_dropped = 0;
-    int dummy_left_processed = 0;
-    process_camera(left_sync, CameraView::Left, dummy_left_dropped,
-                   dummy_left_processed);
+    int d_dropped = 0, d_proc = 0;
+    if (active_cameras.count(1)) {
+      process_camera(rear_sync, CameraView::Rear, d_dropped, d_proc);
+    } else
+      discard_camera(rear_sync);
 
-    int dummy_right_dropped = 0;
-    int dummy_right_processed = 0;
-    process_camera(right_sync, CameraView::Right, dummy_right_dropped,
-                   dummy_right_processed);
+    if (active_cameras.count(2)) {
+      process_camera(left_sync, CameraView::Left, d_dropped, d_proc);
+    } else
+      discard_camera(left_sync);
 
-    int dummy_fl_dropped = 0;
-    int dummy_fl_processed = 0;
-    process_camera(fl_sync, CameraView::FrontLeft, dummy_fl_dropped,
-                   dummy_fl_processed);
+    if (active_cameras.count(3)) {
+      process_camera(right_sync, CameraView::Right, d_dropped, d_proc);
+    } else
+      discard_camera(right_sync);
 
-    int dummy_fr_dropped = 0;
-    int dummy_fr_processed = 0;
-    process_camera(fr_sync, CameraView::FrontRight, dummy_fr_dropped,
-                   dummy_fr_processed);
+    if (active_cameras.count(4)) {
+      process_camera(fl_sync, CameraView::FrontLeft, d_dropped, d_proc);
+    } else
+      discard_camera(fl_sync);
 
-    int dummy_rl_dropped = 0;
-    int dummy_rl_processed = 0;
-    process_camera(rl_sync, CameraView::RearLeft, dummy_rl_dropped,
-                   dummy_rl_processed);
+    if (active_cameras.count(5)) {
+      process_camera(fr_sync, CameraView::FrontRight, d_dropped, d_proc);
+    } else
+      discard_camera(fr_sync);
 
-    int dummy_rr_dropped = 0;
-    int dummy_rr_processed = 0;
-    process_camera(rr_sync, CameraView::RearRight, dummy_rr_dropped,
-                   dummy_rr_processed);
+    if (active_cameras.count(6)) {
+      process_camera(rl_sync, CameraView::RearLeft, d_dropped, d_proc);
+    } else
+      discard_camera(rl_sync);
+
+    if (active_cameras.count(7)) {
+      process_camera(rr_sync, CameraView::RearRight, d_dropped, d_proc);
+    } else
+      discard_camera(rr_sync);
   }
 
   std::cout << "[Pipeline] Loop exit. Waiting for StarPU to drain...\n";
