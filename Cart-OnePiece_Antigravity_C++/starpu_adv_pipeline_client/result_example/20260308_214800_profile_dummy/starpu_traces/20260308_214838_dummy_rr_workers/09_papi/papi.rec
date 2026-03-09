@@ -1,0 +1,776 @@
+JobId: 1
+Event: PAPI_TOT_CYC
+Value: 13101018
+
+JobId: 1
+Event: PAPI_TOT_INS
+Value: 21540014
+
+JobId: 4
+Event: PAPI_TOT_CYC
+Value: 9790092
+
+JobId: 4
+Event: PAPI_TOT_INS
+Value: 21518080
+
+JobId: 2
+Event: PAPI_TOT_CYC
+Value: 95925387
+
+JobId: 2
+Event: PAPI_TOT_INS
+Value: 110208103
+
+JobId: 3
+Event: PAPI_TOT_CYC
+Value: 22801364
+
+JobId: 3
+Event: PAPI_TOT_INS
+Value: 20849021
+
+JobId: 5
+Event: PAPI_TOT_CYC
+Value: 35215014
+
+JobId: 5
+Event: PAPI_TOT_INS
+Value: 64447693
+
+JobId: 6
+Event: PAPI_TOT_CYC
+Value: 20938198
+
+JobId: 6
+Event: PAPI_TOT_INS
+Value: 20848570
+
+JobId: 7
+Event: PAPI_TOT_CYC
+Value: 12589747
+
+JobId: 7
+Event: PAPI_TOT_INS
+Value: 21517932
+
+JobId: 8
+Event: PAPI_TOT_CYC
+Value: 30489587
+
+JobId: 8
+Event: PAPI_TOT_INS
+Value: 55856661
+
+JobId: 9
+Event: PAPI_TOT_CYC
+Value: 18965776
+
+JobId: 9
+Event: PAPI_TOT_INS
+Value: 20847960
+
+JobId: 10
+Event: PAPI_TOT_CYC
+Value: 10926275
+
+JobId: 10
+Event: PAPI_TOT_INS
+Value: 21516552
+
+JobId: 12
+Event: PAPI_TOT_CYC
+Value: 16716067
+
+JobId: 12
+Event: PAPI_TOT_INS
+Value: 20848012
+
+JobId: 13
+Event: PAPI_TOT_CYC
+Value: 9763024
+
+JobId: 13
+Event: PAPI_TOT_INS
+Value: 21516603
+
+JobId: 14
+Event: PAPI_TOT_CYC
+Value: 33864264
+
+JobId: 14
+Event: PAPI_TOT_INS
+Value: 59344463
+
+JobId: 15
+Event: PAPI_TOT_CYC
+Value: 16580243
+
+JobId: 15
+Event: PAPI_TOT_INS
+Value: 20846901
+
+JobId: 16
+Event: PAPI_TOT_CYC
+Value: 9789707
+
+JobId: 16
+Event: PAPI_TOT_INS
+Value: 21516070
+
+JobId: 17
+Event: PAPI_TOT_CYC
+Value: 35029334
+
+JobId: 17
+Event: PAPI_TOT_INS
+Value: 62515584
+
+JobId: 18
+Event: PAPI_TOT_CYC
+Value: 17705725
+
+JobId: 18
+Event: PAPI_TOT_INS
+Value: 20846595
+
+JobId: 19
+Event: PAPI_TOT_CYC
+Value: 13783880
+
+JobId: 19
+Event: PAPI_TOT_INS
+Value: 21515699
+
+JobId: 21
+Event: PAPI_TOT_CYC
+Value: 16814931
+
+JobId: 21
+Event: PAPI_TOT_INS
+Value: 20846615
+
+JobId: 22
+Event: PAPI_TOT_CYC
+Value: 11629522
+
+JobId: 22
+Event: PAPI_TOT_INS
+Value: 21516071
+
+JobId: 24
+Event: PAPI_TOT_CYC
+Value: 15679943
+
+JobId: 24
+Event: PAPI_TOT_INS
+Value: 20846800
+
+JobId: 25
+Event: PAPI_TOT_CYC
+Value: 10787909
+
+JobId: 25
+Event: PAPI_TOT_INS
+Value: 21517440
+
+JobId: 27
+Event: PAPI_TOT_CYC
+Value: 17668730
+
+JobId: 27
+Event: PAPI_TOT_INS
+Value: 20847862
+
+JobId: 28
+Event: PAPI_TOT_CYC
+Value: 9827361
+
+JobId: 28
+Event: PAPI_TOT_INS
+Value: 21516393
+
+JobId: 30
+Event: PAPI_TOT_CYC
+Value: 17520870
+
+JobId: 30
+Event: PAPI_TOT_INS
+Value: 20846687
+
+JobId: 31
+Event: PAPI_TOT_CYC
+Value: 9872827
+
+JobId: 31
+Event: PAPI_TOT_INS
+Value: 21515987
+
+JobId: 33
+Event: PAPI_TOT_CYC
+Value: 16429437
+
+JobId: 33
+Event: PAPI_TOT_INS
+Value: 20846676
+
+JobId: 34
+Event: PAPI_TOT_CYC
+Value: 12096802
+
+JobId: 34
+Event: PAPI_TOT_INS
+Value: 21516089
+
+JobId: 36
+Event: PAPI_TOT_CYC
+Value: 15672198
+
+JobId: 36
+Event: PAPI_TOT_INS
+Value: 20846672
+
+JobId: 37
+Event: PAPI_TOT_CYC
+Value: 9904887
+
+JobId: 37
+Event: PAPI_TOT_INS
+Value: 21516135
+
+JobId: 38
+Event: PAPI_TOT_CYC
+Value: 39404871
+
+JobId: 38
+Event: PAPI_TOT_INS
+Value: 70187737
+
+JobId: 39
+Event: PAPI_TOT_CYC
+Value: 17669742
+
+JobId: 39
+Event: PAPI_TOT_INS
+Value: 20847717
+
+JobId: 40
+Event: PAPI_TOT_CYC
+Value: 9937272
+
+JobId: 40
+Event: PAPI_TOT_INS
+Value: 21516486
+
+JobId: 41
+Event: PAPI_TOT_CYC
+Value: 32283395
+
+JobId: 41
+Event: PAPI_TOT_INS
+Value: 58121102
+
+JobId: 42
+Event: PAPI_TOT_CYC
+Value: 17584131
+
+JobId: 42
+Event: PAPI_TOT_INS
+Value: 20846680
+
+JobId: 43
+Event: PAPI_TOT_CYC
+Value: 9678783
+
+JobId: 43
+Event: PAPI_TOT_INS
+Value: 21516480
+
+JobId: 44
+Event: PAPI_TOT_CYC
+Value: 33977440
+
+JobId: 44
+Event: PAPI_TOT_INS
+Value: 48057730
+
+JobId: 45
+Event: PAPI_TOT_CYC
+Value: 16234829
+
+JobId: 45
+Event: PAPI_TOT_INS
+Value: 20846507
+
+JobId: 46
+Event: PAPI_TOT_CYC
+Value: 10269039
+
+JobId: 46
+Event: PAPI_TOT_INS
+Value: 21515617
+
+JobId: 48
+Event: PAPI_TOT_CYC
+Value: 18284124
+
+JobId: 48
+Event: PAPI_TOT_INS
+Value: 20846607
+
+JobId: 49
+Event: PAPI_TOT_CYC
+Value: 9728171
+
+JobId: 49
+Event: PAPI_TOT_INS
+Value: 21516046
+
+JobId: 51
+Event: PAPI_TOT_CYC
+Value: 17177808
+
+JobId: 51
+Event: PAPI_TOT_INS
+Value: 20847328
+
+JobId: 52
+Event: PAPI_TOT_CYC
+Value: 9712534
+
+JobId: 52
+Event: PAPI_TOT_INS
+Value: 21516655
+
+JobId: 54
+Event: PAPI_TOT_CYC
+Value: 15552337
+
+JobId: 54
+Event: PAPI_TOT_INS
+Value: 20847910
+
+JobId: 55
+Event: PAPI_TOT_CYC
+Value: 11656953
+
+JobId: 55
+Event: PAPI_TOT_INS
+Value: 21516459
+
+JobId: 57
+Event: PAPI_TOT_CYC
+Value: 17632624
+
+JobId: 57
+Event: PAPI_TOT_INS
+Value: 20846789
+
+JobId: 58
+Event: PAPI_TOT_CYC
+Value: 10254564
+
+JobId: 58
+Event: PAPI_TOT_INS
+Value: 21516054
+
+JobId: 59
+Event: PAPI_TOT_CYC
+Value: 34704079
+
+JobId: 59
+Event: PAPI_TOT_INS
+Value: 62288227
+
+JobId: 60
+Event: PAPI_TOT_CYC
+Value: 18476566
+
+JobId: 60
+Event: PAPI_TOT_INS
+Value: 20846455
+
+JobId: 61
+Event: PAPI_TOT_CYC
+Value: 9900926
+
+JobId: 61
+Event: PAPI_TOT_INS
+Value: 21516233
+
+JobId: 63
+Event: PAPI_TOT_CYC
+Value: 16027294
+
+JobId: 63
+Event: PAPI_TOT_INS
+Value: 20846629
+
+JobId: 64
+Event: PAPI_TOT_CYC
+Value: 10191380
+
+JobId: 64
+Event: PAPI_TOT_INS
+Value: 21516230
+
+JobId: 65
+Event: PAPI_TOT_CYC
+Value: 33978371
+
+JobId: 65
+Event: PAPI_TOT_INS
+Value: 60913747
+
+JobId: 66
+Event: PAPI_TOT_CYC
+Value: 16400270
+
+JobId: 66
+Event: PAPI_TOT_INS
+Value: 20847123
+
+JobId: 67
+Event: PAPI_TOT_CYC
+Value: 9863636
+
+JobId: 67
+Event: PAPI_TOT_INS
+Value: 21516098
+
+JobId: 69
+Event: PAPI_TOT_CYC
+Value: 17858055
+
+JobId: 69
+Event: PAPI_TOT_INS
+Value: 20846006
+
+JobId: 70
+Event: PAPI_TOT_CYC
+Value: 9809566
+
+JobId: 70
+Event: PAPI_TOT_INS
+Value: 21516211
+
+JobId: 72
+Event: PAPI_TOT_CYC
+Value: 16385397
+
+JobId: 72
+Event: PAPI_TOT_INS
+Value: 20846663
+
+JobId: 73
+Event: PAPI_TOT_CYC
+Value: 9991417
+
+JobId: 73
+Event: PAPI_TOT_INS
+Value: 21516280
+
+JobId: 75
+Event: PAPI_TOT_CYC
+Value: 16183698
+
+JobId: 75
+Event: PAPI_TOT_INS
+Value: 20846665
+
+JobId: 76
+Event: PAPI_TOT_CYC
+Value: 10186241
+
+JobId: 76
+Event: PAPI_TOT_INS
+Value: 21515611
+
+JobId: 77
+Event: PAPI_TOT_CYC
+Value: 34895560
+
+JobId: 77
+Event: PAPI_TOT_INS
+Value: 61490555
+
+JobId: 78
+Event: PAPI_TOT_CYC
+Value: 16579071
+
+JobId: 78
+Event: PAPI_TOT_INS
+Value: 20846435
+
+JobId: 79
+Event: PAPI_TOT_CYC
+Value: 12746136
+
+JobId: 79
+Event: PAPI_TOT_INS
+Value: 21516306
+
+JobId: 80
+Event: PAPI_TOT_CYC
+Value: 36218590
+
+JobId: 80
+Event: PAPI_TOT_INS
+Value: 65337839
+
+JobId: 81
+Event: PAPI_TOT_CYC
+Value: 16750569
+
+JobId: 81
+Event: PAPI_TOT_INS
+Value: 20846488
+
+JobId: 82
+Event: PAPI_TOT_CYC
+Value: 9666939
+
+JobId: 82
+Event: PAPI_TOT_INS
+Value: 21516051
+
+JobId: 83
+Event: PAPI_TOT_CYC
+Value: 34185051
+
+JobId: 83
+Event: PAPI_TOT_INS
+Value: 61249962
+
+JobId: 84
+Event: PAPI_TOT_CYC
+Value: 15604857
+
+JobId: 84
+Event: PAPI_TOT_INS
+Value: 20846131
+
+JobId: 85
+Event: PAPI_TOT_CYC
+Value: 12466003
+
+JobId: 85
+Event: PAPI_TOT_INS
+Value: 21515626
+
+JobId: 87
+Event: PAPI_TOT_CYC
+Value: 16653924
+
+JobId: 87
+Event: PAPI_TOT_INS
+Value: 20846606
+
+JobId: 88
+Event: PAPI_TOT_CYC
+Value: 10328096
+
+JobId: 88
+Event: PAPI_TOT_INS
+Value: 21516036
+
+JobId: 90
+Event: PAPI_TOT_CYC
+Value: 19528086
+
+JobId: 90
+Event: PAPI_TOT_INS
+Value: 20846023
+
+JobId: 91
+Event: PAPI_TOT_CYC
+Value: 12747368
+
+JobId: 91
+Event: PAPI_TOT_INS
+Value: 21516153
+
+JobId: 93
+Event: PAPI_TOT_CYC
+Value: 16300395
+
+JobId: 93
+Event: PAPI_TOT_INS
+Value: 20846629
+
+JobId: 94
+Event: PAPI_TOT_CYC
+Value: 10015131
+
+JobId: 94
+Event: PAPI_TOT_INS
+Value: 21515636
+
+JobId: 96
+Event: PAPI_TOT_CYC
+Value: 15747268
+
+JobId: 96
+Event: PAPI_TOT_INS
+Value: 20846749
+
+JobId: 97
+Event: PAPI_TOT_CYC
+Value: 11160147
+
+JobId: 97
+Event: PAPI_TOT_INS
+Value: 21515754
+
+JobId: 98
+Event: PAPI_TOT_CYC
+Value: 32894678
+
+JobId: 98
+Event: PAPI_TOT_INS
+Value: 57032255
+
+JobId: 99
+Event: PAPI_TOT_CYC
+Value: 18206899
+
+JobId: 99
+Event: PAPI_TOT_INS
+Value: 20846477
+
+JobId: 100
+Event: PAPI_TOT_CYC
+Value: 9586680
+
+JobId: 100
+Event: PAPI_TOT_INS
+Value: 21516217
+
+JobId: 102
+Event: PAPI_TOT_CYC
+Value: 17451317
+
+JobId: 102
+Event: PAPI_TOT_INS
+Value: 20846596
+
+JobId: 103
+Event: PAPI_TOT_CYC
+Value: 10792271
+
+JobId: 103
+Event: PAPI_TOT_INS
+Value: 21516288
+
+JobId: 104
+Event: PAPI_TOT_CYC
+Value: 34301829
+
+JobId: 104
+Event: PAPI_TOT_INS
+Value: 61578076
+
+JobId: 105
+Event: PAPI_TOT_CYC
+Value: 15643322
+
+JobId: 105
+Event: PAPI_TOT_INS
+Value: 20846697
+
+JobId: 106
+Event: PAPI_TOT_CYC
+Value: 12905051
+
+JobId: 106
+Event: PAPI_TOT_INS
+Value: 21516175
+
+JobId: 108
+Event: PAPI_TOT_CYC
+Value: 16899345
+
+JobId: 108
+Event: PAPI_TOT_INS
+Value: 20846031
+
+JobId: 109
+Event: PAPI_TOT_CYC
+Value: 10402552
+
+JobId: 109
+Event: PAPI_TOT_INS
+Value: 21516145
+
+JobId: 111
+Event: PAPI_TOT_CYC
+Value: 17505438
+
+JobId: 111
+Event: PAPI_TOT_INS
+Value: 20846579
+
+JobId: 112
+Event: PAPI_TOT_CYC
+Value: 9516573
+
+JobId: 112
+Event: PAPI_TOT_INS
+Value: 21516529
+
+JobId: 113
+Event: PAPI_TOT_CYC
+Value: 38692998
+
+JobId: 113
+Event: PAPI_TOT_INS
+Value: 67605996
+
+JobId: 114
+Event: PAPI_TOT_CYC
+Value: 20275320
+
+JobId: 114
+Event: PAPI_TOT_INS
+Value: 20845910
+
+JobId: 115
+Event: PAPI_TOT_CYC
+Value: 10594648
+
+JobId: 115
+Event: PAPI_TOT_INS
+Value: 21516490
+
+JobId: 117
+Event: PAPI_TOT_CYC
+Value: 16667415
+
+JobId: 117
+Event: PAPI_TOT_INS
+Value: 20846695
+
+JobId: 118
+Event: PAPI_TOT_CYC
+Value: 11557741
+
+JobId: 118
+Event: PAPI_TOT_INS
+Value: 21516309
+
+JobId: 119
+Event: PAPI_TOT_CYC
+Value: 34374908
+
+JobId: 119
+Event: PAPI_TOT_INS
+Value: 46684092
+
+JobId: 120
+Event: PAPI_TOT_CYC
+Value: 25107619
+
+JobId: 120
+Event: PAPI_TOT_INS
+Value: 20846595
+

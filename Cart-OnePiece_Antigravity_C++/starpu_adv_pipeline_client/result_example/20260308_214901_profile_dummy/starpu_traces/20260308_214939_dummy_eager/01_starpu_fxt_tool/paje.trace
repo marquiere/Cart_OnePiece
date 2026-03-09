@@ -1,0 +1,4822 @@
+%EventDef	PajeDefineContainerType	1
+%	Alias	string
+%	Type	string
+%	Name	string
+%EndEventDef
+%EventDef	PajeDefineEventType	2
+%	Alias	string
+%	Type	string
+%	Name	string
+%	Color	color
+%EndEventDef
+%EventDef	PajeDefineStateType	3
+%	Alias	string
+%	Type	string
+%	Name	string
+%EndEventDef
+%EventDef	PajeDefineVariableType	4
+%	Alias	string
+%	Type	string
+%	Name	string
+%EndEventDef
+%EventDef	PajeDefineLinkType	5
+%	Alias	string
+%	Type	string
+%	StartContainerType	string
+%	EndContainerType	string
+%	Name	string
+%EndEventDef
+%EventDef	PajeDefineEntityValue	6
+%	Alias	string
+%	Type	string
+%	Name	string
+%	Color	color
+%EndEventDef
+%EventDef	PajeCreateContainer	7
+%	Time	date
+%	Alias	string
+%	Type	string
+%	Container	string
+%	Name	string
+%EndEventDef
+%EventDef	PajeDestroyContainer	8
+%	Time	date
+%	Name	string
+%	Type	string
+%EndEventDef
+%EventDef	PajeNewEvent	9
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%EndEventDef
+%EventDef PajeSetState 10
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	string
+%EndEventDef
+%EventDef	PajePushState	11
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	string
+%EndEventDef
+%EventDef	PajePopState	12
+%	Time	date
+%	Container	string
+%	Type	string
+%EndEventDef
+%EventDef	PajeSetVariable	13
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	double
+%EndEventDef
+%EventDef	PajeAddVariable	14
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	double
+%EndEventDef
+%EventDef	PajeSubVariable	15
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	double
+%EndEventDef
+%EventDef	PajeStartLink	18
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%	StartContainer	string
+%	Key	string
+%EndEventDef
+%EventDef	PajeEndLink	19
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%	EndContainer	string
+%	Key	string
+%EndEventDef
+%EventDef PajeSetState 20
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	string
+%	Size	string
+%	Params	string
+%	Footprint	string
+%	Tag	string
+%	JobId	string
+%	SubmitOrder	string
+%	Priority	string
+%	GFlop	string
+%	X	string
+%	Y	string
+%	Iteration	string
+%	Subiteration	string
+%	NumaNodes	string
+%EndEventDef
+%EventDef PajeSetState 21
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	string
+%	Size	string
+%	Params	string
+%	Footprint	string
+%	Tag	string
+%	JobId	string
+%	SubmitOrder	string
+%EndEventDef
+%EventDef	PajeStartLink	23
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%	StartContainer	string
+%	Key	string
+%	MPITAG	string
+%	MPIType	string
+%	Priority	string
+%	Handle	string
+%	HName	string
+%	X	string
+%	Y	string
+%EndEventDef
+%EventDef	PajeStartLink	24
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%	StartContainer	string
+%	Key	string
+%	Handle	string
+%	HName	string
+%	X	string
+%	Y	string
+%EndEventDef
+%EventDef	PajeNewEvent	25
+%	Time	date
+%	Type	string
+%	Container	string
+%	Value	string
+%	CheckpointInstance	string
+%	CheckpointDomain	string
+%EndEventDef
+%EventDef	PajeSetState	26
+%	Time	date
+%	Container	string
+%	Type	string
+%	Value	string
+%	JobId	string
+%EndEventDef
+                                        
+1       MPIP      0       "MPI Program"                      	
+1       P      MPIP       "Program"                      	
+1       Mn      P       "Memory Node"                         
+1       T      Mn       "Thread"                               
+1       UT      P       "User Thread"                               
+1       Mm      Mn       "Memory Manager"                         
+1       W      T       "Worker"                               
+1       MPICt   P       "MPI Communication Thread"              
+1       Sc       P       "Scheduler State"                        
+2       prog_event   P       "program event type"		"1.0 1.0 1.0" 		
+2       checkpoint_begin  P       "Checkpoint Begin"	"0.0 1.0 0.0" 			
+2       checkpoint_end  P       "Checkpoint End"		"0.0 0.0 1.0" 		
+2       pu   P       "Task Push"           "1.0 1.0 1.0"                   
+2       po   P       "Task Pop"          "1.0 1.0 1.0"                     
+2       register     P       "data registration"		"1.0 1.0 1.0" 		
+2       unregister     P       "data unregistration"	"1.0 1.0 1.0" 			
+2       user_event   P       "user event type"		"1.0 1.0 1.0" 		
+2       thread_event   T       "thread event type"	"1.0 1.0 1.0" 			
+2       user_user_event   UT       "user event type"		"1.0 1.0 1.0" 		
+2       user_thread_event   UT       "thread event type"	"1.0 1.0 1.0" 			
+2       MPIev   MPICt    "MPI event type"		"1.0 1.0 1.0" 	
+3       S       T       "Thread State"                        
+3       CtS     MPICt    "Communication Thread State"          
+3       Ctx1      W     "InCtx1"         		
+3       Ctx2      W     "InCtx2"         		
+3       Ctx3      W     "InCtx3"         		
+3       Ctx4      W     "InCtx4"         		
+3       Ctx5      W     "InCtx5"         		
+3       Ctx6      W     "InCtx6"         		
+3       Ctx7      W     "InCtx7"         		
+3       Ctx8      W     "InCtx8"         		
+3       Ctx9      W     "InCtx9"         		
+2       SI       Mm "data state invalid"            "1.0 1.0 1.0"                 
+2       SS       Mm "data state shared"        "1.0 1.0 1.0"                    
+2       SO       Mm "data state owner"        "1.0 1.0 1.0"                     
+2       WU       Mm "data wont use"           "1.0 1.0 1.0"                  
+2       Al       Mm    "Allocating Start"  "1.0 1.0 1.0"   
+2       rc       Mm    "Request Created"  "1.0 1.0 1.0"   
+2       AlE      Mm    "Allocating End" "1.0 1.0 1.0"    
+2       Alr      Mm    "Allocating Async Start"  "1.0 1.0 1.0"   
+2       AlrE     Mm    "Allocating Async End" "1.0 1.0 1.0"    
+2       Fe       Mm    "Free Start" "1.0 1.0 1.0"    
+2       FeE      Mm    "Free End"   "1.0 1.0 1.0"  
+2       Wb       Mm    "WritingBack Start" "1.0 1.0 1.0"    
+2       WbE      Mm    "WritingBack End"  "1.0 1.0 1.0"   
+2       DCo      Mm    "DriverCopy Start"  "1.0 1.0 1.0"   
+2       DCoE     Mm    "DriverCopy End" "1.0 1.0 1.0"    
+2       DCoA     Mm    "DriverCopyAsync Start"  "1.0 1.0 1.0"   
+2       DCoAE    Mm    "DriverCopyAsync End"  "1.0 1.0 1.0"   
+3       MS       Mm       "Memory Node State"                        
+4       nsubmitted    Sc       "Number of Submitted Uncompleted Tasks"                        
+4       nready    Sc       "Number of Ready Tasks"                        
+4       gft    Sc       "Total GFlop/s"                        
+4       use     Mm       "Used (MB)"                        
+4       bwi_mm     Mm       "Bandwidth In (MB/s)"                        
+4       bwo_mm     Mm       "Bandwidth Out (MB/s)"                        
+4       bwi_mpi     MPICt       "Bandwidth In (MB/s)"                        
+4       bwo_mpi     MPICt       "Bandwidth Out (MB/s)"                        
+4       gf      W       "GFlop/s"                        
+6       I       S       Idle         ".9 .1 .0"		
+6       In       S      Initializing       "0.0 .7 1.0"            
+6       D       S      Deinitializing       "0.0 .1 .7"            
+6       Fi       S      FetchingInput       "1.0 .1 1.0"            
+6       Po       S      PushingOutput       "0.1 1.0 1.0"            
+6       C       S       Callback       ".0 .3 .8"            
+6       B       S       Overhead         ".5 .18 .0"		
+6       Ps      S       "Parallel sync"  ".5 .18 1.0"		
+6       E       S       Executing         ".0 .6 .5"		
+6       Sc       S      Scheduling         ".7 .36 .0"		
+6       Sl       S      Sleeping         ".9 .1 .0"		
+6       P       S       Progressing         ".1 .3 .1"		
+6       U       S       Unpartitioning      ".0 .0 1.0"		
+6       H       S       Hypervisor      ".5 .18 .0"		
+6       Bu      S       "Building task"   ".5 .18 .0"		
+6       Su      S       "Submitting task" ".3 .09 .0"		
+6       Th      S       "Throttling task submission" ".8 .6 .6"		
+6       MD      S       "Decoding task for MPI" ".5 .18 .2"		
+6       MPr     S       "Preparing task for MPI" ".4 .14 .2"		
+6       MPo     S       "Post-processing task for MPI" ".3 .09 .2"		
+3       WS       W       "Worker State"                        
+6       I       WS       Idle         ".9 .1 .0"		
+6       In       WS      Initializing       "0.0 .7 1.0"            
+6       D       WS      Deinitializing       "0.0 .1 .7"            
+6       Fi       WS      FetchingInput       "1.0 .1 1.0"            
+6       Po       WS      PushingOutput       "0.1 1.0 1.0"            
+6       C       WS       Callback       ".0 .3 .8"            
+6       B       WS       Overhead         ".5 .18 .0"		
+6       Ps      WS       "Parallel sync"  ".5 .18 1.0"		
+6       E       WS       Executing         ".0 .6 .5"		
+6       Sc       WS      Scheduling         ".7 .36 .0"		
+6       Sl       WS      Sleeping         ".9 .1 .0"		
+6       P       WS       Progressing         ".1 .3 .1"		
+6       U       WS       Unpartitioning      ".0 .0 1.0"		
+6       H       WS       Hypervisor      ".5 .18 .0"		
+6       Bu      WS       "Building task"   ".5 .18 .0"		
+6       Su      WS       "Submitting task" ".3 .09 .0"		
+6       Th      WS       "Throttling task submission" ".8 .6 .6"		
+3       US       UT       "User Thread State"                        
+6       Bu      US      "Building task"   ".5 .18 .0"		
+6       Su      US      "Submitting task" ".3 .09 .0"		
+6       C       US      "Callback" ".0 .3 .8"		
+6       Sc      US      "Scheduling"         ".7 .36 .0"		
+6       Th      US      "Throttling task submission" ".8 .6 .6"		
+6       MD      US      "Decoding task for MPI" ".5 .18 .2"		
+6       MPr     US      "Preparing task for MPI" ".4 .14 .2"		
+6       MPo     US      "Post-processing task for MPI" ".3 .09 .2"		
+6       W       US      "Waiting task" ".9 .1 .0"		
+6       WA      US      "Waiting all tasks" ".9 .1 .0"		
+6       No      US      Nothing ".0 .0 .0"		
+6       P       CtS       Processing         "0 0 0"		
+6       Pl       CtS      Polling	   "1.0 .5 0"		
+6       Dr       CtS      DriverRun	   ".1 .1 1.0"	
+6       Sl       CtS      Sleeping         ".9 .1 .0"		
+6       UT       CtS      UserTesting        ".2 .1 .6"	
+6       UW       CtS      UserWaiting        ".4 .1 .3"	
+6       SdS       CtS      SendSubmitted     "1.0 .1 1.0"	
+6       RvS       CtS      ReceiveSubmitted  "0.1 1.0 1.0"	
+6       SdC       CtS      SendCompleted     "1.0 .5 1.0"	
+6       RvC       CtS      ReceiveCompleted  "0.5 1.0 1.0"	
+6       TD       CtS      "Testing Detached"  ".0 .0 .6"	
+6       MT       CtS      "MPI Test"  ".0 .0 .8"	
+6       Bu      CtS      "Building task"   ".5 .18 .0"		
+6       Su      CtS      "Submitting task" ".3 .09 .0"		
+6       Th      CtS      "Throttling task submission" ".8 .6 .6"		
+6       C       CtS      "Callback" ".0 .3 .8"		
+6       I       Ctx1      Idle         ".9 .1 .0"		
+6       In       Ctx1      Initializing       "0.0 .7 1.0"            
+6       D       Ctx1      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx1      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx1      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx1       Callback       ".0 .3 .8"            
+6       B       Ctx1       Overhead         ".5 .18 .0"		
+6       Ps      Ctx1       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx1       Executing         ".0 .6 .5"		
+6       Sc       Ctx1      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx1      Sleeping         ".9 .1 .0"		
+6       P       Ctx1       Progressing         ".1 .3 .1"		
+6       U       Ctx1       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx1       Hypervisor         ".5 .18 .0"		
+6       I       Ctx2      Idle         ".9 .1 .0"		
+6       In       Ctx2      Initializing       "0.0 .7 1.0"            
+6       D       Ctx2      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx2      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx2      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx2       Callback       ".0 .3 .8"            
+6       B       Ctx2       Overhead         ".5 .18 .0"		
+6       Ps      Ctx2       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx2       Executing         ".0 .6 .5"		
+6       Sc       Ctx2      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx2      Sleeping         ".9 .1 .0"		
+6       P       Ctx2       Progressing         ".1 .3 .1"		
+6       U       Ctx2       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx2       Hypervisor         ".5 .18 .0"		
+6       I       Ctx3      Idle         ".9 .1 .0"		
+6       In       Ctx3      Initializing       "0.0 .7 1.0"            
+6       D       Ctx3      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx3      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx3      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx3       Callback       ".0 .3 .8"            
+6       B       Ctx3       Overhead         ".5 .18 .0"		
+6       Ps      Ctx3       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx3       Executing         ".0 .6 .5"		
+6       Sc       Ctx3      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx3      Sleeping         ".9 .1 .0"		
+6       P       Ctx3       Progressing         ".1 .3 .1"		
+6       U       Ctx3       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx3       Hypervisor         ".5 .18 .0"		
+6       I       Ctx4      Idle         ".9 .1 .0"		
+6       In       Ctx4      Initializing       "0.0 .7 1.0"            
+6       D       Ctx4      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx4      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx4      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx4       Callback       ".0 .3 .8"            
+6       B       Ctx4       Overhead         ".5 .18 .0"		
+6       Ps      Ctx4       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx4       Executing         ".0 .6 .5"		
+6       Sc       Ctx4      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx4      Sleeping         ".9 .1 .0"		
+6       P       Ctx4       Progressing         ".1 .3 .1"		
+6       U       Ctx4       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx4       Hypervisor         ".5 .18 .0"		
+6       I       Ctx5      Idle         ".9 .1 .0"		
+6       In       Ctx5      Initializing       "0.0 .7 1.0"            
+6       D       Ctx5      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx5      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx5      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx5       Callback       ".0 .3 .8"            
+6       B       Ctx5       Overhead         ".5 .18 .0"		
+6       Ps      Ctx5       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx5       Executing         ".0 .6 .5"		
+6       Sc       Ctx5      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx5      Sleeping         ".9 .1 .0"		
+6       P       Ctx5       Progressing         ".1 .3 .1"		
+6       U       Ctx5       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx5       Hypervisor         ".5 .18 .0"		
+6       I       Ctx6      Idle         ".9 .1 .0"		
+6       In       Ctx6      Initializing       "0.0 .7 1.0"            
+6       D       Ctx6      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx6      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx6      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx6       Callback       ".0 .3 .8"            
+6       B       Ctx6       Overhead         ".5 .18 .0"		
+6       Ps      Ctx6       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx6       Executing         ".0 .6 .5"		
+6       Sc       Ctx6      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx6      Sleeping         ".9 .1 .0"		
+6       P       Ctx6       Progressing         ".1 .3 .1"		
+6       U       Ctx6       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx6       Hypervisor         ".5 .18 .0"		
+6       I       Ctx7      Idle         ".9 .1 .0"		
+6       In       Ctx7      Initializing       "0.0 .7 1.0"            
+6       D       Ctx7      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx7      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx7      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx7       Callback       ".0 .3 .8"            
+6       B       Ctx7       Overhead         ".5 .18 .0"		
+6       Ps      Ctx7       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx7       Executing         ".0 .6 .5"		
+6       Sc       Ctx7      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx7      Sleeping         ".9 .1 .0"		
+6       P       Ctx7       Progressing         ".1 .3 .1"		
+6       U       Ctx7       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx7       Hypervisor         ".5 .18 .0"		
+6       I       Ctx8      Idle         ".9 .1 .0"		
+6       In       Ctx8      Initializing       "0.0 .7 1.0"            
+6       D       Ctx8      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx8      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx8      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx8       Callback       ".0 .3 .8"            
+6       B       Ctx8       Overhead         ".5 .18 .0"		
+6       Ps      Ctx8       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx8       Executing         ".0 .6 .5"		
+6       Sc       Ctx8      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx8      Sleeping         ".9 .1 .0"		
+6       P       Ctx8       Progressing         ".1 .3 .1"		
+6       U       Ctx8       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx8       Hypervisor         ".5 .18 .0"		
+6       I       Ctx9      Idle         ".9 .1 .0"		
+6       In       Ctx9      Initializing       "0.0 .7 1.0"            
+6       D       Ctx9      Deinitializing       "0.0 .1 .7"            
+6       Fi       Ctx9      FetchingInput       "1.0 .1 1.0"            
+6       Po       Ctx9      PushingOutput       "0.1 1.0 1.0"            
+6       C       Ctx9       Callback       ".0 .3 .8"            
+6       B       Ctx9       Overhead         ".5 .18 .0"		
+6       Ps      Ctx9       "Parallel sync"  ".5 .18 1.0"		
+6       E       Ctx9       Executing         ".0 .6 .5"		
+6       Sc       Ctx9      Scheduling         ".7 .36 .0"		
+6       Sl       Ctx9      Sleeping         ".9 .1 .0"		
+6       P       Ctx9       Progressing         ".1 .3 .1"		
+6       U       Ctx9       Unpartitioning         ".0 .0 1.0"	
+6       H       Ctx9       Hypervisor         ".5 .18 .0"		
+6       A       MS      Allocating         ".4 .1 .0"		
+6       Ar       MS      AllocatingReuse       ".1 .1 .8"		
+6       F       MS      Freeing         ".6 .3 .0"		
+6       W       MS      WritingBack         ".0 .0 .5"		
+6       Wa       MS     WritingBackAsync    ".0 .0 .4"		
+6       R       MS      Reclaiming         ".0 .1 .6"		
+6       Co       MS     DriverCopy         ".3 .5 .1"		
+6       CoA      MS     DriverCopyAsync         ".1 .3 .1"		
+6       No       MS     Nothing         ".0 .0 .0"		
+5       MPIL     MPIP	MPICt	MPICt   "MPI communication"
+5       F       P	Mm	Mm      "Intra-node data Fetch"
+5       TF      P	Mm	Mm      "Intra-node data TaskPreFetch"
+5       PF      P	Mm	Mm      "Intra-node data PreFetch"
+5       IF      P	Mm	Mm      "Intra-node data IdleFetch"
+5       WSL     P	W	W       "Work steal"
+7	0.0 MPIroot      MPIP      0       root
+7	0.0	p	P	MPIroot	program 
+7	0.0	sched	Sc	p	scheduler
+13	0.0	sched	nsubmitted	0.0
+13	0.0	sched	nready	0.0
+13	0.0	sched	gft	0.0
+7	129.904974000	mn0	Mn	p	MEMNODE0
+7	129.904974000	mm0	Mm	mn0	MEMMANAGER0
+13	129.904974000	mm0	use	0.0
+13	129.904974000	mm0	bwi_mm	0.0
+13	129.904974000	mm0	bwo_mm	0.0
+7	129.911433000	mn1	Mn	p	MEMNODE1
+7	129.911433000	mm1	Mm	mn1	MEMMANAGER1
+13	129.911433000	mm1	use	0.0
+13	129.911433000	mm1	bwi_mm	0.0
+13	129.911433000	mm1	bwo_mm	0.0
+7	132.968658000	t3443656	UT	p	UserThread3443656
+11	132.968658000	t3443656	US	Sc
+12	132.975023000	t3443656	US
+11	132.980021000	t3443656	US	Sc
+12	132.981782000	t3443656	US
+7	133.109471000	t3443728	T	mn1	T0
+7	133.109471000	w0	W	t3443728	CUDA0_0
+13	133.109471000	w0	gf	0.0
+10	133.109471000	t3443728	S	In
+7	133.277819000	t3443729	T	mn0	T2
+7	133.277819000	w1	W	t3443729	CPU0
+13	133.277819000	w1	gf	0.0
+10	133.277819000	w1	WS	"In"
+10	133.349208000	w1	WS	"B"
+10	133.349208000	w1	WS	"I"
+10	133.352272000	w1	WS	"P"
+10	133.356169000	w1	WS	"Sc"
+10	133.358306000	w1	WS	"Sl"
+7	133.436794000	t3443730	T	mn0	T4
+7	133.436794000	w2	W	t3443730	CPU1
+13	133.436794000	w2	gf	0.0
+10	133.436794000	w2	WS	"In"
+10	133.460553000	w2	WS	"B"
+10	133.460553000	w2	WS	"I"
+10	133.461472000	w2	WS	"P"
+10	133.462659000	w2	WS	"Sc"
+10	133.463371000	w2	WS	"Sl"
+7	133.522678000	t3443731	T	mn0	T6
+7	133.522678000	w3	W	t3443731	CPU2
+13	133.522678000	w3	gf	0.0
+10	133.522678000	w3	WS	"In"
+10	133.551726000	w3	WS	"B"
+10	133.551726000	w3	WS	"I"
+10	133.552648000	w3	WS	"P"
+10	133.553777000	w3	WS	"Sc"
+10	133.554388000	w3	WS	"Sl"
+7	133.682380000	t3443732	T	mn0	T8
+7	133.682380000	w4	W	t3443732	CPU3
+13	133.682380000	w4	gf	0.0
+10	133.682380000	w4	WS	"In"
+10	133.718085000	w4	WS	"B"
+10	133.718085000	w4	WS	"I"
+10	133.718980000	w4	WS	"P"
+10	133.720081000	w4	WS	"Sc"
+10	133.720661000	w4	WS	"Sl"
+7	133.779865000	t3443733	T	mn0	T10
+7	133.779865000	w5	W	t3443733	CPU4
+13	133.779865000	w5	gf	0.0
+10	133.779865000	w5	WS	"In"
+10	133.814552000	w5	WS	"B"
+10	133.814552000	w5	WS	"I"
+10	133.815430000	w5	WS	"P"
+10	133.816705000	w5	WS	"Sc"
+10	133.817378000	w5	WS	"Sl"
+7	133.871925000	t3443734	T	mn0	T12
+7	133.871925000	w6	W	t3443734	CPU5
+13	133.871925000	w6	gf	0.0
+10	133.871925000	w6	WS	"In"
+10	133.900737000	w6	WS	"B"
+10	133.900737000	w6	WS	"I"
+10	133.901340000	w6	WS	"P"
+10	133.902595000	w6	WS	"Sc"
+10	133.903259000	w6	WS	"Sl"
+7	133.970864000	t3443735	T	mn0	T14
+7	133.970864000	w7	W	t3443735	CPU6
+13	133.970864000	w7	gf	0.0
+10	133.970864000	w7	WS	"In"
+10	134.004589000	w7	WS	"B"
+10	134.004589000	w7	WS	"I"
+10	134.005456000	w7	WS	"P"
+10	134.006529000	w7	WS	"Sc"
+10	134.007256000	w7	WS	"Sl"
+7	134.073543000	t3443736	T	mn0	T16
+7	134.073543000	w8	W	t3443736	CPU7
+13	134.073543000	w8	gf	0.0
+10	134.073543000	w8	WS	"In"
+10	134.161469000	w8	WS	"B"
+10	134.161469000	w8	WS	"I"
+10	134.162420000	w8	WS	"P"
+10	134.163731000	w8	WS	"Sc"
+10	134.164476000	w8	WS	"Sl"
+10	299.479596000	t3443728	S	B
+10	299.479596000	w0	WS	"I"
+10	299.490250000	t3443728	S	P
+10	299.495153000	t3443728	S	Sc
+10	299.496130000	t3443728	S	Sl
+9	335.022734000	register	p	56dd51c89520
+9	335.026076000	register	p	56dd51c8b060
+9	335.029834000	register	p	56dd51c8cba0
+9	335.033237000	register	p	56dd51c8e6e0
+9	343.457134000	register	p	56dd51e344b0
+9	343.461181000	register	p	56dd51e35ff0
+9	343.464759000	register	p	56dd51e37b30
+9	343.467975000	register	p	56dd51e39670
+11	2237.272719000	t3443656	US	Su
+13	2237.276393000	sched nsubmitted	1.000000
+13	2237.373790000	sched	nready	1.000000
+9       2237.373790000    pu      p     1
+11	2237.378628000	t3443656	US	Sc
+12	2237.383221000	t3443656	US
+12	2237.384099000	t3443656	US
+11	2237.385978000	t3443656	US	Su
+13	2237.386963000	sched nsubmitted	2.000000
+13	2237.390260000	sched	nready	0.000000
+13	2237.390260000	sched	nsubmitted	1.000000
+9       2237.390260000    po      p     1
+10	2237.393027000	w8	WS	"B"
+10	2237.394262000	w8	WS	"B"
+10	2237.395369000	w8	WS	"Fi"
+10	2237.398880000	w8	WS	"B"
+10	2237.399247000	w8	WS	"B"
+10	2237.401644000	w8	WS	"B"
+6	perfmodel_preproc	WS	perfmodel_preproc	"0.000000 0.600000 0.400000" 
+6	perfmodel_preproc_1	Ctx1	perfmodel_preproc	"1.0 0.39 1.0" 
+6	perfmodel_preproc_2	Ctx2	perfmodel_preproc	".0 1.0 .0" 
+6	perfmodel_preproc_3	Ctx3	perfmodel_preproc	"0.87 0.87 .0" 
+6	perfmodel_preproc_4	Ctx4	perfmodel_preproc	".0 0.95 1.0" 
+6	perfmodel_preproc_5	Ctx5	perfmodel_preproc	".0 .0 .0" 
+6	perfmodel_preproc_6	Ctx6	perfmodel_preproc	".0 .0 0.5" 
+6	perfmodel_preproc_7	Ctx7	perfmodel_preproc	"0.41 0.41 0.41" 
+6	perfmodel_preproc_8	Ctx8	perfmodel_preproc	"1.0 .0 1.0" 
+6	perfmodel_preproc_9	Ctx9	perfmodel_preproc	".0 .0 1.0" 
+10	2237.408786000	w8	WS	"perfmodel_preproc"
+20	2237.408786000	w8	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	1	1	0	0.000000	0	0	-1	-1	"-1_-1"
+12	2237.447501000	t3443656	US
+11	2237.469256000	t3443656	US	Su
+13	2237.469966000	sched nsubmitted	2.000000
+12	2237.503613000	t3443656	US
+10	2249.268746000	w8	WS	"B"
+13	2237.408786000	w8	gf	0.000000
+13	0.000000000	sched	gft	0.000000
+13	2237.408786000	sched	gft	0.000000
+10	2249.271790000	w8	WS	"Po"
+10	2249.274463000	w8	WS	"B"
+13	2249.279019000	sched	nready	1.000000
+9       2249.279019000    pu      p     2
+11	2249.280213000	w8	WS	Sc
+12	2249.282163000	w8	WS # handle_worker_scheduling_pop
+13	2249.283703000	sched	nready	0.000000
+13	2249.283703000	sched	nsubmitted	1.000000
+9       2249.283703000    po      p     2
+10	2249.284181000	w8	WS	"P"
+10	2249.285143000	t3443728	S	B
+10	2249.285441000	w8	WS	"Sc"
+10	2249.286029000	w8	WS	"Sl"
+10	2249.286172000	t3443728	S	B
+10	2249.286645000	w0	WS	"Fi"
+11	2249.294728000	mm1	MS	Ar
+12	2249.295644000	mm1	MS
+10	2249.296663000	t3443728	S	P
+11	2249.300796000	mm1	MS	Ar
+12	2249.301056000	mm1	MS
+11	2249.302136000	mm1	MS	A
+13	2249.304872000	mm1	use	32.000000
+12	2249.543428000	mm1	MS
+11	2249.545488000	mm1	MS	Co
+24	2249.545488000	F	p	1572864	mm0	com_1	56dd51c8b060	"noname"	0	0
+11	2249.552944000	mm1	MS	CoA
+12	2249.579467000	mm1	MS
+11	2249.585164000	mm1	MS	Ar
+12	2249.585540000	mm1	MS
+11	2249.585812000	mm1	MS	A
+13	2249.586414000	mm1	use	41.500000
+12	2250.651092000	mm1	MS
+12	2250.664700000	mm1	MS
+19	2250.664700000	F	p	1572864	mm1	com_1
+13	2249.545488000	mm0	bwo_mm	1405.331608
+13	2249.545488000	mm1	bwi_mm	1405.331608
+13	2250.664700000	mm0	bwo_mm	0.000000
+13	2250.664700000	mm1	bwi_mm	0.000000
+10	2250.666297000	t3443728	S	B
+10	2250.667515000	t3443728	S	B
+6	perfmodel_infer_trt	WS	perfmodel_infer_trt	"0.000000 0.600000 0.400000" 
+6	perfmodel_infer_trt_1	Ctx1	perfmodel_infer_trt	"1.0 0.39 1.0" 
+6	perfmodel_infer_trt_2	Ctx2	perfmodel_infer_trt	".0 1.0 .0" 
+6	perfmodel_infer_trt_3	Ctx3	perfmodel_infer_trt	"0.87 0.87 .0" 
+6	perfmodel_infer_trt_4	Ctx4	perfmodel_infer_trt	".0 0.95 1.0" 
+6	perfmodel_infer_trt_5	Ctx5	perfmodel_infer_trt	".0 .0 .0" 
+6	perfmodel_infer_trt_6	Ctx6	perfmodel_infer_trt	".0 .0 0.5" 
+6	perfmodel_infer_trt_7	Ctx7	perfmodel_infer_trt	"0.41 0.41 0.41" 
+6	perfmodel_infer_trt_8	Ctx8	perfmodel_infer_trt	"1.0 .0 1.0" 
+6	perfmodel_infer_trt_9	Ctx9	perfmodel_infer_trt	".0 .0 1.0" 
+10	2250.672103000	w0	WS	"perfmodel_infer_trt"
+20	2250.672103000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	2	2	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2250.675751000	t3443728	S	E	2
+10	2311.031881000	t3443728	S	B
+10	2311.049809000	w0	WS	"I"
+13	2250.672103000	w0	gf	0.000000
+10	2311.052156000	t3443728	S	Po
+10	2311.054627000	t3443728	S	B
+13	2311.058353000	sched	nready	1.000000
+9       2311.058353000    pu      p     3
+11	2311.064146000	t3443728	S	Sc
+13	2311.069623000	sched	nready	0.000000
+13	2311.069623000	sched	nsubmitted	0.000000
+9       2311.069623000    po      p     3
+10	2311.071294000	w1	WS	"B"
+12	2311.071609000	t3443728	S
+10	2311.072083000	w1	WS	"B"
+10	2311.072798000	w1	WS	"Fi"
+10	2311.073385000	t3443728	S	P
+11	2311.077497000	mm0	MS	Co
+24	2311.077497000	F	p	9961472	mm1	com_2	56dd51c8cba0	"noname"	0	0
+10	2311.077581000	w1	WS	"B"
+11	2311.098681000	mm0	MS	CoA
+12	2311.111657000	mm0	MS
+10	2311.116162000	t3443728	S	Sc
+10	2311.117133000	t3443728	S	Sl
+11	2312.255879000	t3443656	US	Su
+13	2312.258624000	sched nsubmitted	1.000000
+13	2312.276283000	sched	nready	1.000000
+9       2312.276283000    pu      p     4
+11	2312.278335000	t3443656	US	Sc
+12	2312.280609000	t3443656	US
+12	2312.280873000	t3443656	US
+11	2312.281788000	t3443656	US	Su
+13	2312.282276000	sched nsubmitted	2.000000
+12	2312.290622000	t3443656	US
+11	2312.306867000	t3443656	US	Su
+13	2312.307374000	sched nsubmitted	3.000000
+12	2312.315259000	t3443656	US
+13	2312.325916000	sched	nready	0.000000
+13	2312.325916000	sched	nsubmitted	2.000000
+9       2312.325916000    po      p     4
+10	2312.327089000	w2	WS	"B"
+10	2312.327700000	w2	WS	"B"
+10	2312.328147000	w2	WS	"Fi"
+10	2312.329595000	w2	WS	"B"
+10	2312.329886000	w2	WS	"B"
+10	2312.331092000	w2	WS	"B"
+10	2312.334896000	w2	WS	"perfmodel_preproc"
+20	2312.334896000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	4	4	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2316.569922000	w2	WS	"B"
+13	2312.334896000	w2	gf	0.000000
+10	2316.571866000	w2	WS	"Po"
+10	2316.573577000	w2	WS	"B"
+13	2316.577157000	sched	nready	1.000000
+9       2316.577157000    pu      p     5
+11	2316.577840000	w2	WS	Sc
+12	2316.580153000	w2	WS # handle_worker_scheduling_pop
+13	2316.581779000	sched	nready	0.000000
+13	2316.581779000	sched	nsubmitted	1.000000
+9       2316.581779000    po      p     5
+10	2316.581713000	w2	WS	"P"
+10	2316.582914000	w2	WS	"Sc"
+10	2316.583025000	t3443728	S	B
+10	2316.583436000	t3443728	S	B
+10	2316.583543000	w2	WS	"Sl"
+10	2316.584457000	w0	WS	"Fi"
+11	2316.588286000	mm1	MS	Ar
+12	2316.588535000	mm1	MS
+10	2316.589454000	t3443728	S	P
+11	2316.590859000	mm1	MS	Ar
+12	2316.591043000	mm1	MS
+11	2316.592049000	mm1	MS	A
+12	2316.598840000	mm1	MS
+11	2316.600065000	mm1	MS	Co
+24	2316.600065000	F	p	1572864	mm0	com_3	56dd51e35ff0	"noname"	0	0
+11	2316.606444000	mm1	MS	CoA
+12	2316.624644000	mm1	MS
+11	2316.628180000	mm1	MS	Ar
+12	2316.628405000	mm1	MS
+11	2316.628628000	mm1	MS	A
+13	2316.629069000	mm1	use	51.000000
+12	2317.818602000	mm1	MS
+12	2317.827352000	mm0	MS
+19	2317.827352000	F	p	9961472	mm0	com_2
+13	2311.077497000	mm1	bwo_mm	1475.805332
+13	2311.077497000	mm0	bwi_mm	1475.805332
+10	2317.828521000	w1	WS	"B"
+12	2317.830011000	mm1	MS
+19	2317.830011000	F	p	1572864	mm1	com_3
+13	2316.600065000	mm0	bwo_mm	1278.807362
+13	2316.600065000	mm1	bwi_mm	1278.807362
+13	2317.827352000	mm1	bwo_mm	0.000000
+13	2317.827352000	mm0	bwi_mm	0.000000
+13	2317.830011000	mm0	bwo_mm	0.000000
+13	2317.830011000	mm1	bwi_mm	0.000000
+10	2317.830668000	t3443728	S	B
+10	2317.831414000	w1	WS	"B"
+10	2317.832101000	t3443728	S	B
+6	perfmodel_post	WS	perfmodel_post	"0.000000 0.600000 0.400000" 
+6	perfmodel_post_1	Ctx1	perfmodel_post	"1.0 0.39 1.0" 
+6	perfmodel_post_2	Ctx2	perfmodel_post	".0 1.0 .0" 
+6	perfmodel_post_3	Ctx3	perfmodel_post	"0.87 0.87 .0" 
+6	perfmodel_post_4	Ctx4	perfmodel_post	".0 0.95 1.0" 
+6	perfmodel_post_5	Ctx5	perfmodel_post	".0 .0 .0" 
+6	perfmodel_post_6	Ctx6	perfmodel_post	".0 .0 0.5" 
+6	perfmodel_post_7	Ctx7	perfmodel_post	"0.41 0.41 0.41" 
+6	perfmodel_post_8	Ctx8	perfmodel_post	"1.0 .0 1.0" 
+6	perfmodel_post_9	Ctx9	perfmodel_post	".0 .0 1.0" 
+10	2317.835893000	w1	WS	"perfmodel_post"
+10	2317.836168000	w0	WS	"perfmodel_infer_trt"
+20	2317.835893000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	3	3	0	0.000000	0	0	-1	-1	"-1_-1"
+20	2317.836168000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	5	5	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2317.840610000	t3443728	S	E	5
+10	2319.303575000	t3443728	S	B
+10	2319.312884000	w0	WS	"I"
+13	2311.049809000	w0	gf	0.000000
+10	2319.314588000	t3443728	S	Po
+10	2319.316100000	t3443728	S	B
+13	2319.321488000	sched	nready	1.000000
+9       2319.321488000    pu      p     6
+11	2319.326842000	t3443728	S	Sc
+13	2319.331032000	sched	nready	0.000000
+13	2319.331032000	sched	nsubmitted	0.000000
+9       2319.331032000    po      p     6
+12	2319.331265000	t3443728	S
+10	2319.332454000	w3	WS	"B"
+10	2319.332902000	w3	WS	"B"
+10	2319.333573000	w3	WS	"Fi"
+10	2319.333752000	t3443728	S	P
+10	2319.336756000	w3	WS	"B"
+11	2319.337407000	mm0	MS	Co
+24	2319.337407000	F	p	9961472	mm1	com_4	56dd51e37b30	"noname"	0	0
+11	2319.342481000	mm0	MS	CoA
+12	2319.354143000	mm0	MS
+10	2319.358794000	t3443728	S	Sc
+10	2319.359867000	t3443728	S	Sl
+10	2323.752467000	w1	WS	"B"
+13	2317.835893000	w1	gf	0.000000
+10	2323.754799000	w1	WS	"Po"
+10	2323.757132000	w1	WS	"B"
+11	2323.761672000	w1	WS	C
+12	2323.779158000	w1	WS # handle_end_callback
+10	2323.781539000	w1	WS	"P"
+10	2323.783220000	w1	WS	"Sc"
+10	2323.784090000	w1	WS	"Sl"
+12	2325.737781000	mm0	MS
+19	2325.737781000	F	p	9961472	mm0	com_4
+13	2319.337407000	mm1	bwo_mm	1556.389049
+13	2319.337407000	mm0	bwi_mm	1556.389049
+13	2325.737781000	mm1	bwo_mm	0.000000
+13	2325.737781000	mm0	bwi_mm	0.000000
+10	2325.739431000	w3	WS	"B"
+10	2325.742763000	w3	WS	"B"
+10	2325.748566000	w3	WS	"perfmodel_post"
+20	2325.748566000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	6	6	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2331.555425000	w3	WS	"B"
+13	2325.748566000	w3	gf	0.000000
+10	2331.557166000	w3	WS	"Po"
+10	2331.559079000	w3	WS	"B"
+11	2331.562508000	w3	WS	C
+12	2331.571515000	w3	WS # handle_end_callback
+10	2331.573232000	w3	WS	"P"
+10	2331.575100000	w3	WS	"Sc"
+10	2331.575837000	w3	WS	"Sl"
+11	2409.452099000	t3443656	US	Su
+13	2409.454859000	sched nsubmitted	1.000000
+13	2409.477824000	sched	nready	1.000000
+9       2409.477824000    pu      p     7
+11	2409.481139000	t3443656	US	Sc
+12	2409.483813000	t3443656	US
+12	2409.484144000	t3443656	US
+11	2409.485331000	t3443656	US	Su
+13	2409.485863000	sched nsubmitted	2.000000
+13	2409.486816000	sched	nready	0.000000
+13	2409.486816000	sched	nsubmitted	1.000000
+9       2409.486816000    po      p     7
+10	2409.488593000	w2	WS	"B"
+10	2409.489480000	w2	WS	"B"
+10	2409.490364000	w2	WS	"Fi"
+10	2409.493066000	w2	WS	"B"
+10	2409.493438000	w2	WS	"B"
+10	2409.495093000	w2	WS	"B"
+12	2409.495951000	t3443656	US
+10	2409.499838000	w2	WS	"perfmodel_preproc"
+20	2409.499838000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	7	7	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2409.508593000	t3443656	US	Su
+13	2409.509241000	sched nsubmitted	2.000000
+12	2409.515094000	t3443656	US
+10	2414.703477000	w2	WS	"B"
+13	2316.569922000	w2	gf	0.000000
+13	2409.499838000	w2	gf	0.000000
+10	2414.706157000	w2	WS	"Po"
+10	2414.708696000	w2	WS	"B"
+13	2414.713504000	sched	nready	1.000000
+9       2414.713504000    pu      p     8
+11	2414.714792000	w2	WS	Sc
+12	2414.718030000	w2	WS # handle_worker_scheduling_pop
+13	2414.719854000	sched	nready	0.000000
+13	2414.719854000	sched	nsubmitted	1.000000
+9       2414.719854000    po      p     8
+10	2414.720124000	w2	WS	"P"
+10	2414.721654000	w2	WS	"Sc"
+10	2414.722336000	t3443728	S	B
+10	2414.722426000	w2	WS	"Sl"
+10	2414.723296000	t3443728	S	B
+10	2414.723929000	w0	WS	"Fi"
+10	2414.730625000	t3443728	S	P
+11	2414.732740000	mm1	MS	Co
+24	2414.732740000	F	p	1572864	mm0	com_5	56dd51c8b060	"noname"	0	0
+11	2414.743852000	mm1	MS	CoA
+12	2414.770467000	mm1	MS
+12	2415.823225000	mm1	MS
+19	2415.823225000	F	p	1572864	mm1	com_5
+13	2414.732740000	mm0	bwo_mm	1442.352715
+13	2414.732740000	mm1	bwi_mm	1442.352715
+13	2415.823225000	mm0	bwo_mm	0.000000
+13	2415.823225000	mm1	bwi_mm	0.000000
+10	2415.824553000	t3443728	S	B
+10	2415.827096000	t3443728	S	B
+10	2415.833335000	w0	WS	"perfmodel_infer_trt"
+20	2415.833335000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	8	8	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2415.839369000	t3443728	S	E	8
+10	2418.245430000	t3443728	S	B
+10	2418.260814000	w0	WS	"I"
+13	2319.312884000	w0	gf	0.000000
+13	2415.833335000	w0	gf	0.000000
+10	2418.263018000	t3443728	S	Po
+10	2418.264852000	t3443728	S	B
+13	2418.269532000	sched	nready	1.000000
+9       2418.269532000    pu      p     9
+11	2418.274143000	t3443728	S	Sc
+12	2418.277062000	t3443728	S
+10	2418.278848000	t3443728	S	P
+13	2418.279990000	sched	nready	0.000000
+13	2418.279990000	sched	nsubmitted	0.000000
+9       2418.279990000    po      p     9
+10	2418.280953000	w2	WS	"B"
+10	2418.281480000	w2	WS	"B"
+11	2418.281558000	mm0	MS	Co
+24	2418.281558000	TF	p	9961472	mm1	com_6	56dd51c8cba0	"noname"	0	0
+10	2418.281905000	w2	WS	"Fi"
+11	2418.287051000	mm0	MS	CoA
+12	2418.301705000	mm0	MS
+10	2418.313648000	t3443728	S	Sc
+10	2418.314667000	t3443728	S	Sl
+10	2418.320005000	w2	WS	"B"
+12	2424.481939000	mm0	MS
+19	2424.481939000	TF	p	9961472	mm0	com_6
+13	2418.281558000	mm1	bwo_mm	1606.590305
+13	2418.281558000	mm0	bwi_mm	1606.590305
+13	2424.481939000	mm1	bwo_mm	0.000000
+13	2424.481939000	mm0	bwi_mm	0.000000
+10	2424.483462000	w2	WS	"B"
+10	2424.486800000	w2	WS	"B"
+10	2424.494058000	w2	WS	"perfmodel_post"
+20	2424.494058000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	9	9	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2431.445898000	w2	WS	"B"
+13	2414.703477000	w2	gf	0.000000
+10	2431.447503000	w2	WS	"Po"
+10	2431.450147000	w2	WS	"B"
+11	2431.452531000	w2	WS	C
+12	2431.466353000	w2	WS # handle_end_callback
+10	2431.468219000	w2	WS	"P"
+10	2431.469495000	w2	WS	"Sc"
+10	2431.470229000	w2	WS	"Sl"
+11	2483.997505000	t3443656	US	Su
+13	2484.000586000	sched nsubmitted	1.000000
+13	2484.024089000	sched	nready	1.000000
+9       2484.024089000    pu      p     10
+11	2484.027314000	t3443656	US	Sc
+13	2484.032033000	sched	nready	0.000000
+13	2484.032033000	sched	nsubmitted	0.000000
+9       2484.032033000    po      p     10
+10	2484.033936000	w2	WS	"B"
+12	2484.034497000	t3443656	US
+10	2484.034689000	w2	WS	"B"
+12	2484.034775000	t3443656	US
+10	2484.035583000	w2	WS	"Fi"
+11	2484.035795000	t3443656	US	Su
+13	2484.036311000	sched nsubmitted	1.000000
+10	2484.037857000	w2	WS	"B"
+10	2484.038177000	w2	WS	"B"
+10	2484.040258000	w2	WS	"B"
+10	2484.045136000	w2	WS	"perfmodel_preproc"
+12	2484.045925000	t3443656	US
+20	2484.045136000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	10	10	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2484.061798000	t3443656	US	Su
+13	2484.062339000	sched nsubmitted	2.000000
+12	2484.067587000	t3443656	US
+10	2488.121591000	w2	WS	"B"
+13	2431.445898000	w2	gf	0.000000
+13	2484.045136000	w2	gf	0.000000
+10	2488.123261000	w2	WS	"Po"
+10	2488.125236000	w2	WS	"B"
+13	2488.129157000	sched	nready	1.000000
+9       2488.129157000    pu      p     11
+11	2488.129789000	w2	WS	Sc
+12	2488.131493000	w2	WS # handle_worker_scheduling_pop
+10	2488.133393000	w2	WS	"P"
+13	2488.134176000	sched	nready	0.000000
+13	2488.134176000	sched	nsubmitted	1.000000
+9       2488.134176000    po      p     11
+10	2488.135113000	w2	WS	"Sc"
+10	2488.135672000	w2	WS	"Sl"
+10	2488.135944000	t3443728	S	B
+10	2488.136600000	t3443728	S	B
+10	2488.137186000	w0	WS	"Fi"
+10	2488.143492000	t3443728	S	P
+11	2488.150636000	mm1	MS	Co
+24	2488.150636000	F	p	1572864	mm0	com_7	56dd51e35ff0	"noname"	0	0
+11	2488.162152000	mm1	MS	CoA
+12	2488.186185000	mm1	MS
+12	2489.255324000	mm1	MS
+19	2489.255324000	F	p	1572864	mm1	com_7
+13	2488.150636000	mm0	bwo_mm	1423.808351
+13	2488.150636000	mm1	bwi_mm	1423.808351
+13	2489.255324000	mm0	bwo_mm	0.000000
+13	2489.255324000	mm1	bwi_mm	0.000000
+10	2489.256425000	t3443728	S	B
+10	2489.258412000	t3443728	S	B
+10	2489.264619000	w0	WS	"perfmodel_infer_trt"
+20	2489.264619000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	11	11	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2489.270559000	t3443728	S	E	11
+10	2490.939151000	t3443728	S	B
+10	2490.950811000	w0	WS	"I"
+13	2418.260814000	w0	gf	0.000000
+13	2489.264619000	w0	gf	0.000000
+10	2490.952541000	t3443728	S	Po
+10	2490.953907000	t3443728	S	B
+13	2490.957178000	sched	nready	1.000000
+9       2490.957178000    pu      p     12
+11	2490.961873000	t3443728	S	Sc
+12	2490.963445000	t3443728	S
+10	2490.964930000	t3443728	S	P
+13	2490.965590000	sched	nready	0.000000
+13	2490.965590000	sched	nsubmitted	0.000000
+9       2490.965590000    po      p     12
+10	2490.966722000	w1	WS	"B"
+11	2490.967154000	mm0	MS	Co
+24	2490.967154000	TF	p	9961472	mm1	com_8	56dd51e37b30	"noname"	0	0
+10	2490.967331000	w1	WS	"B"
+10	2490.967697000	w1	WS	"Fi"
+11	2490.971229000	mm0	MS	CoA
+12	2490.979934000	mm0	MS
+10	2490.989956000	t3443728	S	Sc
+10	2490.990803000	t3443728	S	Sl
+10	2491.001329000	w1	WS	"B"
+12	2497.188641000	mm0	MS
+19	2497.188641000	TF	p	9961472	mm0	com_8
+13	2490.967154000	mm1	bwo_mm	1601.140049
+13	2490.967154000	mm0	bwi_mm	1601.140049
+13	2497.188641000	mm1	bwo_mm	0.000000
+13	2497.188641000	mm0	bwi_mm	0.000000
+10	2497.190150000	w1	WS	"B"
+10	2497.192971000	w1	WS	"B"
+10	2497.199319000	w1	WS	"perfmodel_post"
+20	2497.199319000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	12	12	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2503.400772000	w1	WS	"B"
+13	2323.752467000	w1	gf	0.000000
+13	2497.199319000	w1	gf	0.000000
+10	2503.403606000	w1	WS	"Po"
+10	2503.406219000	w1	WS	"B"
+11	2503.409465000	w1	WS	C
+12	2503.422461000	w1	WS # handle_end_callback
+10	2503.424649000	w1	WS	"P"
+10	2503.427150000	w1	WS	"Sc"
+10	2503.428217000	w1	WS	"Sl"
+11	2562.628958000	t3443656	US	Su
+13	2562.631809000	sched nsubmitted	1.000000
+13	2562.654455000	sched	nready	1.000000
+9       2562.654455000    pu      p     13
+11	2562.658103000	t3443656	US	Sc
+12	2562.660709000	t3443656	US
+12	2562.660973000	t3443656	US
+11	2562.661926000	t3443656	US	Su
+13	2562.662558000	sched	nready	0.000000
+13	2562.662558000	sched	nsubmitted	0.000000
+9       2562.662558000    po      p     13
+13	2562.662517000	sched nsubmitted	1.000000
+10	2562.664386000	w1	WS	"B"
+10	2562.665051000	w1	WS	"B"
+10	2562.665817000	w1	WS	"Fi"
+10	2562.668043000	w1	WS	"B"
+10	2562.668380000	w1	WS	"B"
+10	2562.669811000	w1	WS	"B"
+12	2562.673415000	t3443656	US
+10	2562.675356000	w1	WS	"perfmodel_preproc"
+20	2562.675356000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	13	13	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2562.687898000	t3443656	US	Su
+13	2562.688452000	sched nsubmitted	2.000000
+12	2562.693720000	t3443656	US
+10	2567.206033000	w1	WS	"B"
+13	2503.400772000	w1	gf	0.000000
+13	2562.675356000	w1	gf	0.000000
+10	2567.208183000	w1	WS	"Po"
+10	2567.210241000	w1	WS	"B"
+13	2567.214952000	sched	nready	1.000000
+9       2567.214952000    pu      p     14
+11	2567.216005000	w1	WS	Sc
+12	2567.220817000	w1	WS # handle_worker_scheduling_pop
+13	2567.222265000	sched	nready	0.000000
+13	2567.222265000	sched	nsubmitted	1.000000
+9       2567.222265000    po      p     14
+10	2567.222988000	w1	WS	"P"
+10	2567.223645000	w2	WS	"B"
+10	2567.224158000	w2	WS	"B"
+10	2567.224526000	w1	WS	"Sc"
+10	2567.224812000	w2	WS	"Fi"
+10	2567.225324000	w1	WS	"Sl"
+10	2567.228669000	w2	WS	"B"
+10	2567.229103000	w2	WS	"B"
+10	2567.230506000	w2	WS	"B"
+10	2567.234631000	w2	WS	"perfmodel_infer_trt"
+20	2567.234631000	w2	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	14	14	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2576.599519000	w2	WS	"B"
+13	2488.121591000	w2	gf	0.000000
+13	2567.234631000	w2	gf	0.000000
+10	2576.601052000	w2	WS	"Po"
+10	2576.602792000	w2	WS	"B"
+13	2576.606712000	sched	nready	1.000000
+9       2576.606712000    pu      p     15
+11	2576.608863000	w2	WS	Sc
+12	2576.610673000	w2	WS # handle_worker_scheduling_pop
+10	2576.612408000	w2	WS	"P"
+13	2576.613082000	sched	nready	0.000000
+13	2576.613082000	sched	nsubmitted	0.000000
+9       2576.613082000    po      p     15
+10	2576.613663000	w2	WS	"Sc"
+10	2576.614247000	w2	WS	"Sl"
+10	2576.614338000	w1	WS	"B"
+10	2576.614789000	w1	WS	"B"
+10	2576.615245000	w1	WS	"Fi"
+10	2576.616510000	w1	WS	"B"
+10	2576.616730000	w1	WS	"B"
+10	2576.617747000	w1	WS	"B"
+10	2576.622028000	w1	WS	"perfmodel_post"
+20	2576.622028000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	15	15	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2582.179716000	w1	WS	"B"
+13	2567.206033000	w1	gf	0.000000
+13	2576.622028000	w1	gf	0.000000
+10	2582.181446000	w1	WS	"Po"
+10	2582.183166000	w1	WS	"B"
+11	2582.186250000	w1	WS	C
+12	2582.199438000	w1	WS # handle_end_callback
+10	2582.201449000	w1	WS	"P"
+10	2582.203066000	w1	WS	"Sc"
+10	2582.204741000	w1	WS	"Sl"
+11	2646.066054000	t3443656	US	Su
+13	2646.068725000	sched nsubmitted	1.000000
+13	2646.091273000	sched	nready	1.000000
+9       2646.091273000    pu      p     16
+11	2646.095069000	t3443656	US	Sc
+12	2646.099121000	t3443656	US
+12	2646.099431000	t3443656	US
+13	2646.100791000	sched	nready	0.000000
+13	2646.100791000	sched	nsubmitted	0.000000
+9       2646.100791000    po      p     16
+11	2646.100689000	t3443656	US	Su
+13	2646.101308000	sched nsubmitted	1.000000
+10	2646.102093000	w3	WS	"B"
+10	2646.102657000	w3	WS	"B"
+10	2646.103327000	w3	WS	"Fi"
+10	2646.104931000	w3	WS	"B"
+10	2646.105181000	w3	WS	"B"
+10	2646.106142000	w3	WS	"B"
+10	2646.110857000	w3	WS	"perfmodel_preproc"
+12	2646.111503000	t3443656	US
+20	2646.110857000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	16	16	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2646.125454000	t3443656	US	Su
+13	2646.126569000	sched nsubmitted	2.000000
+12	2646.132426000	t3443656	US
+10	2649.137666000	w3	WS	"B"
+13	2331.555425000	w3	gf	0.000000
+13	2646.110857000	w3	gf	0.000000
+10	2649.138936000	w3	WS	"Po"
+10	2649.140621000	w3	WS	"B"
+13	2649.147929000	sched	nready	1.000000
+9       2649.147929000    pu      p     17
+11	2649.148876000	w3	WS	Sc
+12	2649.150277000	w3	WS # handle_worker_scheduling_pop
+10	2649.152288000	w3	WS	"P"
+13	2649.152473000	sched	nready	0.000000
+13	2649.152473000	sched	nsubmitted	1.000000
+9       2649.152473000    po      p     17
+10	2649.153681000	w3	WS	"Sc"
+10	2649.154241000	t3443728	S	B
+10	2649.154288000	w3	WS	"Sl"
+10	2649.154806000	t3443728	S	B
+10	2649.155211000	w0	WS	"Fi"
+10	2649.159235000	t3443728	S	P
+11	2649.160885000	mm1	MS	Co
+24	2649.160885000	F	p	1572864	mm0	com_9	56dd51e35ff0	"noname"	0	0
+11	2649.171281000	mm1	MS	CoA
+12	2649.190388000	mm1	MS
+12	2650.270199000	mm1	MS
+19	2650.270199000	F	p	1572864	mm1	com_9
+13	2649.160885000	mm0	bwo_mm	1417.870864
+13	2649.160885000	mm1	bwi_mm	1417.870864
+13	2650.270199000	mm0	bwo_mm	0.000000
+13	2650.270199000	mm1	bwi_mm	0.000000
+10	2650.270975000	t3443728	S	B
+10	2650.272288000	t3443728	S	B
+10	2650.275595000	w0	WS	"perfmodel_infer_trt"
+20	2650.275595000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	17	17	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2650.279097000	t3443728	S	E	17
+10	2650.626575000	t3443728	S	B
+10	2650.634405000	w0	WS	"I"
+13	2490.950811000	w0	gf	0.000000
+13	2650.275595000	w0	gf	0.000000
+10	2650.635532000	t3443728	S	Po
+10	2650.636595000	t3443728	S	B
+13	2650.638751000	sched	nready	1.000000
+9       2650.638751000    pu      p     18
+11	2650.641032000	t3443728	S	Sc
+12	2650.642809000	t3443728	S
+13	2650.643584000	sched	nready	0.000000
+13	2650.643584000	sched	nsubmitted	0.000000
+9       2650.643584000    po      p     18
+10	2650.644053000	t3443728	S	P
+10	2650.644218000	w3	WS	"B"
+10	2650.644651000	w3	WS	"B"
+10	2650.644968000	w3	WS	"Fi"
+10	2650.646672000	t3443728	S	Sc
+10	2650.647317000	t3443728	S	Sl
+10	2650.647758000	w3	WS	"B"
+11	2650.648673000	mm0	MS	Co
+24	2650.648673000	F	p	9961472	mm1	com_10	56dd51e37b30	"noname"	0	0
+11	2650.651765000	mm0	MS	CoA
+12	2650.658275000	mm0	MS
+12	2656.836140000	mm0	MS
+19	2656.836140000	F	p	9961472	mm0	com_10
+13	2650.648673000	mm1	bwo_mm	1609.943455
+13	2650.648673000	mm0	bwi_mm	1609.943455
+13	2656.836140000	mm1	bwo_mm	0.000000
+13	2656.836140000	mm0	bwi_mm	0.000000
+10	2656.837508000	w3	WS	"B"
+10	2656.840683000	w3	WS	"B"
+10	2656.845961000	w3	WS	"perfmodel_post"
+20	2656.845961000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	18	18	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2662.081742000	w3	WS	"B"
+13	2649.137666000	w3	gf	0.000000
+13	2656.845961000	w3	gf	0.000000
+10	2662.083337000	w3	WS	"Po"
+10	2662.086100000	w3	WS	"B"
+11	2662.088440000	w3	WS	C
+12	2662.100908000	w3	WS # handle_end_callback
+10	2662.103058000	w3	WS	"P"
+10	2662.104350000	w3	WS	"Sc"
+10	2662.105100000	w3	WS	"Sl"
+11	2741.412829000	t3443656	US	Su
+13	2741.415989000	sched nsubmitted	1.000000
+13	2741.438704000	sched	nready	1.000000
+9       2741.438704000    pu      p     19
+11	2741.441378000	t3443656	US	Sc
+12	2741.444772000	t3443656	US
+12	2741.445078000	t3443656	US
+11	2741.446145000	t3443656	US	Su
+13	2741.446994000	sched nsubmitted	2.000000
+13	2741.447592000	sched	nready	0.000000
+13	2741.447592000	sched	nsubmitted	1.000000
+9       2741.447592000    po      p     19
+10	2741.448855000	w2	WS	"B"
+10	2741.449327000	w2	WS	"B"
+10	2741.450066000	w2	WS	"Fi"
+10	2741.452014000	w2	WS	"B"
+10	2741.452263000	w2	WS	"B"
+10	2741.453207000	w2	WS	"B"
+12	2741.456627000	t3443656	US
+10	2741.457132000	w2	WS	"perfmodel_preproc"
+20	2741.457132000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	19	19	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2741.470680000	t3443656	US	Su
+13	2741.471260000	sched nsubmitted	2.000000
+12	2741.476400000	t3443656	US
+10	2744.455855000	w2	WS	"B"
+13	2576.599519000	w2	gf	0.000000
+13	2741.457132000	w2	gf	0.000000
+10	2744.457687000	w2	WS	"Po"
+10	2744.459926000	w2	WS	"B"
+13	2744.463104000	sched	nready	1.000000
+9       2744.463104000    pu      p     20
+11	2744.463834000	w2	WS	Sc
+12	2744.465814000	w2	WS # handle_worker_scheduling_pop
+13	2744.467579000	sched	nready	0.000000
+13	2744.467579000	sched	nsubmitted	1.000000
+9       2744.467579000    po      p     20
+10	2744.467646000	w2	WS	"P"
+10	2744.468770000	w2	WS	"Sc"
+10	2744.469222000	t3443728	S	B
+10	2744.469357000	w2	WS	"Sl"
+10	2744.469830000	t3443728	S	B
+10	2744.470391000	w0	WS	"Fi"
+10	2744.475945000	t3443728	S	P
+11	2744.477483000	mm1	MS	Co
+24	2744.477483000	F	p	1572864	mm0	com_11	56dd51c8b060	"noname"	0	0
+11	2744.487753000	mm1	MS	CoA
+12	2744.508030000	mm1	MS
+12	2745.556613000	mm1	MS
+19	2745.556613000	F	p	1572864	mm1	com_11
+13	2744.477483000	mm0	bwo_mm	1457.529677
+13	2744.477483000	mm1	bwi_mm	1457.529677
+13	2745.556613000	mm0	bwo_mm	0.000000
+13	2745.556613000	mm1	bwi_mm	0.000000
+10	2745.557461000	t3443728	S	B
+10	2745.559013000	t3443728	S	B
+10	2745.563715000	w0	WS	"perfmodel_infer_trt"
+20	2745.563715000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	20	20	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2745.567463000	t3443728	S	E	20
+10	2747.865452000	t3443728	S	B
+10	2747.875569000	w0	WS	"I"
+13	2650.634405000	w0	gf	0.000000
+13	2745.563715000	w0	gf	0.000000
+10	2747.876917000	t3443728	S	Po
+10	2747.878536000	t3443728	S	B
+13	2747.881931000	sched	nready	1.000000
+9       2747.881931000    pu      p     21
+11	2747.884800000	t3443728	S	Sc
+12	2747.886522000	t3443728	S
+13	2747.887720000	sched	nready	0.000000
+13	2747.887720000	sched	nsubmitted	0.000000
+9       2747.887720000    po      p     21
+10	2747.887951000	t3443728	S	P
+10	2747.888846000	w2	WS	"B"
+10	2747.889222000	w2	WS	"B"
+10	2747.889607000	w2	WS	"Fi"
+11	2747.889702000	mm0	MS	Co
+24	2747.889702000	TF	p	9961472	mm1	com_12	56dd51c8cba0	"noname"	0	0
+11	2747.893614000	mm0	MS	CoA
+12	2747.902682000	mm0	MS
+10	2747.909747000	t3443728	S	Sc
+10	2747.910516000	t3443728	S	Sl
+10	2747.912372000	w2	WS	"B"
+12	2754.350680000	mm0	MS
+19	2754.350680000	TF	p	9961472	mm0	com_12
+13	2747.889702000	mm1	bwo_mm	1541.790113
+13	2747.889702000	mm0	bwi_mm	1541.790113
+13	2754.350680000	mm1	bwo_mm	0.000000
+13	2754.350680000	mm0	bwi_mm	0.000000
+10	2755.138778000	w2	WS	"B"
+10	2755.142114000	w2	WS	"B"
+10	2755.152003000	w2	WS	"perfmodel_post"
+20	2755.152003000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	21	21	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2760.727741000	w2	WS	"B"
+13	2744.455855000	w2	gf	0.000000
+13	2755.152003000	w2	gf	0.000000
+10	2760.729355000	w2	WS	"Po"
+10	2760.731438000	w2	WS	"B"
+11	2760.733949000	w2	WS	C
+12	2760.744216000	w2	WS # handle_end_callback
+10	2760.746814000	w2	WS	"P"
+10	2760.748360000	w2	WS	"Sc"
+10	2760.749196000	w2	WS	"Sl"
+11	2819.058035000	t3443656	US	Su
+13	2819.061130000	sched nsubmitted	1.000000
+13	2819.082186000	sched	nready	1.000000
+9       2819.082186000    pu      p     22
+11	2819.085318000	t3443656	US	Sc
+12	2819.088944000	t3443656	US
+12	2819.089252000	t3443656	US
+11	2819.090307000	t3443656	US	Su
+13	2819.091435000	sched nsubmitted	2.000000
+13	2819.098424000	sched	nready	0.000000
+13	2819.098424000	sched	nsubmitted	1.000000
+9       2819.098424000    po      p     22
+10	2819.099982000	w1	WS	"B"
+10	2819.100604000	w1	WS	"B"
+12	2819.101202000	t3443656	US
+10	2819.101251000	w1	WS	"Fi"
+10	2819.102788000	w1	WS	"B"
+10	2819.103045000	w1	WS	"B"
+10	2819.104042000	w1	WS	"B"
+10	2819.108632000	w1	WS	"perfmodel_preproc"
+20	2819.108632000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	22	22	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2819.112670000	t3443656	US	Su
+13	2819.113419000	sched nsubmitted	2.000000
+12	2819.119305000	t3443656	US
+10	2822.188324000	w1	WS	"B"
+13	2582.179716000	w1	gf	0.000000
+13	2819.108632000	w1	gf	0.000000
+10	2822.190037000	w1	WS	"Po"
+10	2822.192441000	w1	WS	"B"
+13	2822.195410000	sched	nready	1.000000
+9       2822.195410000    pu      p     23
+11	2822.196067000	w1	WS	Sc
+12	2822.197874000	w1	WS # handle_worker_scheduling_pop
+10	2822.199507000	w1	WS	"P"
+13	2822.199684000	sched	nready	0.000000
+13	2822.199684000	sched	nsubmitted	1.000000
+9       2822.199684000    po      p     23
+10	2822.200691000	w1	WS	"Sc"
+10	2822.201066000	t3443728	S	B
+10	2822.201361000	w1	WS	"Sl"
+10	2822.201582000	t3443728	S	B
+10	2822.202039000	w0	WS	"Fi"
+10	2822.207368000	t3443728	S	P
+11	2822.208912000	mm1	MS	Co
+24	2822.208912000	F	p	1572864	mm0	com_13	56dd51e35ff0	"noname"	0	0
+11	2822.218464000	mm1	MS	CoA
+12	2822.236586000	mm1	MS
+12	2823.300671000	mm1	MS
+19	2823.300671000	F	p	1572864	mm1	com_13
+13	2822.208912000	mm0	bwo_mm	1440.669598
+13	2822.208912000	mm1	bwi_mm	1440.669598
+13	2823.300671000	mm0	bwo_mm	0.000000
+13	2823.300671000	mm1	bwi_mm	0.000000
+10	2823.301490000	t3443728	S	B
+10	2823.302804000	t3443728	S	B
+10	2823.306638000	w0	WS	"perfmodel_infer_trt"
+20	2823.306638000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	23	23	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2823.310814000	t3443728	S	E	23
+10	2824.512056000	t3443728	S	B
+10	2824.521426000	w0	WS	"I"
+13	2747.875569000	w0	gf	0.000000
+13	2823.306638000	w0	gf	0.000000
+10	2824.522587000	t3443728	S	Po
+10	2824.524045000	t3443728	S	B
+13	2824.526402000	sched	nready	1.000000
+9       2824.526402000    pu      p     24
+11	2824.529390000	t3443728	S	Sc
+12	2824.530671000	t3443728	S
+13	2824.531897000	sched	nready	0.000000
+13	2824.531897000	sched	nsubmitted	0.000000
+9       2824.531897000    po      p     24
+10	2824.531950000	t3443728	S	P
+10	2824.533013000	w2	WS	"B"
+10	2824.533425000	w2	WS	"B"
+11	2824.533512000	mm0	MS	Co
+24	2824.533512000	TF	p	9961472	mm1	com_14	56dd51e37b30	"noname"	0	0
+10	2824.533784000	w2	WS	"Fi"
+11	2824.536218000	mm0	MS	CoA
+12	2824.543395000	mm0	MS
+10	2824.549643000	t3443728	S	Sc
+10	2824.550418000	t3443728	S	Sl
+10	2824.553003000	w2	WS	"B"
+12	2830.883506000	mm0	MS
+19	2830.883506000	TF	p	9961472	mm0	com_14
+13	2824.533512000	mm1	bwo_mm	1568.737230
+13	2824.533512000	mm0	bwi_mm	1568.737230
+13	2830.883506000	mm1	bwo_mm	0.000000
+13	2830.883506000	mm0	bwi_mm	0.000000
+10	2830.887029000	w2	WS	"B"
+10	2830.890271000	w2	WS	"B"
+10	2830.896470000	w2	WS	"perfmodel_post"
+20	2830.896470000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	24	24	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2838.075300000	w2	WS	"B"
+13	2760.727741000	w2	gf	0.000000
+13	2830.896470000	w2	gf	0.000000
+10	2838.076859000	w2	WS	"Po"
+10	2838.079318000	w2	WS	"B"
+11	2838.082288000	w2	WS	C
+12	2838.092165000	w2	WS # handle_end_callback
+10	2838.094656000	w2	WS	"P"
+10	2838.096236000	w2	WS	"Sc"
+10	2838.097166000	w2	WS	"Sl"
+11	2894.844959000	t3443656	US	Su
+13	2894.847740000	sched nsubmitted	1.000000
+13	2894.871430000	sched	nready	1.000000
+9       2894.871430000    pu      p     25
+11	2894.874991000	t3443656	US	Sc
+12	2894.878757000	t3443656	US
+12	2894.879118000	t3443656	US
+13	2894.879901000	sched	nready	0.000000
+13	2894.879901000	sched	nsubmitted	0.000000
+9       2894.879901000    po      p     25
+11	2894.880141000	t3443656	US	Su
+13	2894.880788000	sched nsubmitted	1.000000
+10	2894.881173000	w2	WS	"B"
+10	2894.881593000	w2	WS	"B"
+10	2894.882644000	w2	WS	"Fi"
+10	2894.884144000	w2	WS	"B"
+10	2894.884354000	w2	WS	"B"
+10	2894.885406000	w2	WS	"B"
+10	2894.890166000	w2	WS	"perfmodel_preproc"
+12	2894.890524000	t3443656	US
+20	2894.890166000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	25	25	0	0.000000	0	0	-1	-1	"-1_-1"
+11	2894.904469000	t3443656	US	Su
+13	2894.905478000	sched nsubmitted	2.000000
+12	2894.910871000	t3443656	US
+10	2898.792547000	w2	WS	"B"
+13	2838.075300000	w2	gf	0.000000
+13	2894.890166000	w2	gf	0.000000
+10	2898.794338000	w2	WS	"Po"
+10	2898.795930000	w2	WS	"B"
+13	2898.799340000	sched	nready	1.000000
+9       2898.799340000    pu      p     26
+11	2898.800123000	w2	WS	Sc
+12	2898.801925000	w2	WS # handle_worker_scheduling_pop
+13	2898.803124000	sched	nready	0.000000
+13	2898.803124000	sched	nsubmitted	1.000000
+9       2898.803124000    po      p     26
+10	2898.803691000	w2	WS	"P"
+10	2898.804628000	t3443728	S	B
+10	2898.804885000	w2	WS	"Sc"
+10	2898.805183000	t3443728	S	B
+10	2898.805458000	w2	WS	"Sl"
+10	2898.805641000	w0	WS	"Fi"
+10	2898.810260000	t3443728	S	P
+11	2898.811768000	mm1	MS	Co
+24	2898.811768000	F	p	1572864	mm0	com_15	56dd51c8b060	"noname"	0	0
+11	2898.820975000	mm1	MS	CoA
+12	2898.840514000	mm1	MS
+12	2900.818267000	mm1	MS
+19	2900.818267000	F	p	1572864	mm1	com_15
+13	2898.811768000	mm0	bwo_mm	783.884766
+13	2898.811768000	mm1	bwi_mm	783.884766
+13	2900.818267000	mm0	bwo_mm	0.000000
+13	2900.818267000	mm1	bwi_mm	0.000000
+10	2900.818992000	t3443728	S	B
+10	2900.820482000	t3443728	S	B
+10	2900.832046000	w0	WS	"perfmodel_infer_trt"
+20	2900.832046000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	26	26	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2900.836413000	t3443728	S	E	26
+10	2901.636089000	t3443728	S	B
+10	2901.645787000	w0	WS	"I"
+13	2824.521426000	w0	gf	0.000000
+13	2900.832046000	w0	gf	0.000000
+10	2901.646899000	t3443728	S	Po
+10	2901.647894000	t3443728	S	B
+13	2901.650821000	sched	nready	1.000000
+9       2901.650821000    pu      p     27
+11	2901.653766000	t3443728	S	Sc
+12	2901.654964000	t3443728	S
+10	2901.655989000	t3443728	S	P
+13	2901.657396000	sched	nready	0.000000
+13	2901.657396000	sched	nsubmitted	0.000000
+9       2901.657396000    po      p     27
+11	2901.657622000	mm0	MS	Co
+24	2901.657622000	TF	p	9961472	mm1	com_16	56dd51c8cba0	"noname"	0	0
+10	2901.658753000	w2	WS	"B"
+10	2901.659142000	w2	WS	"B"
+10	2901.659477000	w2	WS	"Fi"
+11	2901.661152000	mm0	MS	CoA
+12	2901.668383000	mm0	MS
+10	2901.674530000	t3443728	S	Sc
+10	2901.675310000	t3443728	S	Sl
+10	2901.680773000	w2	WS	"B"
+12	2909.341902000	mm0	MS
+19	2909.341902000	TF	p	9961472	mm0	com_16
+13	2901.657622000	mm1	bwo_mm	1296.344225
+13	2901.657622000	mm0	bwi_mm	1296.344225
+13	2909.341902000	mm1	bwo_mm	0.000000
+13	2909.341902000	mm0	bwi_mm	0.000000
+10	2909.923521000	w2	WS	"B"
+10	2909.927302000	w2	WS	"B"
+10	2909.932850000	w2	WS	"perfmodel_post"
+20	2909.932850000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	27	27	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2915.911176000	w2	WS	"B"
+13	2898.792547000	w2	gf	0.000000
+13	2909.932850000	w2	gf	0.000000
+10	2915.912566000	w2	WS	"Po"
+10	2915.914508000	w2	WS	"B"
+11	2915.917106000	w2	WS	C
+12	2915.926256000	w2	WS # handle_end_callback
+10	2915.928523000	w2	WS	"P"
+10	2915.930079000	w2	WS	"Sc"
+10	2915.930991000	w2	WS	"Sl"
+11	2977.478933000	t3443656	US	Su
+13	2977.482520000	sched nsubmitted	1.000000
+13	2977.504294000	sched	nready	1.000000
+9       2977.504294000    pu      p     28
+11	2977.507815000	t3443656	US	Sc
+13	2977.511376000	sched	nready	0.000000
+13	2977.511376000	sched	nsubmitted	0.000000
+9       2977.511376000    po      p     28
+10	2977.512871000	w1	WS	"B"
+10	2977.513376000	w1	WS	"B"
+10	2977.513933000	w1	WS	"Fi"
+12	2977.514099000	t3443656	US
+12	2977.514384000	t3443656	US
+11	2977.515407000	t3443656	US	Su
+13	2977.516114000	sched nsubmitted	1.000000
+10	2977.516310000	w1	WS	"B"
+10	2977.516613000	w1	WS	"B"
+10	2977.517625000	w1	WS	"B"
+10	2977.521677000	w1	WS	"perfmodel_preproc"
+20	2977.521677000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	28	28	0	0.000000	0	0	-1	-1	"-1_-1"
+12	2977.527247000	t3443656	US
+11	2977.542675000	t3443656	US	Su
+13	2977.543290000	sched nsubmitted	2.000000
+12	2977.552778000	t3443656	US
+10	2980.916137000	w1	WS	"B"
+13	2822.188324000	w1	gf	0.000000
+13	2977.521677000	w1	gf	0.000000
+10	2980.917728000	w1	WS	"Po"
+10	2980.919610000	w1	WS	"B"
+13	2980.922977000	sched	nready	1.000000
+9       2980.922977000    pu      p     29
+11	2980.924245000	w1	WS	Sc
+13	2980.928167000	sched	nready	0.000000
+13	2980.928167000	sched	nsubmitted	1.000000
+9       2980.928167000    po      p     29
+10	2980.929504000	t3443728	S	B
+10	2980.929992000	t3443728	S	B
+12	2980.930332000	w1	WS # handle_worker_scheduling_pop
+10	2980.930552000	w0	WS	"Fi"
+10	2980.931855000	w1	WS	"P"
+10	2980.933097000	w1	WS	"Sc"
+10	2980.933650000	w1	WS	"Sl"
+10	2980.935798000	t3443728	S	P
+11	2980.937345000	mm1	MS	Co
+24	2980.937345000	F	p	1572864	mm0	com_17	56dd51e35ff0	"noname"	0	0
+11	2980.946659000	mm1	MS	CoA
+12	2980.966070000	mm1	MS
+12	2982.049270000	mm1	MS
+19	2982.049270000	F	p	1572864	mm1	com_17
+13	2980.937345000	mm0	bwo_mm	1414.541448
+13	2980.937345000	mm1	bwi_mm	1414.541448
+13	2982.049270000	mm0	bwo_mm	0.000000
+13	2982.049270000	mm1	bwi_mm	0.000000
+10	2982.050062000	t3443728	S	B
+10	2982.051534000	t3443728	S	B
+10	2982.055680000	w0	WS	"perfmodel_infer_trt"
+20	2982.055680000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	29	29	0	0.000000	0	0	-1	-1	"-1_-1"
+26	2982.059303000	t3443728	S	E	29
+10	2983.226958000	t3443728	S	B
+10	2983.236205000	w0	WS	"I"
+13	2901.645787000	w0	gf	0.000000
+13	2982.055680000	w0	gf	0.000000
+10	2983.237317000	t3443728	S	Po
+10	2983.238318000	t3443728	S	B
+13	2983.240684000	sched	nready	1.000000
+9       2983.240684000    pu      p     30
+11	2983.243206000	t3443728	S	Sc
+12	2983.244357000	t3443728	S
+10	2983.245385000	t3443728	S	P
+13	2983.245846000	sched	nready	0.000000
+13	2983.245846000	sched	nsubmitted	0.000000
+9       2983.245846000    po      p     30
+10	2983.246505000	w1	WS	"B"
+10	2983.246890000	w1	WS	"B"
+11	2983.247138000	mm0	MS	Co
+24	2983.247138000	TF	p	9961472	mm1	com_18	56dd51e37b30	"noname"	0	0
+10	2983.247272000	w1	WS	"Fi"
+11	2983.250576000	mm0	MS	CoA
+12	2983.258071000	mm0	MS
+10	2983.264303000	t3443728	S	Sc
+10	2983.265101000	t3443728	S	Sl
+10	2983.267571000	w1	WS	"B"
+12	2989.452632000	mm0	MS
+19	2989.452632000	TF	p	9961472	mm0	com_18
+13	2983.247138000	mm1	bwo_mm	1605.266559
+13	2983.247138000	mm0	bwi_mm	1605.266559
+13	2989.452632000	mm1	bwo_mm	0.000000
+13	2989.452632000	mm0	bwi_mm	0.000000
+10	2989.453846000	w1	WS	"B"
+10	2989.457210000	w1	WS	"B"
+10	2989.463795000	w1	WS	"perfmodel_post"
+20	2989.463795000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	30	30	0	0.000000	0	0	-1	-1	"-1_-1"
+10	2995.263192000	w1	WS	"B"
+13	2980.916137000	w1	gf	0.000000
+13	2989.463795000	w1	gf	0.000000
+10	2995.264600000	w1	WS	"Po"
+10	2995.266708000	w1	WS	"B"
+11	2995.268967000	w1	WS	C
+12	2995.280736000	w1	WS # handle_end_callback
+10	2995.282483000	w1	WS	"P"
+10	2995.283780000	w1	WS	"Sc"
+10	2995.284510000	w1	WS	"Sl"
+11	3048.766858000	t3443656	US	Su
+13	3048.769490000	sched nsubmitted	1.000000
+13	3048.791799000	sched	nready	1.000000
+9       3048.791799000    pu      p     31
+11	3048.795702000	t3443656	US	Sc
+13	3048.799155000	sched	nready	0.000000
+13	3048.799155000	sched	nsubmitted	0.000000
+9       3048.799155000    po      p     31
+12	3048.799191000	t3443656	US
+12	3048.799464000	t3443656	US
+11	3048.800343000	t3443656	US	Su
+10	3048.800652000	w2	WS	"B"
+13	3048.800990000	sched nsubmitted	1.000000
+10	3048.801563000	w2	WS	"B"
+10	3048.802137000	w2	WS	"Fi"
+10	3048.803909000	w2	WS	"B"
+10	3048.804127000	w2	WS	"B"
+10	3048.805245000	w2	WS	"B"
+10	3048.809450000	w2	WS	"perfmodel_preproc"
+12	3048.810434000	t3443656	US
+20	3048.809450000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	31	31	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3048.825102000	t3443656	US	Su
+13	3048.825566000	sched nsubmitted	2.000000
+12	3048.830966000	t3443656	US
+10	3052.805686000	w2	WS	"B"
+13	2915.911176000	w2	gf	0.000000
+13	3048.809450000	w2	gf	0.000000
+10	3052.807000000	w2	WS	"Po"
+10	3052.808755000	w2	WS	"B"
+13	3052.812502000	sched	nready	1.000000
+9       3052.812502000    pu      p     32
+11	3052.813078000	w2	WS	Sc
+12	3052.815134000	w2	WS # handle_worker_scheduling_pop
+10	3052.816489000	w2	WS	"P"
+13	3052.817054000	sched	nready	0.000000
+13	3052.817054000	sched	nsubmitted	1.000000
+9       3052.817054000    po      p     32
+10	3052.817815000	w2	WS	"Sc"
+10	3052.818168000	w3	WS	"B"
+10	3052.818421000	w2	WS	"Sl"
+10	3052.818781000	w3	WS	"B"
+10	3052.819219000	w3	WS	"Fi"
+10	3052.820843000	w3	WS	"B"
+10	3052.821086000	w3	WS	"B"
+10	3052.822042000	w3	WS	"B"
+10	3052.825302000	w3	WS	"perfmodel_infer_trt"
+20	3052.825302000	w3	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	32	32	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3060.976196000	w3	WS	"B"
+13	2662.081742000	w3	gf	0.000000
+13	3052.825302000	w3	gf	0.000000
+10	3060.978206000	w3	WS	"Po"
+10	3060.980574000	w3	WS	"B"
+13	3060.984940000	sched	nready	1.000000
+9       3060.984940000    pu      p     33
+11	3060.987565000	w3	WS	Sc
+12	3060.991276000	w3	WS # handle_worker_scheduling_pop
+10	3060.993070000	w3	WS	"P"
+13	3060.993871000	sched	nready	0.000000
+13	3060.993871000	sched	nsubmitted	0.000000
+9       3060.993871000    po      p     33
+10	3060.994703000	w3	WS	"Sc"
+10	3060.994961000	w1	WS	"B"
+10	3060.995419000	w1	WS	"B"
+10	3060.995576000	w3	WS	"Sl"
+10	3060.995919000	w1	WS	"Fi"
+10	3060.997386000	w1	WS	"B"
+10	3060.997704000	w1	WS	"B"
+10	3060.998753000	w1	WS	"B"
+10	3061.003016000	w1	WS	"perfmodel_post"
+20	3061.003016000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	33	33	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3066.758357000	w1	WS	"B"
+13	2995.263192000	w1	gf	0.000000
+13	3061.003016000	w1	gf	0.000000
+10	3066.760324000	w1	WS	"Po"
+10	3066.762165000	w1	WS	"B"
+11	3066.765114000	w1	WS	C
+12	3066.777912000	w1	WS # handle_end_callback
+10	3066.779645000	w1	WS	"P"
+10	3066.781364000	w1	WS	"Sc"
+10	3066.782087000	w1	WS	"Sl"
+11	3119.913954000	t3443656	US	Su
+13	3119.916639000	sched nsubmitted	1.000000
+13	3119.940649000	sched	nready	1.000000
+9       3119.940649000    pu      p     34
+11	3119.944090000	t3443656	US	Sc
+13	3119.948857000	sched	nready	0.000000
+13	3119.948857000	sched	nsubmitted	0.000000
+9       3119.948857000    po      p     34
+10	3119.950136000	w3	WS	"B"
+10	3119.951042000	w3	WS	"B"
+10	3119.951738000	w3	WS	"Fi"
+12	3119.952046000	t3443656	US
+12	3119.952299000	t3443656	US
+11	3119.953400000	t3443656	US	Su
+10	3119.953773000	w3	WS	"B"
+10	3119.953989000	w3	WS	"B"
+13	3119.954201000	sched nsubmitted	1.000000
+10	3119.954963000	w3	WS	"B"
+10	3119.959029000	w3	WS	"perfmodel_preproc"
+20	3119.959029000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	34	34	0	0.000000	0	0	-1	-1	"-1_-1"
+12	3119.964014000	t3443656	US
+11	3119.980123000	t3443656	US	Su
+13	3119.980619000	sched nsubmitted	2.000000
+12	3119.986476000	t3443656	US
+10	3123.335522000	w3	WS	"B"
+13	3060.976196000	w3	gf	0.000000
+13	3119.959029000	w3	gf	0.000000
+10	3123.337054000	w3	WS	"Po"
+10	3123.338872000	w3	WS	"B"
+13	3123.342774000	sched	nready	1.000000
+9       3123.342774000    pu      p     35
+11	3123.343455000	w3	WS	Sc
+12	3123.345287000	w3	WS # handle_worker_scheduling_pop
+13	3123.346694000	sched	nready	0.000000
+13	3123.346694000	sched	nsubmitted	1.000000
+9       3123.346694000    po      p     35
+10	3123.346677000	w3	WS	"P"
+10	3123.348335000	w3	WS	"Sc"
+10	3123.348460000	t3443728	S	B
+10	3123.349031000	w3	WS	"Sl"
+10	3123.349080000	t3443728	S	B
+10	3123.349603000	w0	WS	"Fi"
+10	3123.355280000	t3443728	S	P
+11	3123.356856000	mm1	MS	Co
+24	3123.356856000	F	p	1572864	mm0	com_19	56dd51e35ff0	"noname"	0	0
+11	3123.367121000	mm1	MS	CoA
+12	3123.386791000	mm1	MS
+12	3124.481770000	mm1	MS
+19	3124.481770000	F	p	1572864	mm1	com_19
+13	3123.356856000	mm0	bwo_mm	1398.208219
+13	3123.356856000	mm1	bwi_mm	1398.208219
+13	3124.481770000	mm0	bwo_mm	0.000000
+13	3124.481770000	mm1	bwi_mm	0.000000
+10	3124.482986000	t3443728	S	B
+10	3124.484153000	t3443728	S	B
+10	3124.488327000	w0	WS	"perfmodel_infer_trt"
+20	3124.488327000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	35	35	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3124.492084000	t3443728	S	E	35
+10	3125.834974000	t3443728	S	B
+10	3125.844493000	w0	WS	"I"
+13	2983.236205000	w0	gf	0.000000
+13	3124.488327000	w0	gf	0.000000
+10	3125.845593000	t3443728	S	Po
+10	3125.846814000	t3443728	S	B
+13	3125.849232000	sched	nready	1.000000
+9       3125.849232000    pu      p     36
+11	3125.852032000	t3443728	S	Sc
+12	3125.853256000	t3443728	S
+10	3125.854350000	t3443728	S	P
+13	3125.854610000	sched	nready	0.000000
+13	3125.854610000	sched	nsubmitted	0.000000
+9       3125.854610000    po      p     36
+10	3125.855664000	w1	WS	"B"
+11	3125.856024000	mm0	MS	Co
+24	3125.856024000	TF	p	9961472	mm1	com_20	56dd51e37b30	"noname"	0	0
+10	3125.856153000	w1	WS	"B"
+10	3125.856518000	w1	WS	"Fi"
+11	3125.858786000	mm0	MS	CoA
+12	3125.864921000	mm0	MS
+10	3125.871273000	t3443728	S	Sc
+10	3125.872030000	t3443728	S	Sl
+10	3125.874884000	w1	WS	"B"
+12	3132.008549000	mm0	MS
+19	3132.008549000	TF	p	9961472	mm0	com_20
+13	3125.856024000	mm1	bwo_mm	1619.086798
+13	3125.856024000	mm0	bwi_mm	1619.086798
+13	3132.008549000	mm1	bwo_mm	0.000000
+13	3132.008549000	mm0	bwi_mm	0.000000
+10	3132.009972000	w1	WS	"B"
+10	3132.013010000	w1	WS	"B"
+10	3132.018811000	w1	WS	"perfmodel_post"
+20	3132.018811000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	36	36	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3137.667129000	w1	WS	"B"
+13	3066.758357000	w1	gf	0.000000
+13	3132.018811000	w1	gf	0.000000
+10	3137.668682000	w1	WS	"Po"
+10	3137.670508000	w1	WS	"B"
+11	3137.673604000	w1	WS	C
+12	3137.686284000	w1	WS # handle_end_callback
+10	3137.688358000	w1	WS	"P"
+10	3137.690043000	w1	WS	"Sc"
+10	3137.690745000	w1	WS	"Sl"
+11	3196.861247000	t3443656	US	Su
+13	3196.864249000	sched nsubmitted	1.000000
+13	3196.887044000	sched	nready	1.000000
+9       3196.887044000    pu      p     37
+11	3196.889734000	t3443656	US	Sc
+12	3196.894140000	t3443656	US
+12	3196.894412000	t3443656	US
+11	3196.895360000	t3443656	US	Su
+13	3196.895857000	sched nsubmitted	2.000000
+13	3196.899813000	sched	nready	0.000000
+13	3196.899813000	sched	nsubmitted	1.000000
+9       3196.899813000    po      p     37
+10	3196.900998000	w3	WS	"B"
+10	3196.901657000	w3	WS	"B"
+10	3196.902357000	w3	WS	"Fi"
+10	3196.904632000	w3	WS	"B"
+12	3196.904982000	t3443656	US
+10	3196.905143000	w3	WS	"B"
+10	3196.906443000	w3	WS	"B"
+10	3196.911721000	w3	WS	"perfmodel_preproc"
+20	3196.911721000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	37	37	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3196.919486000	t3443656	US	Su
+13	3196.919937000	sched nsubmitted	2.000000
+12	3196.926279000	t3443656	US
+10	3200.134189000	w3	WS	"B"
+13	3123.335522000	w3	gf	0.000000
+13	3196.911721000	w3	gf	0.000000
+10	3200.135833000	w3	WS	"Po"
+10	3200.137699000	w3	WS	"B"
+13	3200.141825000	sched	nready	1.000000
+9       3200.141825000    pu      p     38
+11	3200.142736000	w3	WS	Sc
+12	3200.148989000	w3	WS # handle_worker_scheduling_pop
+13	3200.151049000	sched	nready	0.000000
+13	3200.151049000	sched	nsubmitted	1.000000
+9       3200.151049000    po      p     38
+10	3200.151138000	w3	WS	"P"
+10	3200.152415000	w3	WS	"Sc"
+10	3200.152523000	t3443728	S	B
+10	3200.153050000	t3443728	S	B
+10	3200.153117000	w3	WS	"Sl"
+10	3200.153541000	w0	WS	"Fi"
+10	3200.159417000	t3443728	S	P
+11	3200.160915000	mm1	MS	Co
+24	3200.160915000	F	p	1572864	mm0	com_21	56dd51c8b060	"noname"	0	0
+11	3200.170821000	mm1	MS	CoA
+12	3200.191495000	mm1	MS
+12	3201.281156000	mm1	MS
+19	3201.281156000	F	p	1572864	mm1	com_21
+13	3200.160915000	mm0	bwo_mm	1404.040738
+13	3200.160915000	mm1	bwi_mm	1404.040738
+13	3201.281156000	mm0	bwo_mm	0.000000
+13	3201.281156000	mm1	bwi_mm	0.000000
+10	3201.281947000	t3443728	S	B
+10	3201.283986000	t3443728	S	B
+10	3201.288616000	w0	WS	"perfmodel_infer_trt"
+20	3201.288616000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	38	38	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3201.292686000	t3443728	S	E	38
+10	3201.665636000	t3443728	S	B
+10	3201.674980000	w0	WS	"I"
+13	3125.844493000	w0	gf	0.000000
+13	3201.288616000	w0	gf	0.000000
+10	3201.676480000	t3443728	S	Po
+10	3201.677620000	t3443728	S	B
+13	3201.680210000	sched	nready	1.000000
+9       3201.680210000    pu      p     39
+11	3201.683280000	t3443728	S	Sc
+12	3201.684532000	t3443728	S
+10	3201.685749000	t3443728	S	P
+13	3201.685889000	sched	nready	0.000000
+13	3201.685889000	sched	nsubmitted	0.000000
+9       3201.685889000    po      p     39
+10	3201.687341000	w1	WS	"B"
+11	3201.687420000	mm0	MS	Co
+24	3201.687420000	TF	p	9961472	mm1	com_22	56dd51c8cba0	"noname"	0	0
+10	3201.687800000	w1	WS	"B"
+10	3201.688202000	w1	WS	"Fi"
+11	3201.690244000	mm0	MS	CoA
+12	3201.697425000	mm0	MS
+10	3201.703537000	t3443728	S	Sc
+10	3201.704302000	t3443728	S	Sl
+10	3201.712138000	w1	WS	"B"
+12	3207.852538000	mm0	MS
+19	3207.852538000	TF	p	9961472	mm0	com_22
+13	3201.687420000	mm1	bwo_mm	1615.779617
+13	3201.687420000	mm0	bwi_mm	1615.779617
+13	3207.852538000	mm1	bwo_mm	0.000000
+13	3207.852538000	mm0	bwi_mm	0.000000
+10	3207.854327000	w1	WS	"B"
+10	3207.858792000	w1	WS	"B"
+10	3207.866178000	w1	WS	"perfmodel_post"
+20	3207.866178000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	39	39	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3214.995008000	w1	WS	"B"
+13	3137.667129000	w1	gf	0.000000
+13	3207.866178000	w1	gf	0.000000
+10	3214.996625000	w1	WS	"Po"
+10	3214.998865000	w1	WS	"B"
+11	3215.001247000	w1	WS	C
+12	3215.013196000	w1	WS # handle_end_callback
+10	3215.014938000	w1	WS	"P"
+10	3215.016292000	w1	WS	"Sc"
+10	3215.017062000	w1	WS	"Sl"
+11	3268.506957000	t3443656	US	Su
+13	3268.509662000	sched nsubmitted	1.000000
+13	3268.533167000	sched	nready	1.000000
+9       3268.533167000    pu      p     40
+11	3268.536863000	t3443656	US	Sc
+12	3268.540495000	t3443656	US
+12	3268.540874000	t3443656	US
+13	3268.541574000	sched	nready	0.000000
+13	3268.541574000	sched	nsubmitted	0.000000
+9       3268.541574000    po      p     40
+11	3268.542217000	t3443656	US	Su
+13	3268.542767000	sched nsubmitted	1.000000
+10	3268.542985000	w1	WS	"B"
+10	3268.543510000	w1	WS	"B"
+10	3268.544282000	w1	WS	"Fi"
+10	3268.546117000	w1	WS	"B"
+10	3268.546359000	w1	WS	"B"
+10	3268.547317000	w1	WS	"B"
+12	3268.551701000	t3443656	US
+10	3268.551901000	w1	WS	"perfmodel_preproc"
+20	3268.551901000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	40	40	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3268.566010000	t3443656	US	Su
+13	3268.566616000	sched nsubmitted	2.000000
+12	3268.572220000	t3443656	US
+10	3278.071035000	w1	WS	"B"
+13	3214.995008000	w1	gf	0.000000
+13	3268.551901000	w1	gf	0.000000
+10	3278.072575000	w1	WS	"Po"
+10	3278.074378000	w1	WS	"B"
+13	3278.078666000	sched	nready	1.000000
+9       3278.078666000    pu      p     41
+11	3278.079507000	w1	WS	Sc
+12	3278.081204000	w1	WS # handle_worker_scheduling_pop
+10	3278.082601000	w1	WS	"P"
+13	3278.083385000	sched	nready	0.000000
+13	3278.083385000	sched	nsubmitted	1.000000
+9       3278.083385000    po      p     41
+10	3278.083940000	w1	WS	"Sc"
+10	3278.084612000	w1	WS	"Sl"
+10	3278.085366000	w2	WS	"B"
+10	3278.085768000	w2	WS	"B"
+10	3278.086213000	w2	WS	"Fi"
+10	3278.088086000	w2	WS	"B"
+10	3278.088332000	w2	WS	"B"
+10	3278.089389000	w2	WS	"B"
+10	3278.093542000	w2	WS	"perfmodel_infer_trt"
+20	3278.093542000	w2	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	41	41	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3286.724711000	w2	WS	"B"
+13	3052.805686000	w2	gf	0.000000
+13	3278.093542000	w2	gf	0.000000
+10	3286.727421000	w2	WS	"Po"
+10	3286.729207000	w2	WS	"B"
+13	3286.732847000	sched	nready	1.000000
+9       3286.732847000    pu      p     42
+11	3286.735566000	w2	WS	Sc
+12	3286.737785000	w2	WS # handle_worker_scheduling_pop
+13	3286.739323000	sched	nready	0.000000
+13	3286.739323000	sched	nsubmitted	0.000000
+9       3286.739323000    po      p     42
+10	3286.739287000	w2	WS	"P"
+10	3286.740909000	w2	WS	"Sc"
+10	3286.741085000	w1	WS	"B"
+10	3286.741608000	w2	WS	"Sl"
+10	3286.741760000	w1	WS	"B"
+10	3286.742284000	w1	WS	"Fi"
+10	3286.744190000	w1	WS	"B"
+10	3286.744481000	w1	WS	"B"
+10	3286.745686000	w1	WS	"B"
+10	3286.750957000	w1	WS	"perfmodel_post"
+20	3286.750957000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	42	42	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3292.186088000	w1	WS	"B"
+13	3278.071035000	w1	gf	0.000000
+10	3292.188110000	w1	WS	"Po"
+10	3292.190340000	w1	WS	"B"
+11	3292.192494000	w1	WS	C
+12	3292.204394000	w1	WS # handle_end_callback
+10	3292.206120000	w1	WS	"P"
+10	3292.207488000	w1	WS	"Sc"
+10	3292.208225000	w1	WS	"Sl"
+11	3336.567034000	t3443656	US	Su
+13	3336.570209000	sched nsubmitted	1.000000
+13	3336.591687000	sched	nready	1.000000
+9       3336.591687000    pu      p     43
+11	3336.594651000	t3443656	US	Sc
+12	3336.598398000	t3443656	US
+12	3336.598665000	t3443656	US
+11	3336.599891000	t3443656	US	Su
+13	3336.600449000	sched nsubmitted	2.000000
+13	3336.603687000	sched	nready	0.000000
+13	3336.603687000	sched	nsubmitted	1.000000
+9       3336.603687000    po      p     43
+10	3336.604791000	w2	WS	"B"
+10	3336.605303000	w2	WS	"B"
+10	3336.605923000	w2	WS	"Fi"
+10	3336.607518000	w2	WS	"B"
+10	3336.607820000	w2	WS	"B"
+10	3336.608903000	w2	WS	"B"
+12	3336.609752000	t3443656	US
+10	3336.612824000	w2	WS	"perfmodel_preproc"
+20	3336.612824000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	43	43	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3336.623571000	t3443656	US	Su
+13	3336.624633000	sched nsubmitted	2.000000
+12	3336.630915000	t3443656	US
+10	3339.768568000	w2	WS	"B"
+13	3286.724711000	w2	gf	0.000000
+13	3336.612824000	w2	gf	0.000000
+10	3339.769980000	w2	WS	"Po"
+10	3339.771955000	w2	WS	"B"
+13	3339.775698000	sched	nready	1.000000
+9       3339.775698000    pu      p     44
+11	3339.776462000	w2	WS	Sc
+12	3339.779241000	w2	WS # handle_worker_scheduling_pop
+10	3339.780493000	w2	WS	"P"
+13	3339.780806000	sched	nready	0.000000
+13	3339.780806000	sched	nsubmitted	1.000000
+9       3339.780806000    po      p     44
+10	3339.781722000	w2	WS	"Sc"
+10	3339.782223000	t3443728	S	B
+10	3339.782322000	w2	WS	"Sl"
+10	3339.782929000	t3443728	S	B
+10	3339.783372000	w0	WS	"Fi"
+10	3339.788792000	t3443728	S	P
+11	3339.790377000	mm1	MS	Co
+24	3339.790377000	F	p	1572864	mm0	com_23	56dd51c8b060	"noname"	0	0
+11	3339.800685000	mm1	MS	CoA
+12	3339.820726000	mm1	MS
+12	3340.987627000	mm1	MS
+19	3340.987627000	F	p	1572864	mm1	com_23
+13	3339.790377000	mm0	bwo_mm	1313.730633
+13	3339.790377000	mm1	bwi_mm	1313.730633
+13	3340.987627000	mm0	bwo_mm	0.000000
+13	3340.987627000	mm1	bwi_mm	0.000000
+10	3340.988700000	t3443728	S	B
+10	3340.991196000	t3443728	S	B
+10	3340.996035000	w0	WS	"perfmodel_infer_trt"
+20	3340.996035000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	44	44	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3341.001935000	t3443728	S	E	44
+10	3343.293618000	t3443728	S	B
+10	3343.309194000	w0	WS	"I"
+13	3201.674980000	w0	gf	0.000000
+13	3340.996035000	w0	gf	0.000000
+10	3343.310869000	t3443728	S	Po
+10	3343.312406000	t3443728	S	B
+13	3343.316559000	sched	nready	1.000000
+9       3343.316559000    pu      p     45
+11	3343.321033000	t3443728	S	Sc
+12	3343.322780000	t3443728	S
+10	3343.324577000	t3443728	S	P
+13	3343.325591000	sched	nready	0.000000
+13	3343.325591000	sched	nsubmitted	0.000000
+9       3343.325591000    po      p     45
+11	3343.326694000	mm0	MS	Co
+24	3343.326694000	TF	p	9961472	mm1	com_24	56dd51c8cba0	"noname"	0	0
+10	3343.326835000	w2	WS	"B"
+10	3343.327274000	w2	WS	"B"
+10	3343.327762000	w2	WS	"Fi"
+11	3343.332117000	mm0	MS	CoA
+12	3343.345406000	mm0	MS
+10	3343.356805000	t3443728	S	Sc
+10	3343.357654000	t3443728	S	Sl
+10	3344.175924000	w2	WS	"B"
+12	3349.520816000	mm0	MS
+19	3349.520816000	TF	p	9961472	mm0	com_24
+13	3343.326694000	mm1	bwo_mm	1608.213723
+13	3343.326694000	mm0	bwi_mm	1608.213723
+13	3349.520816000	mm1	bwo_mm	0.000000
+13	3349.520816000	mm0	bwi_mm	0.000000
+10	3349.521951000	w2	WS	"B"
+10	3349.525335000	w2	WS	"B"
+10	3349.531010000	w2	WS	"perfmodel_post"
+20	3349.531010000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	45	45	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3356.998699000	w2	WS	"B"
+13	3339.768568000	w2	gf	0.000000
+13	3349.531010000	w2	gf	0.000000
+10	3357.000371000	w2	WS	"Po"
+10	3357.002113000	w2	WS	"B"
+11	3357.005067000	w2	WS	C
+12	3357.015396000	w2	WS # handle_end_callback
+10	3357.017443000	w2	WS	"P"
+10	3357.019007000	w2	WS	"Sc"
+10	3357.020296000	w2	WS	"Sl"
+11	3423.182368000	t3443656	US	Su
+13	3423.186100000	sched nsubmitted	1.000000
+13	3423.207439000	sched	nready	1.000000
+9       3423.207439000    pu      p     46
+11	3423.210991000	t3443656	US	Sc
+12	3423.214619000	t3443656	US
+12	3423.214871000	t3443656	US
+11	3423.215785000	t3443656	US	Su
+13	3423.216338000	sched nsubmitted	2.000000
+13	3423.216631000	sched	nready	0.000000
+13	3423.216631000	sched	nsubmitted	1.000000
+9       3423.216631000    po      p     46
+10	3423.218130000	w1	WS	"B"
+10	3423.218857000	w1	WS	"B"
+10	3423.219723000	w1	WS	"Fi"
+10	3423.221728000	w1	WS	"B"
+10	3423.222004000	w1	WS	"B"
+10	3423.223609000	w1	WS	"B"
+12	3423.225601000	t3443656	US
+10	3423.228585000	w1	WS	"perfmodel_preproc"
+20	3423.228585000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	46	46	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3423.239616000	t3443656	US	Su
+13	3423.240591000	sched nsubmitted	2.000000
+12	3423.245577000	t3443656	US
+10	3427.638666000	w1	WS	"B"
+13	3292.186088000	w1	gf	0.000000
+13	3423.228585000	w1	gf	0.000000
+10	3427.642017000	w1	WS	"Po"
+10	3427.644193000	w1	WS	"B"
+13	3427.649647000	sched	nready	1.000000
+9       3427.649647000    pu      p     47
+11	3427.651645000	w1	WS	Sc
+12	3427.655004000	w1	WS # handle_worker_scheduling_pop
+10	3427.657574000	w1	WS	"P"
+13	3427.658340000	sched	nready	0.000000
+13	3427.658340000	sched	nsubmitted	1.000000
+9       3427.658340000    po      p     47
+10	3427.659556000	w1	WS	"Sc"
+10	3427.660134000	t3443728	S	B
+10	3427.660639000	w1	WS	"Sl"
+10	3427.660778000	t3443728	S	B
+10	3427.661293000	w0	WS	"Fi"
+10	3427.667564000	t3443728	S	P
+11	3427.670060000	mm1	MS	Co
+24	3427.670060000	F	p	1572864	mm0	com_25	56dd51e35ff0	"noname"	0	0
+11	3427.681743000	mm1	MS	CoA
+12	3427.704906000	mm1	MS
+12	3428.932537000	mm1	MS
+19	3428.932537000	F	p	1572864	mm1	com_25
+13	3427.670060000	mm0	bwo_mm	1245.855568
+13	3427.670060000	mm1	bwi_mm	1245.855568
+13	3428.932537000	mm0	bwo_mm	0.000000
+13	3428.932537000	mm1	bwi_mm	0.000000
+10	3428.933371000	t3443728	S	B
+10	3428.935210000	t3443728	S	B
+10	3428.940722000	w0	WS	"perfmodel_infer_trt"
+20	3428.940722000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	47	47	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3428.944805000	t3443728	S	E	47
+10	3430.408424000	t3443728	S	B
+10	3430.420519000	w0	WS	"I"
+13	3343.309194000	w0	gf	0.000000
+13	3428.940722000	w0	gf	0.000000
+10	3430.422121000	t3443728	S	Po
+10	3430.423407000	t3443728	S	B
+13	3430.426823000	sched	nready	1.000000
+9       3430.426823000    pu      p     48
+11	3430.430287000	t3443728	S	Sc
+12	3430.432787000	t3443728	S
+13	3430.433883000	sched	nready	0.000000
+13	3430.433883000	sched	nsubmitted	0.000000
+9       3430.433883000    po      p     48
+10	3430.434547000	t3443728	S	P
+10	3430.434643000	w1	WS	"B"
+10	3430.435031000	w1	WS	"B"
+10	3430.435421000	w1	WS	"Fi"
+10	3430.438227000	w1	WS	"B"
+11	3430.438502000	mm0	MS	Co
+24	3430.438502000	F	p	9961472	mm1	com_26	56dd51e37b30	"noname"	0	0
+11	3430.442834000	mm0	MS	CoA
+12	3430.452210000	mm0	MS
+10	3430.455229000	t3443728	S	Sc
+10	3430.456219000	t3443728	S	Sl
+12	3436.646261000	mm0	MS
+19	3436.646261000	F	p	9961472	mm0	com_26
+13	3430.438502000	mm1	bwo_mm	1604.680852
+13	3430.438502000	mm0	bwi_mm	1604.680852
+13	3436.646261000	mm1	bwo_mm	0.000000
+13	3436.646261000	mm0	bwi_mm	0.000000
+10	3436.647245000	w1	WS	"B"
+10	3436.650023000	w1	WS	"B"
+10	3436.654356000	w1	WS	"perfmodel_post"
+20	3436.654356000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	48	48	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3441.854129000	w1	WS	"B"
+13	3427.638666000	w1	gf	0.000000
+13	3436.654356000	w1	gf	0.000000
+10	3441.856066000	w1	WS	"Po"
+10	3441.857929000	w1	WS	"B"
+11	3441.860660000	w1	WS	C
+12	3441.874195000	w1	WS # handle_end_callback
+10	3441.876383000	w1	WS	"P"
+10	3441.878492000	w1	WS	"Sc"
+10	3441.880037000	w1	WS	"Sl"
+11	3498.722013000	t3443656	US	Su
+13	3498.724908000	sched nsubmitted	1.000000
+13	3498.746505000	sched	nready	1.000000
+9       3498.746505000    pu      p     49
+11	3498.749465000	t3443656	US	Sc
+13	3498.752725000	sched	nready	0.000000
+13	3498.752725000	sched	nsubmitted	0.000000
+9       3498.752725000    po      p     49
+12	3498.753236000	t3443656	US
+12	3498.753497000	t3443656	US
+10	3498.754045000	w1	WS	"B"
+11	3498.754419000	t3443656	US	Su
+13	3498.754995000	sched nsubmitted	1.000000
+10	3498.755178000	w1	WS	"B"
+10	3498.755819000	w1	WS	"Fi"
+10	3498.757946000	w1	WS	"B"
+10	3498.758258000	w1	WS	"B"
+10	3498.759322000	w1	WS	"B"
+10	3498.763193000	w1	WS	"perfmodel_preproc"
+12	3498.763336000	t3443656	US
+20	3498.763193000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	49	49	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3498.776961000	t3443656	US	Su
+13	3498.777732000	sched nsubmitted	2.000000
+12	3498.783971000	t3443656	US
+10	3501.675322000	w1	WS	"B"
+13	3441.854129000	w1	gf	0.000000
+13	3498.763193000	w1	gf	0.000000
+10	3501.677289000	w1	WS	"Po"
+10	3501.679039000	w1	WS	"B"
+13	3501.682761000	sched	nready	1.000000
+9       3501.682761000    pu      p     50
+11	3501.683501000	w1	WS	Sc
+12	3501.685480000	w1	WS # handle_worker_scheduling_pop
+10	3501.686872000	w1	WS	"P"
+13	3501.687618000	sched	nready	0.000000
+13	3501.687618000	sched	nsubmitted	1.000000
+9       3501.687618000    po      p     50
+10	3501.688166000	w1	WS	"Sc"
+10	3501.688710000	w1	WS	"Sl"
+10	3501.689059000	t3443728	S	B
+10	3501.689572000	t3443728	S	B
+10	3501.690499000	w0	WS	"Fi"
+10	3501.695575000	t3443728	S	P
+11	3501.697177000	mm1	MS	Co
+24	3501.697177000	F	p	1572864	mm0	com_27	56dd51c8b060	"noname"	0	0
+11	3501.706588000	mm1	MS	CoA
+12	3501.725564000	mm1	MS
+12	3502.783516000	mm1	MS
+19	3502.783516000	F	p	1572864	mm1	com_27
+13	3501.697177000	mm0	bwo_mm	1447.857437
+13	3501.697177000	mm1	bwi_mm	1447.857437
+13	3502.783516000	mm0	bwo_mm	0.000000
+13	3502.783516000	mm1	bwi_mm	0.000000
+10	3502.784194000	t3443728	S	B
+10	3502.785549000	t3443728	S	B
+10	3502.790129000	w0	WS	"perfmodel_infer_trt"
+20	3502.790129000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	50	50	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3502.793736000	t3443728	S	E	50
+10	3504.364020000	t3443728	S	B
+10	3504.373061000	w0	WS	"I"
+13	3430.420519000	w0	gf	0.000000
+13	3502.790129000	w0	gf	0.000000
+10	3504.374249000	t3443728	S	Po
+10	3504.375345000	t3443728	S	B
+13	3504.378229000	sched	nready	1.000000
+9       3504.378229000    pu      p     51
+11	3504.380892000	t3443728	S	Sc
+12	3504.382066000	t3443728	S
+13	3504.383368000	sched	nready	0.000000
+13	3504.383368000	sched	nsubmitted	0.000000
+9       3504.383368000    po      p     51
+10	3504.383408000	t3443728	S	P
+10	3504.384525000	w1	WS	"B"
+10	3504.384969000	w1	WS	"B"
+11	3504.385281000	mm0	MS	Co
+24	3504.385281000	TF	p	9961472	mm1	com_28	56dd51c8cba0	"noname"	0	0
+10	3504.385473000	w1	WS	"Fi"
+11	3504.388209000	mm0	MS	CoA
+12	3504.395536000	mm0	MS
+10	3504.401945000	t3443728	S	Sc
+10	3504.402692000	t3443728	S	Sl
+10	3504.405810000	w1	WS	"B"
+12	3510.643509000	mm0	MS
+19	3510.643509000	TF	p	9961472	mm0	com_28
+13	3504.385281000	mm1	bwo_mm	1591.740026
+13	3504.385281000	mm0	bwi_mm	1591.740026
+13	3510.643509000	mm1	bwo_mm	0.000000
+13	3510.643509000	mm0	bwi_mm	0.000000
+10	3510.644786000	w1	WS	"B"
+10	3510.646839000	w1	WS	"B"
+10	3510.651683000	w1	WS	"perfmodel_post"
+20	3510.651683000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	51	51	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3515.870989000	w1	WS	"B"
+13	3501.675322000	w1	gf	0.000000
+13	3510.651683000	w1	gf	0.000000
+10	3515.872424000	w1	WS	"Po"
+10	3515.874268000	w1	WS	"B"
+11	3515.876697000	w1	WS	C
+12	3515.889942000	w1	WS # handle_end_callback
+10	3515.891986000	w1	WS	"P"
+10	3515.893537000	w1	WS	"Sc"
+10	3515.894479000	w1	WS	"Sl"
+11	3572.015808000	t3443656	US	Su
+13	3572.018541000	sched nsubmitted	1.000000
+13	3572.041726000	sched	nready	1.000000
+9       3572.041726000    pu      p     52
+11	3572.045155000	t3443656	US	Sc
+13	3572.049938000	sched	nready	0.000000
+13	3572.049938000	sched	nsubmitted	0.000000
+9       3572.049938000    po      p     52
+10	3572.052037000	w3	WS	"B"
+10	3572.052670000	w3	WS	"B"
+12	3572.052786000	t3443656	US
+12	3572.053191000	t3443656	US
+10	3572.053379000	w3	WS	"Fi"
+11	3572.054422000	t3443656	US	Su
+13	3572.055087000	sched nsubmitted	1.000000
+10	3572.055555000	w3	WS	"B"
+10	3572.055846000	w3	WS	"B"
+10	3572.057231000	w3	WS	"B"
+10	3572.063224000	w3	WS	"perfmodel_preproc"
+12	3572.065047000	t3443656	US
+20	3572.063224000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	52	52	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3572.080071000	t3443656	US	Su
+13	3572.080703000	sched nsubmitted	2.000000
+12	3572.086034000	t3443656	US
+10	3575.110658000	w3	WS	"B"
+13	3200.134189000	w3	gf	0.000000
+13	3572.063224000	w3	gf	0.000000
+10	3575.112491000	w3	WS	"Po"
+10	3575.114417000	w3	WS	"B"
+13	3575.117944000	sched	nready	1.000000
+9       3575.117944000    pu      p     53
+11	3575.119090000	w3	WS	Sc
+12	3575.120897000	w3	WS # handle_worker_scheduling_pop
+10	3575.122256000	w3	WS	"P"
+13	3575.122492000	sched	nready	0.000000
+13	3575.122492000	sched	nsubmitted	1.000000
+9       3575.122492000    po      p     53
+10	3575.123568000	w3	WS	"Sc"
+10	3575.123917000	t3443728	S	B
+10	3575.124180000	w3	WS	"Sl"
+10	3575.124509000	t3443728	S	B
+10	3575.124970000	w0	WS	"Fi"
+10	3575.130602000	t3443728	S	P
+11	3575.132668000	mm1	MS	Co
+24	3575.132668000	F	p	1572864	mm0	com_29	56dd51e35ff0	"noname"	0	0
+11	3575.147992000	mm1	MS	CoA
+12	3575.169385000	mm1	MS
+12	3576.347989000	mm1	MS
+19	3576.347989000	F	p	1572864	mm1	com_29
+13	3575.132668000	mm0	bwo_mm	1294.196348
+13	3575.132668000	mm1	bwi_mm	1294.196348
+13	3576.347989000	mm0	bwo_mm	0.000000
+13	3576.347989000	mm1	bwi_mm	0.000000
+10	3576.348766000	t3443728	S	B
+10	3576.350513000	t3443728	S	B
+10	3576.354414000	w0	WS	"perfmodel_infer_trt"
+20	3576.354414000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	53	53	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3576.358186000	t3443728	S	E	53
+10	3576.806340000	t3443728	S	B
+10	3576.816862000	w0	WS	"I"
+13	3504.373061000	w0	gf	0.000000
+13	3576.354414000	w0	gf	0.000000
+10	3576.818349000	t3443728	S	Po
+10	3576.819580000	t3443728	S	B
+13	3576.822548000	sched	nready	1.000000
+9       3576.822548000    pu      p     54
+11	3576.826014000	t3443728	S	Sc
+12	3576.827548000	t3443728	S
+13	3576.828926000	sched	nready	0.000000
+13	3576.828926000	sched	nsubmitted	0.000000
+9       3576.828926000    po      p     54
+10	3576.829114000	t3443728	S	P
+10	3576.829887000	w3	WS	"B"
+10	3576.830277000	w3	WS	"B"
+10	3576.830648000	w3	WS	"Fi"
+11	3576.831454000	mm0	MS	Co
+24	3576.831454000	TF	p	9961472	mm1	com_30	56dd51e37b30	"noname"	0	0
+11	3576.834844000	mm0	MS	CoA
+12	3576.842700000	mm0	MS
+10	3576.851799000	t3443728	S	Sc
+10	3576.852755000	t3443728	S	Sl
+10	3576.860752000	w3	WS	"B"
+12	3583.046904000	mm0	MS
+19	3583.046904000	TF	p	9961472	mm0	com_30
+13	3576.831454000	mm1	bwo_mm	1602.695219
+13	3576.831454000	mm0	bwi_mm	1602.695219
+13	3583.046904000	mm1	bwo_mm	0.000000
+13	3583.046904000	mm0	bwi_mm	0.000000
+10	3583.048345000	w3	WS	"B"
+10	3583.051666000	w3	WS	"B"
+10	3583.059601000	w3	WS	"perfmodel_post"
+20	3583.059601000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	54	54	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3588.560651000	w3	WS	"B"
+13	3575.110658000	w3	gf	0.000000
+13	3583.059601000	w3	gf	0.000000
+10	3588.562193000	w3	WS	"Po"
+10	3588.564267000	w3	WS	"B"
+11	3588.566861000	w3	WS	C
+12	3588.578205000	w3	WS # handle_end_callback
+10	3588.580294000	w3	WS	"P"
+10	3588.581471000	w3	WS	"Sc"
+10	3588.582255000	w3	WS	"Sl"
+11	3651.278553000	t3443656	US	Su
+13	3651.281087000	sched nsubmitted	1.000000
+13	3651.301802000	sched	nready	1.000000
+9       3651.301802000    pu      p     55
+11	3651.304419000	t3443656	US	Sc
+12	3651.308149000	t3443656	US
+12	3651.308412000	t3443656	US
+13	3651.309423000	sched	nready	0.000000
+13	3651.309423000	sched	nsubmitted	0.000000
+9       3651.309423000    po      p     55
+11	3651.309372000	t3443656	US	Su
+13	3651.309939000	sched nsubmitted	1.000000
+10	3651.310505000	w2	WS	"B"
+10	3651.310963000	w2	WS	"B"
+10	3651.311667000	w2	WS	"Fi"
+10	3651.313321000	w2	WS	"B"
+10	3651.313573000	w2	WS	"B"
+10	3651.315049000	w2	WS	"B"
+12	3651.318419000	t3443656	US
+10	3651.319791000	w2	WS	"perfmodel_preproc"
+20	3651.319791000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	55	55	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3651.330352000	t3443656	US	Su
+13	3651.330793000	sched nsubmitted	2.000000
+12	3651.335596000	t3443656	US
+10	3655.179909000	w2	WS	"B"
+13	3356.998699000	w2	gf	0.000000
+13	3651.319791000	w2	gf	0.000000
+10	3655.182052000	w2	WS	"Po"
+10	3655.184057000	w2	WS	"B"
+13	3655.187800000	sched	nready	1.000000
+9       3655.187800000    pu      p     56
+11	3655.188582000	w2	WS	Sc
+12	3655.190642000	w2	WS # handle_worker_scheduling_pop
+10	3655.191884000	w2	WS	"P"
+13	3655.192792000	sched	nready	0.000000
+13	3655.192792000	sched	nsubmitted	1.000000
+9       3655.192792000    po      p     56
+10	3655.193306000	w2	WS	"Sc"
+10	3655.193889000	w2	WS	"Sl"
+10	3655.194658000	t3443728	S	B
+10	3655.195502000	t3443728	S	B
+10	3655.196051000	w0	WS	"Fi"
+10	3655.202838000	t3443728	S	P
+11	3655.205544000	mm1	MS	Co
+24	3655.205544000	F	p	1572864	mm0	com_31	56dd51c8b060	"noname"	0	0
+11	3655.216412000	mm1	MS	CoA
+12	3655.240533000	mm1	MS
+12	3656.351948000	mm1	MS
+19	3656.351948000	F	p	1572864	mm1	com_31
+13	3655.205544000	mm0	bwo_mm	1371.998004
+13	3655.205544000	mm1	bwi_mm	1371.998004
+13	3656.351948000	mm0	bwo_mm	0.000000
+13	3656.351948000	mm1	bwi_mm	0.000000
+10	3656.353273000	t3443728	S	B
+10	3656.355483000	t3443728	S	B
+10	3656.361308000	w0	WS	"perfmodel_infer_trt"
+20	3656.361308000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	56	56	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3656.367374000	t3443728	S	E	56
+10	3658.141475000	t3443728	S	B
+10	3658.161971000	w0	WS	"I"
+13	3576.816862000	w0	gf	0.000000
+13	3656.361308000	w0	gf	0.000000
+10	3658.163628000	t3443728	S	Po
+10	3658.164795000	t3443728	S	B
+13	3658.167926000	sched	nready	1.000000
+9       3658.167926000    pu      p     57
+11	3658.171889000	t3443728	S	Sc
+12	3658.173784000	t3443728	S
+13	3658.174577000	sched	nready	0.000000
+13	3658.174577000	sched	nsubmitted	0.000000
+9       3658.174577000    po      p     57
+10	3658.175397000	t3443728	S	P
+10	3658.175455000	w2	WS	"B"
+10	3658.175872000	w2	WS	"B"
+10	3658.176196000	w2	WS	"Fi"
+10	3658.179233000	w2	WS	"B"
+11	3658.180794000	mm0	MS	Co
+24	3658.180794000	F	p	9961472	mm1	com_32	56dd51c8cba0	"noname"	0	0
+11	3658.185267000	mm0	MS	CoA
+12	3658.197118000	mm0	MS
+10	3658.200943000	t3443728	S	Sc
+10	3658.202061000	t3443728	S	Sl
+12	3665.458256000	mm0	MS
+19	3665.458256000	F	p	9961472	mm0	com_32
+13	3658.180794000	mm1	bwo_mm	1368.811270
+13	3658.180794000	mm0	bwi_mm	1368.811270
+13	3665.458256000	mm1	bwo_mm	0.000000
+13	3665.458256000	mm0	bwi_mm	0.000000
+10	3665.662748000	w2	WS	"B"
+10	3665.666271000	w2	WS	"B"
+10	3665.671693000	w2	WS	"perfmodel_post"
+20	3665.671693000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	57	57	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3671.568198000	w2	WS	"B"
+13	3655.179909000	w2	gf	0.000000
+13	3665.671693000	w2	gf	0.000000
+10	3671.569610000	w2	WS	"Po"
+10	3671.571675000	w2	WS	"B"
+11	3671.573783000	w2	WS	C
+12	3671.582224000	w2	WS # handle_end_callback
+10	3671.583940000	w2	WS	"P"
+10	3671.585154000	w2	WS	"Sc"
+10	3671.585820000	w2	WS	"Sl"
+11	3724.633916000	t3443656	US	Su
+13	3724.636284000	sched nsubmitted	1.000000
+13	3724.658483000	sched	nready	1.000000
+9       3724.658483000    pu      p     58
+11	3724.661036000	t3443656	US	Sc
+13	3724.666740000	sched	nready	0.000000
+13	3724.666740000	sched	nsubmitted	0.000000
+9       3724.666740000    po      p     58
+10	3724.667952000	w1	WS	"B"
+12	3724.668455000	t3443656	US
+10	3724.668531000	w1	WS	"B"
+12	3724.668842000	t3443656	US
+10	3724.669141000	w1	WS	"Fi"
+11	3724.669825000	t3443656	US	Su
+13	3724.670526000	sched nsubmitted	1.000000
+10	3724.670832000	w1	WS	"B"
+10	3724.671037000	w1	WS	"B"
+10	3724.672113000	w1	WS	"B"
+10	3724.676206000	w1	WS	"perfmodel_preproc"
+20	3724.676206000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	58	58	0	0.000000	0	0	-1	-1	"-1_-1"
+12	3724.680866000	t3443656	US
+11	3724.694346000	t3443656	US	Su
+13	3724.694856000	sched nsubmitted	2.000000
+12	3724.704866000	t3443656	US
+10	3727.794462000	w1	WS	"B"
+13	3515.870989000	w1	gf	0.000000
+13	3724.676206000	w1	gf	0.000000
+10	3727.796522000	w1	WS	"Po"
+10	3727.798837000	w1	WS	"B"
+13	3727.803565000	sched	nready	1.000000
+9       3727.803565000    pu      p     59
+11	3727.804534000	w1	WS	Sc
+12	3727.806136000	w1	WS # handle_worker_scheduling_pop
+13	3727.808179000	sched	nready	0.000000
+13	3727.808179000	sched	nsubmitted	1.000000
+9       3727.808179000    po      p     59
+10	3727.810428000	t3443728	S	B
+10	3727.811112000	t3443728	S	B
+10	3727.811650000	w0	WS	"Fi"
+10	3727.817808000	t3443728	S	P
+11	3727.820253000	mm1	MS	Co
+24	3727.820253000	F	p	1572864	mm0	com_33	56dd51e35ff0	"noname"	0	0
+10	3727.820633000	w1	WS	"P"
+10	3727.821912000	w1	WS	"Sc"
+10	3727.822667000	w1	WS	"Sl"
+11	3727.832066000	mm1	MS	CoA
+12	3727.858753000	mm1	MS
+12	3728.931522000	mm1	MS
+19	3728.931522000	F	p	1572864	mm1	com_33
+13	3727.820253000	mm0	bwo_mm	1415.376475
+13	3727.820253000	mm1	bwi_mm	1415.376475
+13	3728.931522000	mm0	bwo_mm	0.000000
+13	3728.931522000	mm1	bwi_mm	0.000000
+10	3728.932833000	t3443728	S	B
+10	3728.934717000	t3443728	S	B
+10	3728.940324000	w0	WS	"perfmodel_infer_trt"
+20	3728.940324000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	59	59	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3728.946510000	t3443728	S	E	59
+10	3730.518743000	t3443728	S	B
+10	3730.530690000	w0	WS	"I"
+13	3658.161971000	w0	gf	0.000000
+13	3728.940324000	w0	gf	0.000000
+10	3730.532384000	t3443728	S	Po
+10	3730.534043000	t3443728	S	B
+13	3730.537268000	sched	nready	1.000000
+9       3730.537268000    pu      p     60
+11	3730.540959000	t3443728	S	Sc
+12	3730.543242000	t3443728	S
+13	3730.543739000	sched	nready	0.000000
+13	3730.543739000	sched	nsubmitted	0.000000
+9       3730.543739000    po      p     60
+10	3730.544650000	w1	WS	"B"
+10	3730.544837000	t3443728	S	P
+10	3730.545182000	w1	WS	"B"
+10	3730.545518000	w1	WS	"Fi"
+10	3730.548699000	w1	WS	"B"
+11	3730.549471000	mm0	MS	Co
+24	3730.549471000	F	p	9961472	mm1	com_34	56dd51e37b30	"noname"	0	0
+11	3730.553571000	mm0	MS	CoA
+12	3730.563771000	mm0	MS
+10	3730.567573000	t3443728	S	Sc
+10	3730.568653000	t3443728	S	Sl
+12	3738.226156000	mm0	MS
+19	3738.226156000	F	p	9961472	mm0	com_34
+13	3730.549471000	mm1	bwo_mm	1297.626775
+13	3730.549471000	mm0	bwi_mm	1297.626775
+13	3738.226156000	mm1	bwo_mm	0.000000
+13	3738.226156000	mm0	bwi_mm	0.000000
+10	3738.228215000	w1	WS	"B"
+10	3738.230875000	w1	WS	"B"
+10	3738.236537000	w1	WS	"perfmodel_post"
+20	3738.236537000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	60	60	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3743.399691000	w1	WS	"B"
+13	3727.794462000	w1	gf	0.000000
+13	3738.236537000	w1	gf	0.000000
+10	3743.401946000	w1	WS	"Po"
+10	3743.404149000	w1	WS	"B"
+11	3743.406253000	w1	WS	C
+12	3743.419260000	w1	WS # handle_end_callback
+10	3743.421358000	w1	WS	"P"
+10	3743.422899000	w1	WS	"Sc"
+10	3743.423615000	w1	WS	"Sl"
+11	3802.041899000	t3443656	US	Su
+13	3802.045310000	sched nsubmitted	1.000000
+13	3802.066560000	sched	nready	1.000000
+9       3802.066560000    pu      p     61
+11	3802.069557000	t3443656	US	Sc
+12	3802.072977000	t3443656	US
+12	3802.073247000	t3443656	US
+13	3802.073413000	sched	nready	0.000000
+13	3802.073413000	sched	nsubmitted	0.000000
+9       3802.073413000    po      p     61
+11	3802.074304000	t3443656	US	Su
+13	3802.074941000	sched nsubmitted	1.000000
+10	3802.075051000	w1	WS	"B"
+10	3802.075958000	w1	WS	"B"
+10	3802.076605000	w1	WS	"Fi"
+10	3802.078837000	w1	WS	"B"
+10	3802.079231000	w1	WS	"B"
+10	3802.080465000	w1	WS	"B"
+12	3802.084702000	t3443656	US
+10	3802.085742000	w1	WS	"perfmodel_preproc"
+20	3802.085742000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	61	61	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3802.097175000	t3443656	US	Su
+13	3802.097718000	sched nsubmitted	2.000000
+12	3802.102734000	t3443656	US
+10	3806.505222000	w1	WS	"B"
+13	3743.399691000	w1	gf	0.000000
+13	3802.085742000	w1	gf	0.000000
+10	3806.507678000	w1	WS	"Po"
+10	3806.509572000	w1	WS	"B"
+13	3806.514765000	sched	nready	1.000000
+9       3806.514765000    pu      p     62
+11	3806.515890000	w1	WS	Sc
+12	3806.518045000	w1	WS # handle_worker_scheduling_pop
+10	3806.519945000	w1	WS	"P"
+13	3806.521317000	sched	nready	0.000000
+13	3806.521317000	sched	nsubmitted	1.000000
+9       3806.521317000    po      p     62
+10	3806.521999000	w1	WS	"Sc"
+10	3806.522776000	w1	WS	"Sl"
+10	3806.523168000	w2	WS	"B"
+10	3806.523739000	w2	WS	"B"
+10	3806.524464000	w2	WS	"Fi"
+10	3806.526905000	w2	WS	"B"
+10	3806.527260000	w2	WS	"B"
+10	3806.528621000	w2	WS	"B"
+10	3806.533649000	w2	WS	"perfmodel_infer_trt"
+20	3806.533649000	w2	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	62	62	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3815.523642000	w2	WS	"B"
+13	3671.568198000	w2	gf	0.000000
+13	3806.533649000	w2	gf	0.000000
+10	3815.525098000	w2	WS	"Po"
+10	3815.527047000	w2	WS	"B"
+13	3815.530923000	sched	nready	1.000000
+9       3815.530923000    pu      p     63
+11	3815.532868000	w2	WS	Sc
+12	3815.535457000	w2	WS # handle_worker_scheduling_pop
+10	3815.537195000	w2	WS	"P"
+13	3815.537863000	sched	nready	0.000000
+13	3815.537863000	sched	nsubmitted	0.000000
+9       3815.537863000    po      p     63
+10	3815.538413000	w2	WS	"Sc"
+10	3815.538940000	w2	WS	"Sl"
+10	3815.539057000	w3	WS	"B"
+10	3815.539502000	w3	WS	"B"
+10	3815.539913000	w3	WS	"Fi"
+10	3815.541225000	w3	WS	"B"
+10	3815.541483000	w3	WS	"B"
+10	3815.542401000	w3	WS	"B"
+10	3815.546566000	w3	WS	"perfmodel_post"
+20	3815.546566000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	63	63	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3820.630771000	w3	WS	"B"
+13	3588.560651000	w3	gf	0.000000
+13	3815.546566000	w3	gf	0.000000
+10	3820.632622000	w3	WS	"Po"
+10	3820.634788000	w3	WS	"B"
+11	3820.637145000	w3	WS	C
+12	3820.650205000	w3	WS # handle_end_callback
+10	3820.651854000	w3	WS	"P"
+10	3820.652994000	w3	WS	"Sc"
+10	3820.653769000	w3	WS	"Sl"
+11	3879.178496000	t3443656	US	Su
+13	3879.181946000	sched nsubmitted	1.000000
+13	3879.204153000	sched	nready	1.000000
+9       3879.204153000    pu      p     64
+11	3879.206985000	t3443656	US	Sc
+12	3879.210901000	t3443656	US
+13	3879.211277000	sched	nready	0.000000
+13	3879.211277000	sched	nsubmitted	0.000000
+9       3879.211277000    po      p     64
+12	3879.211191000	t3443656	US
+11	3879.211969000	t3443656	US	Su
+13	3879.213167000	sched nsubmitted	1.000000
+10	3879.213290000	w1	WS	"B"
+10	3879.213962000	w1	WS	"B"
+10	3879.214729000	w1	WS	"Fi"
+10	3879.216839000	w1	WS	"B"
+10	3879.217163000	w1	WS	"B"
+10	3879.218315000	w1	WS	"B"
+12	3879.222860000	t3443656	US
+10	3879.223675000	w1	WS	"perfmodel_preproc"
+20	3879.223675000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	64	64	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3879.235577000	t3443656	US	Su
+13	3879.236461000	sched nsubmitted	2.000000
+12	3879.241438000	t3443656	US
+10	3883.450191000	w1	WS	"B"
+13	3806.505222000	w1	gf	0.000000
+13	3879.223675000	w1	gf	0.000000
+10	3883.452186000	w1	WS	"Po"
+10	3883.454205000	w1	WS	"B"
+13	3883.458608000	sched	nready	1.000000
+9       3883.458608000    pu      p     65
+11	3883.459627000	w1	WS	Sc
+12	3883.461401000	w1	WS # handle_worker_scheduling_pop
+13	3883.462980000	sched	nready	0.000000
+13	3883.462980000	sched	nsubmitted	1.000000
+9       3883.462980000    po      p     65
+10	3883.463169000	w1	WS	"P"
+10	3883.464248000	t3443728	S	B
+10	3883.464703000	w1	WS	"Sc"
+10	3883.464895000	t3443728	S	B
+10	3883.465347000	w0	WS	"Fi"
+10	3883.465504000	w1	WS	"Sl"
+10	3883.470974000	t3443728	S	P
+11	3883.472501000	mm1	MS	Co
+24	3883.472501000	F	p	1572864	mm0	com_35	56dd51e35ff0	"noname"	0	0
+11	3883.481891000	mm1	MS	CoA
+12	3883.502493000	mm1	MS
+12	3884.565844000	mm1	MS
+19	3884.565844000	F	p	1572864	mm1	com_35
+13	3883.472501000	mm0	bwo_mm	1438.582403
+13	3883.472501000	mm1	bwi_mm	1438.582403
+13	3884.565844000	mm0	bwo_mm	0.000000
+13	3884.565844000	mm1	bwi_mm	0.000000
+10	3884.566484000	t3443728	S	B
+10	3884.567607000	t3443728	S	B
+10	3884.571327000	w0	WS	"perfmodel_infer_trt"
+20	3884.571327000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	65	65	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3884.575135000	t3443728	S	E	65
+10	3885.970751000	t3443728	S	B
+10	3885.979773000	w0	WS	"I"
+13	3730.530690000	w0	gf	0.000000
+13	3884.571327000	w0	gf	0.000000
+10	3885.980990000	t3443728	S	Po
+10	3885.982015000	t3443728	S	B
+13	3885.984719000	sched	nready	1.000000
+9       3885.984719000    pu      p     66
+11	3885.987091000	t3443728	S	Sc
+12	3885.988184000	t3443728	S
+10	3885.989492000	t3443728	S	P
+13	3885.989765000	sched	nready	0.000000
+13	3885.989765000	sched	nsubmitted	0.000000
+9       3885.989765000    po      p     66
+10	3885.990833000	w2	WS	"B"
+10	3885.991286000	w2	WS	"B"
+11	3885.991622000	mm0	MS	Co
+24	3885.991622000	TF	p	9961472	mm1	com_36	56dd51e37b30	"noname"	0	0
+10	3885.991779000	w2	WS	"Fi"
+11	3885.994382000	mm0	MS	CoA
+12	3886.001376000	mm0	MS
+10	3886.007518000	t3443728	S	Sc
+10	3886.008201000	t3443728	S	Sl
+10	3886.011094000	w2	WS	"B"
+12	3892.408503000	mm0	MS
+19	3892.408503000	TF	p	9961472	mm0	com_36
+13	3885.991622000	mm1	bwo_mm	1552.385341
+13	3885.991622000	mm0	bwi_mm	1552.385341
+13	3892.408503000	mm1	bwo_mm	0.000000
+13	3892.408503000	mm0	bwi_mm	0.000000
+10	3892.409908000	w2	WS	"B"
+10	3892.412185000	w2	WS	"B"
+10	3892.417813000	w2	WS	"perfmodel_post"
+20	3892.417813000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	66	66	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3898.170102000	w2	WS	"B"
+13	3815.523642000	w2	gf	0.000000
+13	3892.417813000	w2	gf	0.000000
+10	3898.171756000	w2	WS	"Po"
+10	3898.173689000	w2	WS	"B"
+11	3898.176615000	w2	WS	C
+12	3898.186033000	w2	WS # handle_end_callback
+10	3898.187704000	w2	WS	"P"
+10	3898.188905000	w2	WS	"Sc"
+10	3898.189593000	w2	WS	"Sl"
+11	3953.544360000	t3443656	US	Su
+13	3953.548021000	sched nsubmitted	1.000000
+13	3953.569734000	sched	nready	1.000000
+9       3953.569734000    pu      p     67
+11	3953.572856000	t3443656	US	Sc
+12	3953.576717000	t3443656	US
+12	3953.576962000	t3443656	US
+11	3953.578080000	t3443656	US	Su
+13	3953.578651000	sched nsubmitted	2.000000
+13	3953.579614000	sched	nready	0.000000
+13	3953.579614000	sched	nsubmitted	1.000000
+9       3953.579614000    po      p     67
+10	3953.581221000	w1	WS	"B"
+10	3953.582081000	w1	WS	"B"
+10	3953.582755000	w1	WS	"Fi"
+10	3953.585081000	w1	WS	"B"
+10	3953.585381000	w1	WS	"B"
+10	3953.586633000	w1	WS	"B"
+12	3953.588501000	t3443656	US
+10	3953.591659000	w1	WS	"perfmodel_preproc"
+20	3953.591659000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	67	67	0	0.000000	0	0	-1	-1	"-1_-1"
+11	3953.603965000	t3443656	US	Su
+13	3953.604560000	sched nsubmitted	2.000000
+12	3953.610096000	t3443656	US
+10	3957.583075000	w1	WS	"B"
+13	3883.450191000	w1	gf	0.000000
+13	3953.591659000	w1	gf	0.000000
+10	3957.585326000	w1	WS	"Po"
+10	3957.587068000	w1	WS	"B"
+13	3957.590981000	sched	nready	1.000000
+9       3957.590981000    pu      p     68
+11	3957.592367000	w1	WS	Sc
+12	3957.594295000	w1	WS # handle_worker_scheduling_pop
+13	3957.595824000	sched	nready	0.000000
+13	3957.595824000	sched	nsubmitted	1.000000
+9       3957.595824000    po      p     68
+10	3957.595994000	w1	WS	"P"
+10	3957.597024000	t3443728	S	B
+10	3957.597558000	t3443728	S	B
+10	3957.597615000	w1	WS	"Sc"
+10	3957.598058000	w0	WS	"Fi"
+10	3957.598450000	w1	WS	"Sl"
+10	3957.602968000	t3443728	S	P
+11	3957.604402000	mm1	MS	Co
+24	3957.604402000	F	p	1572864	mm0	com_37	56dd51c8b060	"noname"	0	0
+11	3957.613095000	mm1	MS	CoA
+12	3957.631235000	mm1	MS
+12	3958.713068000	mm1	MS
+19	3958.713068000	F	p	1572864	mm1	com_37
+13	3957.604402000	mm0	bwo_mm	1418.699590
+13	3957.604402000	mm1	bwi_mm	1418.699590
+13	3958.713068000	mm0	bwo_mm	0.000000
+13	3958.713068000	mm1	bwi_mm	0.000000
+10	3958.714041000	t3443728	S	B
+10	3958.715247000	t3443728	S	B
+10	3958.719210000	w0	WS	"perfmodel_infer_trt"
+20	3958.719210000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	68	68	0	0.000000	0	0	-1	-1	"-1_-1"
+26	3958.722527000	t3443728	S	E	68
+10	3959.909995000	t3443728	S	B
+10	3959.919209000	w0	WS	"I"
+13	3885.979773000	w0	gf	0.000000
+13	3958.719210000	w0	gf	0.000000
+10	3959.920373000	t3443728	S	Po
+10	3959.921411000	t3443728	S	B
+13	3959.923847000	sched	nready	1.000000
+9       3959.923847000    pu      p     69
+11	3959.927323000	t3443728	S	Sc
+12	3959.928501000	t3443728	S
+10	3959.929638000	t3443728	S	P
+13	3959.929959000	sched	nready	0.000000
+13	3959.929959000	sched	nsubmitted	0.000000
+9       3959.929959000    po      p     69
+10	3959.931144000	w1	WS	"B"
+11	3959.931300000	mm0	MS	Co
+24	3959.931300000	TF	p	9961472	mm1	com_38	56dd51c8cba0	"noname"	0	0
+10	3959.931589000	w1	WS	"B"
+10	3959.931964000	w1	WS	"Fi"
+11	3959.934686000	mm0	MS	CoA
+12	3959.942086000	mm0	MS
+10	3959.948763000	t3443728	S	Sc
+10	3959.949598000	t3443728	S	Sl
+10	3959.951997000	w1	WS	"B"
+12	3966.130165000	mm0	MS
+19	3966.130165000	TF	p	9961472	mm0	com_38
+13	3959.931300000	mm1	bwo_mm	1606.983214
+13	3959.931300000	mm0	bwi_mm	1606.983214
+13	3966.130165000	mm1	bwo_mm	0.000000
+13	3966.130165000	mm0	bwi_mm	0.000000
+10	3966.131096000	w1	WS	"B"
+10	3966.133193000	w1	WS	"B"
+10	3966.138165000	w1	WS	"perfmodel_post"
+20	3966.138165000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	69	69	0	0.000000	0	0	-1	-1	"-1_-1"
+10	3971.540458000	w1	WS	"B"
+13	3957.583075000	w1	gf	0.000000
+13	3966.138165000	w1	gf	0.000000
+10	3971.542300000	w1	WS	"Po"
+10	3971.543749000	w1	WS	"B"
+11	3971.546000000	w1	WS	C
+12	3971.558923000	w1	WS # handle_end_callback
+10	3971.560927000	w1	WS	"P"
+10	3971.562442000	w1	WS	"Sc"
+10	3971.563264000	w1	WS	"Sl"
+11	4019.368028000	t3443656	US	Su
+13	4019.371167000	sched nsubmitted	1.000000
+13	4019.394525000	sched	nready	1.000000
+9       4019.394525000    pu      p     70
+11	4019.398534000	t3443656	US	Sc
+12	4019.402214000	t3443656	US
+12	4019.402567000	t3443656	US
+11	4019.403616000	t3443656	US	Su
+13	4019.404334000	sched nsubmitted	2.000000
+13	4019.404917000	sched	nready	0.000000
+13	4019.404917000	sched	nsubmitted	1.000000
+9       4019.404917000    po      p     70
+10	4019.406775000	w3	WS	"B"
+10	4019.407417000	w3	WS	"B"
+10	4019.408149000	w3	WS	"Fi"
+10	4019.410300000	w3	WS	"B"
+10	4019.410686000	w3	WS	"B"
+10	4019.412039000	w3	WS	"B"
+12	4019.415984000	t3443656	US
+10	4019.417682000	w3	WS	"perfmodel_preproc"
+20	4019.417682000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	70	70	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4019.431077000	t3443656	US	Su
+13	4019.431714000	sched nsubmitted	2.000000
+12	4019.437522000	t3443656	US
+10	4022.443315000	w3	WS	"B"
+13	3820.630771000	w3	gf	0.000000
+13	4019.417682000	w3	gf	0.000000
+10	4022.444726000	w3	WS	"Po"
+10	4022.446504000	w3	WS	"B"
+13	4022.450069000	sched	nready	1.000000
+9       4022.450069000    pu      p     71
+11	4022.451400000	w3	WS	Sc
+12	4022.452874000	w3	WS # handle_worker_scheduling_pop
+10	4022.454177000	w3	WS	"P"
+13	4022.454868000	sched	nready	0.000000
+13	4022.454868000	sched	nsubmitted	1.000000
+9       4022.454868000    po      p     71
+10	4022.455435000	w3	WS	"Sc"
+10	4022.455992000	w3	WS	"Sl"
+10	4022.456870000	t3443728	S	B
+10	4022.457379000	t3443728	S	B
+10	4022.457849000	w0	WS	"Fi"
+10	4022.462297000	t3443728	S	P
+11	4022.464478000	mm1	MS	Co
+24	4022.464478000	F	p	1572864	mm0	com_39	56dd51e35ff0	"noname"	0	0
+11	4022.474581000	mm1	MS	CoA
+12	4022.493134000	mm1	MS
+12	4023.542167000	mm1	MS
+19	4023.542167000	F	p	1572864	mm1	com_39
+13	4022.464478000	mm0	bwo_mm	1459.478569
+13	4022.464478000	mm1	bwi_mm	1459.478569
+13	4023.542167000	mm0	bwo_mm	0.000000
+13	4023.542167000	mm1	bwi_mm	0.000000
+10	4023.542837000	t3443728	S	B
+10	4023.544072000	t3443728	S	B
+10	4023.548412000	w0	WS	"perfmodel_infer_trt"
+20	4023.548412000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	71	71	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4023.552004000	t3443728	S	E	71
+10	4025.472352000	t3443728	S	B
+10	4025.482035000	w0	WS	"I"
+13	3959.919209000	w0	gf	0.000000
+13	4023.548412000	w0	gf	0.000000
+10	4025.483272000	t3443728	S	Po
+10	4025.484395000	t3443728	S	B
+13	4025.488014000	sched	nready	1.000000
+9       4025.488014000    pu      p     72
+11	4025.490835000	t3443728	S	Sc
+12	4025.492484000	t3443728	S
+13	4025.493641000	sched	nready	0.000000
+13	4025.493641000	sched	nsubmitted	0.000000
+9       4025.493641000    po      p     72
+10	4025.493736000	t3443728	S	P
+10	4025.494391000	w3	WS	"B"
+10	4025.494757000	w3	WS	"B"
+10	4025.495056000	w3	WS	"Fi"
+10	4025.497421000	t3443728	S	Sc
+10	4025.497958000	t3443728	S	Sl
+10	4025.498548000	w3	WS	"B"
+11	4025.499369000	mm0	MS	Co
+24	4025.499369000	F	p	9961472	mm1	com_40	56dd51e37b30	"noname"	0	0
+11	4025.502220000	mm0	MS	CoA
+12	4025.509847000	mm0	MS
+12	4031.761512000	mm0	MS
+19	4031.761512000	F	p	9961472	mm0	com_40
+13	4025.499369000	mm1	bwo_mm	1590.744894
+13	4025.499369000	mm0	bwi_mm	1590.744894
+13	4031.761512000	mm1	bwo_mm	0.000000
+13	4031.761512000	mm0	bwi_mm	0.000000
+10	4031.763057000	w3	WS	"B"
+10	4031.765785000	w3	WS	"B"
+10	4031.770911000	w3	WS	"perfmodel_post"
+20	4031.770911000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	72	72	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4036.648668000	w3	WS	"B"
+13	4022.443315000	w3	gf	0.000000
+13	4031.770911000	w3	gf	0.000000
+10	4036.650186000	w3	WS	"Po"
+10	4036.652027000	w3	WS	"B"
+11	4036.654616000	w3	WS	C
+12	4036.667300000	w3	WS # handle_end_callback
+10	4036.669073000	w3	WS	"P"
+10	4036.670309000	w3	WS	"Sc"
+10	4036.670988000	w3	WS	"Sl"
+11	4100.856162000	t3443656	US	Su
+13	4100.858959000	sched nsubmitted	1.000000
+13	4100.882996000	sched	nready	1.000000
+9       4100.882996000    pu      p     73
+11	4100.886816000	t3443656	US	Sc
+13	4100.893126000	sched	nready	0.000000
+13	4100.893126000	sched	nsubmitted	0.000000
+9       4100.893126000    po      p     73
+12	4100.893644000	t3443656	US
+12	4100.894100000	t3443656	US
+10	4100.895129000	w1	WS	"B"
+11	4100.895323000	t3443656	US	Su
+10	4100.895921000	w1	WS	"B"
+13	4100.895985000	sched nsubmitted	1.000000
+10	4100.896676000	w1	WS	"Fi"
+10	4100.898994000	w1	WS	"B"
+10	4100.899376000	w1	WS	"B"
+10	4100.901102000	w1	WS	"B"
+12	4100.906556000	t3443656	US
+10	4100.906759000	w1	WS	"perfmodel_preproc"
+20	4100.906759000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	73	73	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4100.923254000	t3443656	US	Su
+13	4100.923880000	sched nsubmitted	2.000000
+12	4100.929666000	t3443656	US
+10	4104.929735000	w1	WS	"B"
+13	3971.540458000	w1	gf	0.000000
+13	4100.906759000	w1	gf	0.000000
+10	4104.932453000	w1	WS	"Po"
+10	4104.934730000	w1	WS	"B"
+13	4104.939950000	sched	nready	1.000000
+9       4104.939950000    pu      p     74
+11	4104.941333000	w1	WS	Sc
+12	4104.943317000	w1	WS # handle_worker_scheduling_pop
+13	4104.944638000	sched	nready	0.000000
+13	4104.944638000	sched	nsubmitted	1.000000
+9       4104.944638000    po      p     74
+10	4104.945025000	w1	WS	"P"
+10	4104.946107000	t3443728	S	B
+10	4104.946551000	t3443728	S	B
+10	4104.946637000	w1	WS	"Sc"
+10	4104.947036000	w0	WS	"Fi"
+10	4104.947419000	w1	WS	"Sl"
+10	4104.952913000	t3443728	S	P
+11	4104.954477000	mm1	MS	Co
+24	4104.954477000	F	p	1572864	mm0	com_41	56dd51c8b060	"noname"	0	0
+11	4104.965378000	mm1	MS	CoA
+12	4104.984585000	mm1	MS
+12	4106.053425000	mm1	MS
+19	4106.053425000	F	p	1572864	mm1	com_41
+13	4104.954477000	mm0	bwo_mm	1431.245154
+13	4104.954477000	mm1	bwi_mm	1431.245154
+13	4106.053425000	mm0	bwo_mm	0.000000
+13	4106.053425000	mm1	bwi_mm	0.000000
+10	4106.054091000	t3443728	S	B
+10	4106.055499000	t3443728	S	B
+10	4106.059722000	w0	WS	"perfmodel_infer_trt"
+20	4106.059722000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	74	74	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4106.063206000	t3443728	S	E	74
+10	4107.214482000	t3443728	S	B
+10	4107.223333000	w0	WS	"I"
+13	4025.482035000	w0	gf	0.000000
+13	4106.059722000	w0	gf	0.000000
+10	4107.224568000	t3443728	S	Po
+10	4107.225540000	t3443728	S	B
+13	4107.228438000	sched	nready	1.000000
+9       4107.228438000    pu      p     75
+11	4107.230696000	t3443728	S	Sc
+12	4107.231920000	t3443728	S
+10	4107.232999000	t3443728	S	P
+13	4107.233225000	sched	nready	0.000000
+13	4107.233225000	sched	nsubmitted	0.000000
+9       4107.233225000    po      p     75
+10	4107.234863000	w1	WS	"B"
+11	4107.234957000	mm0	MS	Co
+24	4107.234957000	TF	p	9961472	mm1	com_42	56dd51c8cba0	"noname"	0	0
+10	4107.235438000	w1	WS	"B"
+10	4107.235928000	w1	WS	"Fi"
+11	4107.237402000	mm0	MS	CoA
+12	4107.244151000	mm0	MS
+10	4107.250147000	t3443728	S	Sc
+10	4107.250865000	t3443728	S	Sl
+10	4107.258305000	w1	WS	"B"
+12	4113.444900000	mm0	MS
+19	4113.444900000	TF	p	9961472	mm0	com_42
+13	4107.234957000	mm1	bwo_mm	1604.116495
+13	4107.234957000	mm0	bwi_mm	1604.116495
+13	4113.444900000	mm1	bwo_mm	0.000000
+13	4113.444900000	mm0	bwi_mm	0.000000
+10	4113.446246000	w1	WS	"B"
+10	4113.449047000	w1	WS	"B"
+10	4113.455042000	w1	WS	"perfmodel_post"
+20	4113.455042000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	75	75	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4118.579069000	w1	WS	"B"
+13	4104.929735000	w1	gf	0.000000
+13	4113.455042000	w1	gf	0.000000
+10	4118.580406000	w1	WS	"Po"
+10	4118.582513000	w1	WS	"B"
+11	4118.584850000	w1	WS	C
+12	4118.597526000	w1	WS # handle_end_callback
+10	4118.599879000	w1	WS	"P"
+10	4118.601388000	w1	WS	"Sc"
+10	4118.602309000	w1	WS	"Sl"
+11	4172.955474000	t3443656	US	Su
+13	4172.957956000	sched nsubmitted	1.000000
+13	4172.978543000	sched	nready	1.000000
+9       4172.978543000    pu      p     76
+11	4172.981653000	t3443656	US	Sc
+13	4172.987373000	sched	nready	0.000000
+13	4172.987373000	sched	nsubmitted	0.000000
+9       4172.987373000    po      p     76
+12	4172.988187000	t3443656	US
+12	4172.988491000	t3443656	US
+10	4172.989300000	w2	WS	"B"
+11	4172.989465000	t3443656	US	Su
+10	4172.990048000	w2	WS	"B"
+13	4172.990757000	sched nsubmitted	1.000000
+10	4172.990822000	w2	WS	"Fi"
+10	4172.992995000	w2	WS	"B"
+10	4172.993379000	w2	WS	"B"
+10	4172.994622000	w2	WS	"B"
+12	4172.998860000	t3443656	US
+10	4172.999659000	w2	WS	"perfmodel_preproc"
+20	4172.999659000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	76	76	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4173.016390000	t3443656	US	Su
+13	4173.016994000	sched nsubmitted	2.000000
+12	4173.022498000	t3443656	US
+10	4177.134517000	w2	WS	"B"
+13	3898.170102000	w2	gf	0.000000
+13	4172.999659000	w2	gf	0.000000
+10	4177.136091000	w2	WS	"Po"
+10	4177.137799000	w2	WS	"B"
+13	4177.148904000	sched	nready	1.000000
+9       4177.148904000    pu      p     77
+11	4177.152204000	w2	WS	Sc
+12	4177.154578000	w2	WS # handle_worker_scheduling_pop
+13	4177.155833000	sched	nready	0.000000
+13	4177.155833000	sched	nsubmitted	1.000000
+9       4177.155833000    po      p     77
+10	4177.156561000	w2	WS	"P"
+10	4177.157497000	t3443728	S	B
+10	4177.157873000	w2	WS	"Sc"
+10	4177.158037000	t3443728	S	B
+10	4177.158538000	w0	WS	"Fi"
+10	4177.158630000	w2	WS	"Sl"
+10	4177.164169000	t3443728	S	P
+11	4177.165717000	mm1	MS	Co
+24	4177.165717000	F	p	1572864	mm0	com_43	56dd51e35ff0	"noname"	0	0
+11	4177.176164000	mm1	MS	CoA
+12	4177.196930000	mm1	MS
+12	4178.286649000	mm1	MS
+19	4178.286649000	F	p	1572864	mm1	com_43
+13	4177.165717000	mm0	bwo_mm	1403.175215
+13	4177.165717000	mm1	bwi_mm	1403.175215
+13	4178.286649000	mm0	bwo_mm	0.000000
+13	4178.286649000	mm1	bwi_mm	0.000000
+10	4178.287872000	t3443728	S	B
+10	4178.291216000	t3443728	S	B
+10	4178.296774000	w0	WS	"perfmodel_infer_trt"
+20	4178.296774000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	77	77	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4178.320469000	t3443728	S	E	77
+10	4179.912183000	t3443728	S	B
+10	4179.923134000	w0	WS	"I"
+13	4107.223333000	w0	gf	0.000000
+13	4178.296774000	w0	gf	0.000000
+10	4179.924499000	t3443728	S	Po
+10	4179.926121000	t3443728	S	B
+13	4179.929205000	sched	nready	1.000000
+9       4179.929205000    pu      p     78
+11	4179.933403000	t3443728	S	Sc
+12	4179.934912000	t3443728	S
+10	4179.936109000	t3443728	S	P
+13	4179.936695000	sched	nready	0.000000
+13	4179.936695000	sched	nsubmitted	0.000000
+9       4179.936695000    po      p     78
+10	4179.937879000	w2	WS	"B"
+11	4179.938053000	mm0	MS	Co
+24	4179.938053000	TF	p	9961472	mm1	com_44	56dd51e37b30	"noname"	0	0
+10	4179.938369000	w2	WS	"B"
+10	4179.938816000	w2	WS	"Fi"
+11	4179.942665000	mm0	MS	CoA
+12	4179.951753000	mm0	MS
+10	4179.961129000	t3443728	S	Sc
+10	4179.962018000	t3443728	S	Sl
+10	4179.968542000	w2	WS	"B"
+12	4186.166486000	mm0	MS
+19	4186.166486000	TF	p	9961472	mm0	com_44
+13	4179.938053000	mm1	bwo_mm	1599.354444
+13	4179.938053000	mm0	bwi_mm	1599.354444
+13	4186.166486000	mm1	bwo_mm	0.000000
+13	4186.166486000	mm0	bwi_mm	0.000000
+10	4186.687364000	w2	WS	"B"
+10	4186.691286000	w2	WS	"B"
+10	4186.698725000	w2	WS	"perfmodel_post"
+20	4186.698725000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	78	78	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4192.507743000	w2	WS	"B"
+13	4177.134517000	w2	gf	0.000000
+13	4186.698725000	w2	gf	0.000000
+10	4192.509208000	w2	WS	"Po"
+10	4192.511948000	w2	WS	"B"
+11	4192.514339000	w2	WS	C
+12	4192.523518000	w2	WS # handle_end_callback
+10	4192.525484000	w2	WS	"P"
+10	4192.526677000	w2	WS	"Sc"
+10	4192.527471000	w2	WS	"Sl"
+11	4245.089520000	t3443656	US	Su
+13	4245.092615000	sched nsubmitted	1.000000
+13	4245.113518000	sched	nready	1.000000
+9       4245.113518000    pu      p     79
+11	4245.116642000	t3443656	US	Sc
+13	4245.120358000	sched	nready	0.000000
+13	4245.120358000	sched	nsubmitted	0.000000
+9       4245.120358000    po      p     79
+12	4245.120641000	t3443656	US
+12	4245.120907000	t3443656	US
+11	4245.121822000	t3443656	US	Su
+10	4245.121997000	w3	WS	"B"
+13	4245.122375000	sched nsubmitted	1.000000
+10	4245.122694000	w3	WS	"B"
+10	4245.123295000	w3	WS	"Fi"
+10	4245.125478000	w3	WS	"B"
+10	4245.125806000	w3	WS	"B"
+10	4245.126968000	w3	WS	"B"
+12	4245.130634000	t3443656	US
+10	4245.130845000	w3	WS	"perfmodel_preproc"
+20	4245.130845000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	79	79	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4245.149711000	t3443656	US	Su
+13	4245.150492000	sched nsubmitted	2.000000
+12	4245.157501000	t3443656	US
+10	4247.985062000	w3	WS	"B"
+13	4036.648668000	w3	gf	0.000000
+13	4245.130845000	w3	gf	0.000000
+10	4247.986511000	w3	WS	"Po"
+10	4247.988059000	w3	WS	"B"
+13	4247.991870000	sched	nready	1.000000
+9       4247.991870000    pu      p     80
+11	4247.992369000	w3	WS	Sc
+12	4247.993709000	w3	WS # handle_worker_scheduling_pop
+13	4247.995158000	sched	nready	0.000000
+13	4247.995158000	sched	nsubmitted	1.000000
+9       4247.995158000    po      p     80
+10	4247.995143000	w3	WS	"P"
+10	4247.996453000	w3	WS	"Sc"
+10	4247.996778000	t3443728	S	B
+10	4247.997026000	w3	WS	"Sl"
+10	4247.997316000	t3443728	S	B
+10	4247.997749000	w0	WS	"Fi"
+10	4248.002248000	t3443728	S	P
+11	4248.004217000	mm1	MS	Co
+24	4248.004217000	F	p	1572864	mm0	com_45	56dd51c8b060	"noname"	0	0
+11	4248.013947000	mm1	MS	CoA
+12	4248.033647000	mm1	MS
+12	4249.098492000	mm1	MS
+19	4249.098492000	F	p	1572864	mm1	com_45
+13	4248.004217000	mm0	bwo_mm	1437.357154
+13	4248.004217000	mm1	bwi_mm	1437.357154
+13	4249.098492000	mm0	bwo_mm	0.000000
+13	4249.098492000	mm1	bwi_mm	0.000000
+10	4249.099306000	t3443728	S	B
+10	4249.101211000	t3443728	S	B
+10	4249.104993000	w0	WS	"perfmodel_infer_trt"
+20	4249.104993000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	80	80	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4249.108604000	t3443728	S	E	80
+10	4249.545824000	t3443728	S	B
+10	4249.553425000	w0	WS	"I"
+13	4179.923134000	w0	gf	0.000000
+13	4249.104993000	w0	gf	0.000000
+10	4249.554486000	t3443728	S	Po
+10	4249.555466000	t3443728	S	B
+13	4249.557697000	sched	nready	1.000000
+9       4249.557697000    pu      p     81
+11	4249.560143000	t3443728	S	Sc
+12	4249.561721000	t3443728	S
+13	4249.562269000	sched	nready	0.000000
+13	4249.562269000	sched	nsubmitted	0.000000
+9       4249.562269000    po      p     81
+10	4249.562986000	w3	WS	"B"
+10	4249.563037000	t3443728	S	P
+10	4249.563445000	w3	WS	"B"
+10	4249.563766000	w3	WS	"Fi"
+10	4249.565618000	t3443728	S	Sc
+10	4249.566218000	t3443728	S	Sl
+10	4249.566651000	w3	WS	"B"
+11	4249.567508000	mm0	MS	Co
+24	4249.567508000	F	p	9961472	mm1	com_46	56dd51c8cba0	"noname"	0	0
+11	4249.570056000	mm0	MS	CoA
+12	4249.576265000	mm0	MS
+12	4255.843037000	mm0	MS
+19	4255.843037000	F	p	9961472	mm0	com_46
+13	4249.567508000	mm1	bwo_mm	1587.351760
+13	4249.567508000	mm0	bwi_mm	1587.351760
+13	4255.843037000	mm1	bwo_mm	0.000000
+13	4255.843037000	mm0	bwi_mm	0.000000
+10	4255.844837000	w3	WS	"B"
+10	4255.849612000	w3	WS	"B"
+10	4255.857995000	w3	WS	"perfmodel_post"
+20	4255.857995000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	81	81	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4260.826224000	w3	WS	"B"
+13	4247.985062000	w3	gf	0.000000
+13	4255.857995000	w3	gf	0.000000
+10	4260.828088000	w3	WS	"Po"
+10	4260.829698000	w3	WS	"B"
+11	4260.832106000	w3	WS	C
+12	4260.846198000	w3	WS # handle_end_callback
+10	4260.847963000	w3	WS	"P"
+10	4260.849248000	w3	WS	"Sc"
+10	4260.849980000	w3	WS	"Sl"
+11	4316.615417000	t3443656	US	Su
+13	4316.618138000	sched nsubmitted	1.000000
+13	4316.639231000	sched	nready	1.000000
+9       4316.639231000    pu      p     82
+11	4316.643249000	t3443656	US	Sc
+12	4316.646666000	t3443656	US
+12	4316.646939000	t3443656	US
+11	4316.647845000	t3443656	US	Su
+13	4316.648758000	sched	nready	0.000000
+13	4316.648758000	sched	nsubmitted	0.000000
+9       4316.648758000    po      p     82
+13	4316.648627000	sched nsubmitted	1.000000
+10	4316.650282000	w1	WS	"B"
+10	4316.650945000	w1	WS	"B"
+10	4316.651754000	w1	WS	"Fi"
+10	4316.653723000	w1	WS	"B"
+10	4316.654116000	w1	WS	"B"
+10	4316.655600000	w1	WS	"B"
+12	4316.656820000	t3443656	US
+10	4316.660414000	w1	WS	"perfmodel_preproc"
+20	4316.660414000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	82	82	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4316.670416000	t3443656	US	Su
+13	4316.670897000	sched nsubmitted	2.000000
+12	4316.676054000	t3443656	US
+10	4320.497206000	w1	WS	"B"
+13	4118.579069000	w1	gf	0.000000
+13	4316.660414000	w1	gf	0.000000
+10	4320.499733000	w1	WS	"Po"
+10	4320.502476000	w1	WS	"B"
+13	4320.506402000	sched	nready	1.000000
+9       4320.506402000    pu      p     83
+11	4320.507520000	w1	WS	Sc
+12	4320.512015000	w1	WS # handle_worker_scheduling_pop
+13	4320.512570000	sched	nready	0.000000
+13	4320.512570000	sched	nsubmitted	1.000000
+9       4320.512570000    po      p     83
+10	4320.513995000	w1	WS	"P"
+10	4320.514447000	t3443728	S	B
+10	4320.515436000	t3443728	S	B
+10	4320.515584000	w1	WS	"Sc"
+10	4320.516305000	w0	WS	"Fi"
+10	4320.516415000	w1	WS	"Sl"
+10	4320.522695000	t3443728	S	P
+11	4320.524775000	mm1	MS	Co
+24	4320.524775000	F	p	1572864	mm0	com_47	56dd51e35ff0	"noname"	0	0
+11	4320.536712000	mm1	MS	CoA
+12	4320.561254000	mm1	MS
+12	4321.625052000	mm1	MS
+19	4321.625052000	F	p	1572864	mm1	com_47
+13	4320.524775000	mm0	bwo_mm	1429.516385
+13	4320.524775000	mm1	bwi_mm	1429.516385
+13	4321.625052000	mm0	bwo_mm	0.000000
+13	4321.625052000	mm1	bwi_mm	0.000000
+10	4321.625850000	t3443728	S	B
+10	4321.627595000	t3443728	S	B
+10	4321.631906000	w0	WS	"perfmodel_infer_trt"
+20	4321.631906000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	83	83	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4321.635941000	t3443728	S	E	83
+10	4322.968137000	t3443728	S	B
+10	4322.977364000	w0	WS	"I"
+13	4249.553425000	w0	gf	0.000000
+13	4321.631906000	w0	gf	0.000000
+10	4322.978568000	t3443728	S	Po
+10	4322.979750000	t3443728	S	B
+13	4322.983251000	sched	nready	1.000000
+9       4322.983251000    pu      p     84
+11	4322.985769000	t3443728	S	Sc
+12	4322.987502000	t3443728	S
+13	4322.988565000	sched	nready	0.000000
+13	4322.988565000	sched	nsubmitted	0.000000
+9       4322.988565000    po      p     84
+10	4322.989149000	t3443728	S	P
+10	4322.989658000	w1	WS	"B"
+10	4322.990091000	w1	WS	"B"
+10	4322.990531000	w1	WS	"Fi"
+11	4322.990890000	mm0	MS	Co
+24	4322.990890000	TF	p	9961472	mm1	com_48	56dd51e37b30	"noname"	0	0
+11	4322.993720000	mm0	MS	CoA
+12	4323.001272000	mm0	MS
+10	4323.007654000	t3443728	S	Sc
+10	4323.008420000	t3443728	S	Sl
+10	4323.013646000	w1	WS	"B"
+12	4329.247139000	mm0	MS
+19	4329.247139000	TF	p	9961472	mm0	com_48
+13	4322.990890000	mm1	bwo_mm	1592.243531
+13	4322.990890000	mm0	bwi_mm	1592.243531
+13	4329.247139000	mm1	bwo_mm	0.000000
+13	4329.247139000	mm0	bwi_mm	0.000000
+10	4329.248442000	w1	WS	"B"
+10	4329.251497000	w1	WS	"B"
+10	4329.257339000	w1	WS	"perfmodel_post"
+20	4329.257339000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	84	84	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4334.454848000	w1	WS	"B"
+13	4320.497206000	w1	gf	0.000000
+13	4329.257339000	w1	gf	0.000000
+10	4334.456466000	w1	WS	"Po"
+10	4334.458435000	w1	WS	"B"
+11	4334.460769000	w1	WS	C
+12	4334.472371000	w1	WS # handle_end_callback
+10	4334.474375000	w1	WS	"P"
+10	4334.475798000	w1	WS	"Sc"
+10	4334.476709000	w1	WS	"Sl"
+11	4389.407527000	t3443656	US	Su
+13	4389.410498000	sched nsubmitted	1.000000
+13	4389.433631000	sched	nready	1.000000
+9       4389.433631000    pu      p     85
+11	4389.436456000	t3443656	US	Sc
+12	4389.439800000	t3443656	US
+12	4389.440079000	t3443656	US
+13	4389.440294000	sched	nready	0.000000
+13	4389.440294000	sched	nsubmitted	0.000000
+9       4389.440294000    po      p     85
+11	4389.441143000	t3443656	US	Su
+10	4389.441442000	w1	WS	"B"
+13	4389.441781000	sched nsubmitted	1.000000
+10	4389.441949000	w1	WS	"B"
+10	4389.442505000	w1	WS	"Fi"
+10	4389.444105000	w1	WS	"B"
+10	4389.444322000	w1	WS	"B"
+10	4389.445425000	w1	WS	"B"
+10	4389.449752000	w1	WS	"perfmodel_preproc"
+12	4389.450095000	t3443656	US
+20	4389.449752000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	85	85	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4389.464072000	t3443656	US	Su
+13	4389.464549000	sched nsubmitted	2.000000
+12	4389.470042000	t3443656	US
+10	4402.268279000	w1	WS	"B"
+13	4334.454848000	w1	gf	0.000000
+13	4389.449752000	w1	gf	0.000000
+10	4402.270376000	w1	WS	"Po"
+10	4402.272410000	w1	WS	"B"
+13	4402.275690000	sched	nready	1.000000
+9       4402.275690000    pu      p     86
+11	4402.276449000	w1	WS	Sc
+13	4402.280096000	sched	nready	0.000000
+13	4402.280096000	sched	nsubmitted	1.000000
+9       4402.280096000    po      p     86
+12	4402.280124000	w1	WS # handle_worker_scheduling_pop
+10	4402.281516000	t3443728	S	B
+10	4402.281782000	w1	WS	"P"
+10	4402.282055000	t3443728	S	B
+10	4402.282563000	w0	WS	"Fi"
+10	4402.283131000	w1	WS	"Sc"
+10	4402.283712000	w1	WS	"Sl"
+10	4402.288259000	t3443728	S	P
+11	4402.289771000	mm1	MS	Co
+24	4402.289771000	F	p	1572864	mm0	com_49	56dd51c8b060	"noname"	0	0
+11	4402.298683000	mm1	MS	CoA
+12	4402.321925000	mm1	MS
+12	4403.379903000	mm1	MS
+19	4403.379903000	F	p	1572864	mm1	com_49
+13	4402.289771000	mm0	bwo_mm	1442.819769
+13	4402.289771000	mm1	bwi_mm	1442.819769
+13	4403.379903000	mm0	bwo_mm	0.000000
+13	4403.379903000	mm1	bwi_mm	0.000000
+10	4403.380585000	t3443728	S	B
+10	4403.382152000	t3443728	S	B
+10	4403.386780000	w0	WS	"perfmodel_infer_trt"
+20	4403.386780000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	86	86	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4403.390943000	t3443728	S	E	86
+10	4405.877283000	t3443728	S	B
+10	4405.887616000	w0	WS	"I"
+13	4322.977364000	w0	gf	0.000000
+13	4403.386780000	w0	gf	0.000000
+10	4405.889020000	t3443728	S	Po
+10	4405.890125000	t3443728	S	B
+13	4405.892666000	sched	nready	1.000000
+9       4405.892666000    pu      p     87
+11	4405.896296000	t3443728	S	Sc
+12	4405.897589000	t3443728	S
+10	4405.898787000	t3443728	S	P
+13	4405.900338000	sched	nready	0.000000
+13	4405.900338000	sched	nsubmitted	0.000000
+9       4405.900338000    po      p     87
+11	4405.900566000	mm0	MS	Co
+24	4405.900566000	TF	p	9961472	mm1	com_50	56dd51c8cba0	"noname"	0	0
+10	4405.901303000	w2	WS	"B"
+10	4405.901768000	w2	WS	"B"
+10	4405.902169000	w2	WS	"Fi"
+11	4405.904034000	mm0	MS	CoA
+12	4405.912043000	mm0	MS
+10	4405.918315000	t3443728	S	Sc
+10	4405.919051000	t3443728	S	Sl
+10	4405.921567000	w2	WS	"B"
+12	4412.072056000	mm0	MS
+19	4412.072056000	TF	p	9961472	mm0	com_50
+13	4405.900566000	mm1	bwo_mm	1614.111341
+13	4405.900566000	mm0	bwi_mm	1614.111341
+13	4412.072056000	mm1	bwo_mm	0.000000
+13	4412.072056000	mm0	bwi_mm	0.000000
+10	4412.073355000	w2	WS	"B"
+10	4412.076744000	w2	WS	"B"
+10	4412.083034000	w2	WS	"perfmodel_post"
+20	4412.083034000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	87	87	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4421.606046000	w2	WS	"B"
+13	4192.507743000	w2	gf	0.000000
+13	4412.083034000	w2	gf	0.000000
+10	4421.607697000	w2	WS	"Po"
+10	4421.609569000	w2	WS	"B"
+11	4421.612637000	w2	WS	C
+12	4421.624728000	w2	WS # handle_end_callback
+10	4421.626791000	w2	WS	"P"
+10	4421.628567000	w2	WS	"Sc"
+10	4421.629498000	w2	WS	"Sl"
+11	4458.990297000	t3443656	US	Su
+13	4458.993731000	sched nsubmitted	1.000000
+13	4459.015864000	sched	nready	1.000000
+9       4459.015864000    pu      p     88
+11	4459.019632000	t3443656	US	Sc
+13	4459.023550000	sched	nready	0.000000
+13	4459.023550000	sched	nsubmitted	0.000000
+9       4459.023550000    po      p     88
+10	4459.025749000	w2	WS	"B"
+12	4459.025989000	t3443656	US
+12	4459.026234000	t3443656	US
+10	4459.026463000	w2	WS	"B"
+11	4459.027248000	t3443656	US	Su
+10	4459.027309000	w2	WS	"Fi"
+13	4459.027838000	sched nsubmitted	1.000000
+10	4459.029517000	w2	WS	"B"
+10	4459.029951000	w2	WS	"B"
+10	4459.031373000	w2	WS	"B"
+12	4459.035741000	t3443656	US
+10	4459.037071000	w2	WS	"perfmodel_preproc"
+20	4459.037071000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	88	88	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4459.050669000	t3443656	US	Su
+13	4459.051134000	sched nsubmitted	2.000000
+12	4459.056107000	t3443656	US
+10	4463.945843000	w2	WS	"B"
+13	4421.606046000	w2	gf	0.000000
+13	4459.037071000	w2	gf	0.000000
+10	4463.948780000	w2	WS	"Po"
+10	4463.951627000	w2	WS	"B"
+13	4463.956785000	sched	nready	1.000000
+9       4463.956785000    pu      p     89
+11	4463.957848000	w2	WS	Sc
+12	4463.960883000	w2	WS # handle_worker_scheduling_pop
+10	4463.962635000	w2	WS	"P"
+13	4463.964563000	sched	nready	0.000000
+13	4463.964563000	sched	nsubmitted	1.000000
+9       4463.964563000    po      p     89
+10	4463.964680000	w2	WS	"Sc"
+10	4463.965427000	w2	WS	"Sl"
+10	4463.965706000	w1	WS	"B"
+10	4463.966216000	w1	WS	"B"
+10	4463.966703000	w1	WS	"Fi"
+10	4463.968581000	w1	WS	"B"
+10	4463.968820000	w1	WS	"B"
+10	4463.969862000	w1	WS	"B"
+10	4463.974362000	w1	WS	"perfmodel_infer_trt"
+20	4463.974362000	w1	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	89	89	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4473.682448000	w1	WS	"B"
+13	4402.268279000	w1	gf	0.000000
+13	4463.974362000	w1	gf	0.000000
+10	4473.684175000	w1	WS	"Po"
+10	4473.686378000	w1	WS	"B"
+13	4473.690308000	sched	nready	1.000000
+9       4473.690308000    pu      p     90
+11	4473.692302000	w1	WS	Sc
+12	4473.695906000	w1	WS # handle_worker_scheduling_pop
+13	4473.696304000	sched	nready	0.000000
+13	4473.696304000	sched	nsubmitted	0.000000
+9       4473.696304000    po      p     90
+10	4473.697436000	w1	WS	"P"
+10	4473.697816000	w3	WS	"B"
+10	4473.698257000	w3	WS	"B"
+10	4473.698698000	w1	WS	"Sc"
+10	4473.698747000	w3	WS	"Fi"
+10	4473.699258000	w1	WS	"Sl"
+10	4473.700076000	w3	WS	"B"
+10	4473.700319000	w3	WS	"B"
+10	4473.701562000	w3	WS	"B"
+10	4473.705839000	w3	WS	"perfmodel_post"
+20	4473.705839000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	90	90	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4480.358741000	w3	WS	"B"
+13	4260.826224000	w3	gf	0.000000
+13	4473.705839000	w3	gf	0.000000
+10	4480.360871000	w3	WS	"Po"
+10	4480.364178000	w3	WS	"B"
+11	4480.367418000	w3	WS	C
+12	4480.380099000	w3	WS # handle_end_callback
+10	4480.381934000	w3	WS	"P"
+10	4480.383791000	w3	WS	"Sc"
+10	4480.384734000	w3	WS	"Sl"
+11	4533.927577000	t3443656	US	Su
+13	4533.929878000	sched nsubmitted	1.000000
+13	4533.952342000	sched	nready	1.000000
+9       4533.952342000    pu      p     91
+11	4533.955526000	t3443656	US	Sc
+13	4533.959878000	sched	nready	0.000000
+13	4533.959878000	sched	nsubmitted	0.000000
+9       4533.959878000    po      p     91
+10	4533.961352000	w2	WS	"B"
+12	4533.961801000	t3443656	US
+12	4533.962155000	t3443656	US
+10	4533.962451000	w2	WS	"B"
+10	4533.963170000	w2	WS	"Fi"
+11	4533.963530000	t3443656	US	Su
+13	4533.964724000	sched nsubmitted	1.000000
+10	4533.965252000	w2	WS	"B"
+10	4533.965556000	w2	WS	"B"
+10	4533.967114000	w2	WS	"B"
+10	4533.971735000	w2	WS	"perfmodel_preproc"
+12	4533.972753000	t3443656	US
+20	4533.971735000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	91	91	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4533.986447000	t3443656	US	Su
+13	4533.987014000	sched nsubmitted	2.000000
+12	4533.992272000	t3443656	US
+10	4539.006779000	w2	WS	"B"
+13	4463.945843000	w2	gf	0.000000
+13	4533.971735000	w2	gf	0.000000
+10	4539.009145000	w2	WS	"Po"
+10	4539.012009000	w2	WS	"B"
+13	4539.017067000	sched	nready	1.000000
+9       4539.017067000    pu      p     92
+11	4539.018268000	w2	WS	Sc
+12	4539.021772000	w2	WS # handle_worker_scheduling_pop
+10	4539.023488000	w2	WS	"P"
+13	4539.023930000	sched	nready	0.000000
+13	4539.023930000	sched	nsubmitted	1.000000
+9       4539.023930000    po      p     92
+10	4539.025069000	w2	WS	"Sc"
+10	4539.025733000	t3443728	S	B
+10	4539.025868000	w2	WS	"Sl"
+10	4539.026419000	t3443728	S	B
+10	4539.027264000	w0	WS	"Fi"
+10	4539.035062000	t3443728	S	P
+11	4539.037194000	mm1	MS	Co
+24	4539.037194000	F	p	1572864	mm0	com_51	56dd51c8b060	"noname"	0	0
+11	4539.048717000	mm1	MS	CoA
+12	4539.074097000	mm1	MS
+12	4540.152078000	mm1	MS
+19	4540.152078000	F	p	1572864	mm1	com_51
+13	4539.037194000	mm0	bwo_mm	1410.787131
+13	4539.037194000	mm1	bwi_mm	1410.787131
+13	4540.152078000	mm0	bwo_mm	0.000000
+13	4540.152078000	mm1	bwi_mm	0.000000
+10	4540.153176000	t3443728	S	B
+10	4540.155025000	t3443728	S	B
+10	4540.160113000	w0	WS	"perfmodel_infer_trt"
+20	4540.160113000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	92	92	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4540.165734000	t3443728	S	E	92
+10	4541.524045000	t3443728	S	B
+10	4541.532543000	w0	WS	"I"
+13	4405.887616000	w0	gf	0.000000
+13	4540.160113000	w0	gf	0.000000
+10	4541.533665000	t3443728	S	Po
+10	4541.534665000	t3443728	S	B
+13	4541.537648000	sched	nready	1.000000
+9       4541.537648000    pu      p     93
+11	4541.540567000	t3443728	S	Sc
+12	4541.541805000	t3443728	S
+10	4541.542990000	t3443728	S	P
+13	4541.543813000	sched	nready	0.000000
+13	4541.543813000	sched	nsubmitted	0.000000
+9       4541.543813000    po      p     93
+11	4541.544560000	mm0	MS	Co
+24	4541.544560000	TF	p	9961472	mm1	com_52	56dd51c8cba0	"noname"	0	0
+10	4541.544863000	w1	WS	"B"
+10	4541.545260000	w1	WS	"B"
+10	4541.545681000	w1	WS	"Fi"
+11	4541.547552000	mm0	MS	CoA
+12	4541.554198000	mm0	MS
+10	4541.560705000	t3443728	S	Sc
+10	4541.561507000	t3443728	S	Sl
+10	4541.567025000	w1	WS	"B"
+12	4547.848519000	mm0	MS
+19	4547.848519000	TF	p	9961472	mm0	com_52
+13	4541.544560000	mm1	bwo_mm	1580.193018
+13	4541.544560000	mm0	bwi_mm	1580.193018
+13	4547.848519000	mm1	bwo_mm	0.000000
+13	4547.848519000	mm0	bwi_mm	0.000000
+10	4547.849529000	w1	WS	"B"
+10	4547.851725000	w1	WS	"B"
+10	4547.856657000	w1	WS	"perfmodel_post"
+20	4547.856657000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	93	93	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4554.484750000	w1	WS	"B"
+13	4473.682448000	w1	gf	0.000000
+13	4547.856657000	w1	gf	0.000000
+10	4554.487312000	w1	WS	"Po"
+10	4554.489217000	w1	WS	"B"
+11	4554.491982000	w1	WS	C
+12	4554.505616000	w1	WS # handle_end_callback
+10	4554.508113000	w1	WS	"P"
+10	4554.509916000	w1	WS	"Sc"
+10	4554.510816000	w1	WS	"Sl"
+11	4608.416789000	t3443656	US	Su
+13	4608.419473000	sched nsubmitted	1.000000
+13	4608.442647000	sched	nready	1.000000
+9       4608.442647000    pu      p     94
+11	4608.444919000	t3443656	US	Sc
+12	4608.448508000	t3443656	US
+12	4608.448766000	t3443656	US
+13	4608.449339000	sched	nready	0.000000
+13	4608.449339000	sched	nsubmitted	0.000000
+9       4608.449339000    po      p     94
+11	4608.449569000	t3443656	US	Su
+13	4608.450112000	sched nsubmitted	1.000000
+10	4608.450702000	w2	WS	"B"
+10	4608.451332000	w2	WS	"B"
+10	4608.452468000	w2	WS	"Fi"
+10	4608.453909000	w2	WS	"B"
+10	4608.454134000	w2	WS	"B"
+10	4608.455155000	w2	WS	"B"
+12	4608.457541000	t3443656	US
+10	4608.459856000	w2	WS	"perfmodel_preproc"
+20	4608.459856000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	94	94	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4608.470658000	t3443656	US	Su
+13	4608.471148000	sched nsubmitted	2.000000
+12	4608.475291000	t3443656	US
+10	4611.962251000	w2	WS	"B"
+13	4539.006779000	w2	gf	0.000000
+13	4608.459856000	w2	gf	0.000000
+10	4611.964430000	w2	WS	"Po"
+10	4611.966791000	w2	WS	"B"
+13	4611.971445000	sched	nready	1.000000
+9       4611.971445000    pu      p     95
+11	4611.973572000	w2	WS	Sc
+12	4611.976308000	w2	WS # handle_worker_scheduling_pop
+13	4611.977874000	sched	nready	0.000000
+13	4611.977874000	sched	nsubmitted	1.000000
+9       4611.977874000    po      p     95
+10	4611.979353000	w2	WS	"P"
+10	4611.979523000	t3443728	S	B
+10	4611.980007000	t3443728	S	B
+10	4611.980502000	w0	WS	"Fi"
+10	4611.981052000	w2	WS	"Sc"
+10	4611.981760000	w2	WS	"Sl"
+10	4611.985796000	t3443728	S	P
+11	4611.987344000	mm1	MS	Co
+24	4611.987344000	F	p	1572864	mm0	com_53	56dd51e35ff0	"noname"	0	0
+11	4611.998105000	mm1	MS	CoA
+12	4612.018785000	mm1	MS
+12	4613.166343000	mm1	MS
+19	4613.166343000	F	p	1572864	mm1	com_53
+13	4611.987344000	mm0	bwo_mm	1334.067289
+13	4611.987344000	mm1	bwi_mm	1334.067289
+13	4613.166343000	mm0	bwo_mm	0.000000
+13	4613.166343000	mm1	bwi_mm	0.000000
+10	4613.167982000	t3443728	S	B
+10	4613.169573000	t3443728	S	B
+10	4613.174264000	w0	WS	"perfmodel_infer_trt"
+20	4613.174264000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	95	95	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4613.178482000	t3443728	S	E	95
+10	4613.908781000	t3443728	S	B
+10	4613.923840000	w0	WS	"I"
+13	4541.532543000	w0	gf	0.000000
+13	4613.174264000	w0	gf	0.000000
+10	4613.926089000	t3443728	S	Po
+10	4613.927592000	t3443728	S	B
+13	4613.931554000	sched	nready	1.000000
+9       4613.931554000    pu      p     96
+11	4613.935988000	t3443728	S	Sc
+12	4613.937716000	t3443728	S
+10	4613.939533000	t3443728	S	P
+13	4613.940757000	sched	nready	0.000000
+13	4613.940757000	sched	nsubmitted	0.000000
+9       4613.940757000    po      p     96
+10	4613.941789000	w2	WS	"B"
+10	4613.942266000	w2	WS	"B"
+11	4613.942648000	mm0	MS	Co
+24	4613.942648000	TF	p	9961472	mm1	com_54	56dd51e37b30	"noname"	0	0
+10	4613.942799000	w2	WS	"Fi"
+11	4613.946469000	mm0	MS	CoA
+12	4613.957729000	mm0	MS
+10	4613.967495000	t3443728	S	Sc
+10	4613.968454000	t3443728	S	Sl
+10	4613.971323000	w2	WS	"B"
+12	4620.203047000	mm0	MS
+19	4620.203047000	TF	p	9961472	mm0	com_54
+13	4613.942648000	mm1	bwo_mm	1591.188038
+13	4613.942648000	mm0	bwi_mm	1591.188038
+13	4620.203047000	mm1	bwo_mm	0.000000
+13	4620.203047000	mm0	bwi_mm	0.000000
+10	4620.204911000	w2	WS	"B"
+10	4620.207779000	w2	WS	"B"
+10	4620.213684000	w2	WS	"perfmodel_post"
+20	4620.213684000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	96	96	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4626.149053000	w2	WS	"B"
+13	4611.962251000	w2	gf	0.000000
+13	4620.213684000	w2	gf	0.000000
+10	4626.151746000	w2	WS	"Po"
+10	4626.154149000	w2	WS	"B"
+11	4626.157023000	w2	WS	C
+12	4626.168947000	w2	WS # handle_end_callback
+10	4626.170984000	w2	WS	"P"
+10	4626.172612000	w2	WS	"Sc"
+10	4626.173483000	w2	WS	"Sl"
+11	4685.933036000	t3443656	US	Su
+13	4685.935972000	sched nsubmitted	1.000000
+13	4685.959039000	sched	nready	1.000000
+9       4685.959039000    pu      p     97
+11	4685.962638000	t3443656	US	Sc
+13	4685.966473000	sched	nready	0.000000
+13	4685.966473000	sched	nsubmitted	0.000000
+9       4685.966473000    po      p     97
+10	4685.967749000	w2	WS	"B"
+10	4685.968170000	w2	WS	"B"
+10	4685.968733000	w2	WS	"Fi"
+12	4685.970263000	t3443656	US
+10	4685.970427000	w2	WS	"B"
+12	4685.970590000	t3443656	US
+10	4685.970738000	w2	WS	"B"
+10	4685.971664000	w2	WS	"B"
+11	4685.972022000	t3443656	US	Su
+13	4685.972722000	sched nsubmitted	1.000000
+10	4685.976558000	w2	WS	"perfmodel_preproc"
+20	4685.976558000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	97	97	0	0.000000	0	0	-1	-1	"-1_-1"
+12	4685.982959000	t3443656	US
+11	4685.997902000	t3443656	US	Su
+13	4685.998743000	sched nsubmitted	2.000000
+12	4686.005889000	t3443656	US
+10	4692.269666000	w2	WS	"B"
+13	4626.149053000	w2	gf	0.000000
+13	4685.976558000	w2	gf	0.000000
+10	4692.271818000	w2	WS	"Po"
+10	4692.274110000	w2	WS	"B"
+13	4692.279307000	sched	nready	1.000000
+9       4692.279307000    pu      p     98
+11	4692.280371000	w2	WS	Sc
+12	4692.283185000	w2	WS # handle_worker_scheduling_pop
+13	4692.284874000	sched	nready	0.000000
+13	4692.284874000	sched	nsubmitted	1.000000
+9       4692.284874000    po      p     98
+10	4692.285220000	w2	WS	"P"
+10	4692.286513000	t3443728	S	B
+10	4692.287024000	t3443728	S	B
+10	4692.287090000	w2	WS	"Sc"
+10	4692.287552000	w0	WS	"Fi"
+10	4692.287974000	w2	WS	"Sl"
+10	4692.293368000	t3443728	S	P
+11	4692.294966000	mm1	MS	Co
+24	4692.294966000	F	p	1572864	mm0	com_55	56dd51c8b060	"noname"	0	0
+11	4692.304015000	mm1	MS	CoA
+12	4692.323309000	mm1	MS
+12	4693.383572000	mm1	MS
+19	4693.383572000	F	p	1572864	mm1	com_55
+13	4692.294966000	mm0	bwo_mm	1444.842303
+13	4692.294966000	mm1	bwi_mm	1444.842303
+13	4693.383572000	mm0	bwo_mm	0.000000
+13	4693.383572000	mm1	bwi_mm	0.000000
+10	4693.384361000	t3443728	S	B
+10	4693.386259000	t3443728	S	B
+10	4693.390931000	w0	WS	"perfmodel_infer_trt"
+20	4693.390931000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	98	98	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4693.395637000	t3443728	S	E	98
+10	4694.154001000	t3443728	S	B
+10	4694.164415000	w0	WS	"I"
+13	4613.923840000	w0	gf	0.000000
+13	4693.390931000	w0	gf	0.000000
+10	4694.165659000	t3443728	S	Po
+10	4694.166715000	t3443728	S	B
+13	4694.170047000	sched	nready	1.000000
+9       4694.170047000    pu      p     99
+11	4694.172887000	t3443728	S	Sc
+12	4694.174636000	t3443728	S
+13	4694.175835000	sched	nready	0.000000
+13	4694.175835000	sched	nsubmitted	0.000000
+9       4694.175835000    po      p     99
+10	4694.175855000	t3443728	S	P
+10	4694.177592000	w2	WS	"B"
+11	4694.177724000	mm0	MS	Co
+24	4694.177724000	TF	p	9961472	mm1	com_56	56dd51c8cba0	"noname"	0	0
+10	4694.178126000	w2	WS	"B"
+10	4694.178630000	w2	WS	"Fi"
+11	4694.180862000	mm0	MS	CoA
+12	4694.188566000	mm0	MS
+10	4694.194669000	t3443728	S	Sc
+10	4694.195565000	t3443728	S	Sl
+10	4694.200971000	w2	WS	"B"
+12	4700.557533000	mm0	MS
+19	4700.557533000	TF	p	9961472	mm0	com_56
+13	4694.177724000	mm1	bwo_mm	1561.405992
+13	4694.177724000	mm0	bwi_mm	1561.405992
+13	4700.557533000	mm1	bwo_mm	0.000000
+13	4700.557533000	mm0	bwi_mm	0.000000
+10	4700.559064000	w2	WS	"B"
+10	4700.561932000	w2	WS	"B"
+10	4700.567871000	w2	WS	"perfmodel_post"
+20	4700.567871000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	99	99	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4706.591419000	w2	WS	"B"
+13	4692.269666000	w2	gf	0.000000
+10	4706.593128000	w2	WS	"Po"
+10	4706.594909000	w2	WS	"B"
+11	4706.597158000	w2	WS	C
+12	4706.606970000	w2	WS # handle_end_callback
+10	4706.609169000	w2	WS	"P"
+10	4706.610434000	w2	WS	"Sc"
+10	4706.611210000	w2	WS	"Sl"
+11	4754.427081000	t3443656	US	Su
+13	4754.429419000	sched nsubmitted	1.000000
+13	4754.451995000	sched	nready	1.000000
+9       4754.451995000    pu      p     100
+11	4754.455232000	t3443656	US	Sc
+13	4754.458655000	sched	nready	0.000000
+13	4754.458655000	sched	nsubmitted	0.000000
+9       4754.458655000    po      p     100
+12	4754.458678000	t3443656	US
+12	4754.458973000	t3443656	US
+11	4754.459969000	t3443656	US	Su
+10	4754.460227000	w3	WS	"B"
+13	4754.460605000	sched nsubmitted	1.000000
+10	4754.460725000	w3	WS	"B"
+10	4754.461482000	w3	WS	"Fi"
+10	4754.463082000	w3	WS	"B"
+10	4754.463325000	w3	WS	"B"
+10	4754.464655000	w3	WS	"B"
+10	4754.468269000	w3	WS	"perfmodel_preproc"
+12	4754.469212000	t3443656	US
+20	4754.468269000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	100	100	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4754.483272000	t3443656	US	Su
+13	4754.483721000	sched nsubmitted	2.000000
+12	4754.489093000	t3443656	US
+10	4757.292775000	w3	WS	"B"
+13	4480.358741000	w3	gf	0.000000
+13	4754.468269000	w3	gf	0.000000
+10	4757.294018000	w3	WS	"Po"
+10	4757.295322000	w3	WS	"B"
+13	4757.299069000	sched	nready	1.000000
+9       4757.299069000    pu      p     101
+11	4757.299919000	w3	WS	Sc
+12	4757.301240000	w3	WS # handle_worker_scheduling_pop
+13	4757.302451000	sched	nready	0.000000
+13	4757.302451000	sched	nsubmitted	1.000000
+9       4757.302451000    po      p     101
+10	4757.302515000	w3	WS	"P"
+10	4757.304144000	w3	WS	"Sc"
+10	4757.304387000	t3443728	S	B
+10	4757.304719000	w3	WS	"Sl"
+10	4757.305058000	t3443728	S	B
+10	4757.305560000	w0	WS	"Fi"
+10	4757.309686000	t3443728	S	P
+11	4757.311646000	mm1	MS	Co
+24	4757.311646000	F	p	1572864	mm0	com_57	56dd51e35ff0	"noname"	0	0
+11	4757.321917000	mm1	MS	CoA
+12	4757.341739000	mm1	MS
+12	4758.488274000	mm1	MS
+19	4758.488274000	F	p	1572864	mm1	com_57
+13	4757.311646000	mm0	bwo_mm	1336.755542
+13	4757.311646000	mm1	bwi_mm	1336.755542
+13	4758.488274000	mm0	bwo_mm	0.000000
+13	4758.488274000	mm1	bwi_mm	0.000000
+10	4758.488913000	t3443728	S	B
+10	4758.490046000	t3443728	S	B
+10	4758.493962000	w0	WS	"perfmodel_infer_trt"
+20	4758.493962000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	101	101	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4758.497453000	t3443728	S	E	101
+10	4759.157528000	t3443728	S	B
+10	4759.165790000	w0	WS	"I"
+13	4694.164415000	w0	gf	0.000000
+13	4758.493962000	w0	gf	0.000000
+10	4759.167053000	t3443728	S	Po
+10	4759.168277000	t3443728	S	B
+13	4759.170509000	sched	nready	1.000000
+9       4759.170509000    pu      p     102
+11	4759.172896000	t3443728	S	Sc
+12	4759.173897000	t3443728	S
+13	4759.174529000	sched	nready	0.000000
+13	4759.174529000	sched	nsubmitted	0.000000
+9       4759.174529000    po      p     102
+10	4759.174959000	t3443728	S	P
+10	4759.175248000	w3	WS	"B"
+10	4759.175562000	w3	WS	"B"
+10	4759.175879000	w3	WS	"Fi"
+10	4759.177574000	t3443728	S	Sc
+10	4759.178179000	t3443728	S	Sl
+10	4759.178411000	w3	WS	"B"
+11	4759.179481000	mm0	MS	Co
+24	4759.179481000	F	p	9961472	mm1	com_58	56dd51e37b30	"noname"	0	0
+11	4759.182454000	mm0	MS	CoA
+12	4759.189096000	mm0	MS
+12	4765.404618000	mm0	MS
+19	4765.404618000	F	p	9961472	mm0	com_58
+13	4759.179481000	mm1	bwo_mm	1600.201249
+13	4759.179481000	mm0	bwi_mm	1600.201249
+13	4765.404618000	mm1	bwo_mm	0.000000
+13	4765.404618000	mm0	bwi_mm	0.000000
+10	4765.406052000	w3	WS	"B"
+10	4765.408894000	w3	WS	"B"
+10	4765.414364000	w3	WS	"perfmodel_post"
+20	4765.414364000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	102	102	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4770.735414000	w3	WS	"B"
+13	4757.292775000	w3	gf	0.000000
+13	4765.414364000	w3	gf	0.000000
+10	4770.737496000	w3	WS	"Po"
+10	4770.739153000	w3	WS	"B"
+11	4770.741454000	w3	WS	C
+12	4770.754349000	w3	WS # handle_end_callback
+10	4770.756055000	w3	WS	"P"
+10	4770.757204000	w3	WS	"Sc"
+10	4770.757910000	w3	WS	"Sl"
+11	4830.923695000	t3443656	US	Su
+13	4830.926697000	sched nsubmitted	1.000000
+13	4830.949703000	sched	nready	1.000000
+9       4830.949703000    pu      p     103
+11	4830.952833000	t3443656	US	Sc
+12	4830.956491000	t3443656	US
+12	4830.956733000	t3443656	US
+13	4830.957175000	sched	nready	0.000000
+13	4830.957175000	sched	nsubmitted	0.000000
+9       4830.957175000    po      p     103
+11	4830.957783000	t3443656	US	Su
+10	4830.958500000	w2	WS	"B"
+13	4830.958534000	sched nsubmitted	1.000000
+10	4830.959385000	w2	WS	"B"
+10	4830.959968000	w2	WS	"Fi"
+10	4830.961745000	w2	WS	"B"
+10	4830.961960000	w2	WS	"B"
+10	4830.962821000	w2	WS	"B"
+10	4830.967039000	w2	WS	"perfmodel_preproc"
+12	4830.967350000	t3443656	US
+20	4830.967039000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	103	103	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4830.981219000	t3443656	US	Su
+13	4830.981801000	sched nsubmitted	2.000000
+12	4830.987097000	t3443656	US
+10	4835.523566000	w2	WS	"B"
+13	4706.591419000	w2	gf	0.000000
+13	4830.967039000	w2	gf	0.000000
+10	4835.525265000	w2	WS	"Po"
+10	4835.527677000	w2	WS	"B"
+13	4835.531927000	sched	nready	1.000000
+9       4835.531927000    pu      p     104
+11	4835.533015000	w2	WS	Sc
+12	4835.535210000	w2	WS # handle_worker_scheduling_pop
+10	4835.537043000	w2	WS	"P"
+13	4835.537260000	sched	nready	0.000000
+13	4835.537260000	sched	nsubmitted	1.000000
+9       4835.537260000    po      p     104
+10	4835.538861000	w2	WS	"Sc"
+10	4835.539204000	t3443728	S	B
+10	4835.539420000	w2	WS	"Sl"
+10	4835.539892000	t3443728	S	B
+10	4835.540415000	w0	WS	"Fi"
+10	4835.547328000	t3443728	S	P
+11	4835.549548000	mm1	MS	Co
+24	4835.549548000	F	p	1572864	mm0	com_59	56dd51c8b060	"noname"	0	0
+11	4835.564607000	mm1	MS	CoA
+12	4835.595169000	mm1	MS
+12	4836.641371000	mm1	MS
+19	4836.641371000	F	p	1572864	mm1	com_59
+13	4835.549548000	mm0	bwo_mm	1440.585150
+13	4835.549548000	mm1	bwi_mm	1440.585150
+13	4836.641371000	mm0	bwo_mm	0.000000
+13	4836.641371000	mm1	bwi_mm	0.000000
+10	4836.642295000	t3443728	S	B
+10	4836.644273000	t3443728	S	B
+10	4836.649036000	w0	WS	"perfmodel_infer_trt"
+20	4836.649036000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	104	104	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4836.653138000	t3443728	S	E	104
+10	4838.422125000	t3443728	S	B
+10	4838.441923000	w0	WS	"I"
+13	4759.165790000	w0	gf	0.000000
+13	4836.649036000	w0	gf	0.000000
+10	4838.444395000	t3443728	S	Po
+10	4838.446370000	t3443728	S	B
+13	4838.451078000	sched	nready	1.000000
+9       4838.451078000    pu      p     105
+11	4838.458014000	t3443728	S	Sc
+12	4838.460044000	t3443728	S
+10	4838.461825000	t3443728	S	P
+13	4838.462487000	sched	nready	0.000000
+13	4838.462487000	sched	nsubmitted	0.000000
+9       4838.462487000    po      p     105
+10	4838.463979000	w1	WS	"B"
+11	4838.464436000	mm0	MS	Co
+24	4838.464436000	TF	p	9961472	mm1	com_60	56dd51c8cba0	"noname"	0	0
+10	4838.464619000	w1	WS	"B"
+10	4838.465162000	w1	WS	"Fi"
+11	4838.469521000	mm0	MS	CoA
+12	4838.483477000	mm0	MS
+10	4838.494001000	t3443728	S	Sc
+10	4838.494925000	t3443728	S	Sl
+10	4838.498030000	w1	WS	"B"
+12	4844.706262000	mm0	MS
+19	4844.706262000	TF	p	9961472	mm0	com_60
+13	4838.464436000	mm1	bwo_mm	1595.922732
+13	4838.464436000	mm0	bwi_mm	1595.922732
+13	4844.706262000	mm1	bwo_mm	0.000000
+13	4844.706262000	mm0	bwi_mm	0.000000
+10	4844.707863000	w1	WS	"B"
+10	4844.711615000	w1	WS	"B"
+10	4844.717852000	w1	WS	"perfmodel_post"
+20	4844.717852000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	105	105	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4849.934362000	w1	WS	"B"
+13	4554.484750000	w1	gf	0.000000
+13	4844.717852000	w1	gf	0.000000
+10	4849.936055000	w1	WS	"Po"
+10	4849.938311000	w1	WS	"B"
+11	4849.940881000	w1	WS	C
+12	4849.953226000	w1	WS # handle_end_callback
+10	4849.955745000	w1	WS	"P"
+10	4849.957407000	w1	WS	"Sc"
+10	4849.958330000	w1	WS	"Sl"
+11	4901.390442000	t3443656	US	Su
+13	4901.393017000	sched nsubmitted	1.000000
+13	4901.416415000	sched	nready	1.000000
+9       4901.416415000    pu      p     106
+11	4901.420021000	t3443656	US	Sc
+12	4901.424002000	t3443656	US
+12	4901.424277000	t3443656	US
+13	4901.424747000	sched	nready	0.000000
+13	4901.424747000	sched	nsubmitted	0.000000
+9       4901.424747000    po      p     106
+11	4901.425584000	t3443656	US	Su
+13	4901.426256000	sched nsubmitted	1.000000
+10	4901.426393000	w3	WS	"B"
+10	4901.427314000	w3	WS	"B"
+10	4901.427898000	w3	WS	"Fi"
+10	4901.429551000	w3	WS	"B"
+10	4901.429779000	w3	WS	"B"
+10	4901.430709000	w3	WS	"B"
+10	4901.435309000	w3	WS	"perfmodel_preproc"
+12	4901.435430000	t3443656	US
+20	4901.435309000	w3	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	106	106	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4901.449947000	t3443656	US	Su
+13	4901.450705000	sched nsubmitted	2.000000
+12	4901.456643000	t3443656	US
+10	4904.373385000	w3	WS	"B"
+13	4770.735414000	w3	gf	0.000000
+13	4901.435309000	w3	gf	0.000000
+10	4904.374641000	w3	WS	"Po"
+10	4904.376158000	w3	WS	"B"
+13	4904.379930000	sched	nready	1.000000
+9       4904.379930000    pu      p     107
+11	4904.380571000	w3	WS	Sc
+12	4904.381774000	w3	WS # handle_worker_scheduling_pop
+13	4904.382899000	sched	nready	0.000000
+13	4904.382899000	sched	nsubmitted	1.000000
+9       4904.382899000    po      p     107
+10	4904.383134000	w3	WS	"P"
+10	4904.384370000	w3	WS	"Sc"
+10	4904.384511000	t3443728	S	B
+10	4904.384925000	w3	WS	"Sl"
+10	4904.385062000	t3443728	S	B
+10	4904.385518000	w0	WS	"Fi"
+10	4904.390286000	t3443728	S	P
+11	4904.391786000	mm1	MS	Co
+24	4904.391786000	F	p	1572864	mm0	com_61	56dd51e35ff0	"noname"	0	0
+11	4904.401281000	mm1	MS	CoA
+12	4904.420509000	mm1	MS
+12	4905.527962000	mm1	MS
+19	4905.527962000	F	p	1572864	mm1	com_61
+13	4904.391786000	mm0	bwo_mm	1384.348904
+13	4904.391786000	mm1	bwi_mm	1384.348904
+13	4905.527962000	mm0	bwo_mm	0.000000
+13	4905.527962000	mm1	bwi_mm	0.000000
+10	4905.528671000	t3443728	S	B
+10	4905.530168000	t3443728	S	B
+10	4905.534704000	w0	WS	"perfmodel_infer_trt"
+20	4905.534704000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	107	107	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4905.546311000	t3443728	S	E	107
+10	4906.658027000	t3443728	S	B
+10	4906.669016000	w0	WS	"I"
+13	4838.441923000	w0	gf	0.000000
+13	4905.534704000	w0	gf	0.000000
+10	4906.670287000	t3443728	S	Po
+10	4906.671723000	t3443728	S	B
+13	4906.675403000	sched	nready	1.000000
+9       4906.675403000    pu      p     108
+11	4906.679910000	t3443728	S	Sc
+12	4906.681932000	t3443728	S
+10	4906.683386000	t3443728	S	P
+11	4906.685311000	mm0	MS	Co
+24	4906.685311000	TF	p	9961472	mm1	com_62	56dd51e37b30	"noname"	0	0
+11	4906.688721000	mm0	MS	CoA
+13	4906.689644000	sched	nready	0.000000
+13	4906.689644000	sched	nsubmitted	0.000000
+9       4906.689644000    po      p     108
+10	4906.690579000	w1	WS	"B"
+10	4906.691282000	w1	WS	"B"
+10	4906.691818000	w1	WS	"Fi"
+12	4906.697658000	mm0	MS
+10	4906.701397000	t3443728	S	Sc
+10	4906.702098000	t3443728	S	Sl
+10	4906.702919000	w1	WS	"B"
+12	4913.100246000	mm0	MS
+19	4913.100246000	TF	p	9961472	mm0	com_62
+13	4906.685311000	mm1	bwo_mm	1552.856264
+13	4906.685311000	mm0	bwi_mm	1552.856264
+13	4913.100246000	mm1	bwo_mm	0.000000
+13	4913.100246000	mm0	bwi_mm	0.000000
+10	4913.101597000	w1	WS	"B"
+10	4913.105166000	w1	WS	"B"
+10	4913.112046000	w1	WS	"perfmodel_post"
+20	4913.112046000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	108	108	0	0.000000	0	0	-1	-1	"-1_-1"
+10	4918.756495000	w1	WS	"B"
+13	4849.934362000	w1	gf	0.000000
+13	4913.112046000	w1	gf	0.000000
+10	4918.757922000	w1	WS	"Po"
+10	4918.759961000	w1	WS	"B"
+11	4918.762876000	w1	WS	C
+12	4918.775830000	w1	WS # handle_end_callback
+10	4918.778597000	w1	WS	"P"
+10	4918.780164000	w1	WS	"Sc"
+10	4918.781099000	w1	WS	"Sl"
+11	4994.454980000	t3443656	US	Su
+13	4994.457578000	sched nsubmitted	1.000000
+13	4994.483278000	sched	nready	1.000000
+9       4994.483278000    pu      p     109
+11	4994.486873000	t3443656	US	Sc
+12	4994.491379000	t3443656	US
+12	4994.491692000	t3443656	US
+11	4994.492611000	t3443656	US	Su
+13	4994.493192000	sched	nready	0.000000
+13	4994.493192000	sched	nsubmitted	0.000000
+9       4994.493192000    po      p     109
+13	4994.493275000	sched nsubmitted	1.000000
+10	4994.494777000	w2	WS	"B"
+10	4994.495450000	w2	WS	"B"
+10	4994.496265000	w2	WS	"Fi"
+10	4994.498316000	w2	WS	"B"
+10	4994.498706000	w2	WS	"B"
+10	4994.499992000	w2	WS	"B"
+12	4994.502666000	t3443656	US
+10	4994.505193000	w2	WS	"perfmodel_preproc"
+20	4994.505193000	w2	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	109	109	0	0.000000	0	0	-1	-1	"-1_-1"
+11	4994.516058000	t3443656	US	Su
+13	4994.516661000	sched nsubmitted	2.000000
+12	4994.522023000	t3443656	US
+10	4998.708369000	w2	WS	"B"
+13	4835.523566000	w2	gf	0.000000
+13	4994.505193000	w2	gf	0.000000
+10	4998.711388000	w2	WS	"Po"
+10	4998.713583000	w2	WS	"B"
+13	4998.718758000	sched	nready	1.000000
+9       4998.718758000    pu      p     110
+11	4998.719853000	w2	WS	Sc
+12	4998.722352000	w2	WS # handle_worker_scheduling_pop
+13	4998.723856000	sched	nready	0.000000
+13	4998.723856000	sched	nsubmitted	1.000000
+9       4998.723856000    po      p     110
+10	4998.724228000	w2	WS	"P"
+10	4998.725568000	t3443728	S	B
+10	4998.726117000	t3443728	S	B
+10	4998.726178000	w2	WS	"Sc"
+10	4998.726680000	w0	WS	"Fi"
+10	4998.727147000	w2	WS	"Sl"
+10	4998.732060000	t3443728	S	P
+11	4998.733798000	mm1	MS	Co
+24	4998.733798000	F	p	1572864	mm0	com_63	56dd51c8b060	"noname"	0	0
+11	4998.744355000	mm1	MS	CoA
+12	4998.761873000	mm1	MS
+12	4999.815614000	mm1	MS
+19	4999.815614000	F	p	1572864	mm1	com_63
+13	4998.733798000	mm0	bwo_mm	1453.910831
+13	4998.733798000	mm1	bwi_mm	1453.910831
+13	4999.815614000	mm0	bwo_mm	0.000000
+13	4999.815614000	mm1	bwi_mm	0.000000
+10	4999.816494000	t3443728	S	B
+10	4999.817977000	t3443728	S	B
+10	4999.823105000	w0	WS	"perfmodel_infer_trt"
+20	4999.823105000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	110	110	0	0.000000	0	0	-1	-1	"-1_-1"
+26	4999.827063000	t3443728	S	E	110
+10	5000.216988000	t3443728	S	B
+10	5000.225340000	w0	WS	"I"
+13	4906.669016000	w0	gf	0.000000
+13	4999.823105000	w0	gf	0.000000
+10	5000.226488000	t3443728	S	Po
+10	5000.227507000	t3443728	S	B
+13	5000.230508000	sched	nready	1.000000
+9       5000.230508000    pu      p     111
+11	5000.233143000	t3443728	S	Sc
+12	5000.234381000	t3443728	S
+10	5000.235454000	t3443728	S	P
+11	5000.237121000	mm0	MS	Co
+24	5000.237121000	TF	p	9961472	mm1	com_64	56dd51c8cba0	"noname"	0	0
+13	5000.237981000	sched	nready	0.000000
+13	5000.237981000	sched	nsubmitted	0.000000
+9       5000.237981000    po      p     111
+10	5000.239190000	w2	WS	"B"
+10	5000.239752000	w2	WS	"B"
+10	5000.240173000	w2	WS	"Fi"
+11	5000.256882000	mm0	MS	CoA
+12	5000.264428000	mm0	MS
+10	5000.271027000	t3443728	S	Sc
+10	5000.271876000	t3443728	S	Sl
+10	5000.282320000	w2	WS	"B"
+12	5007.626879000	mm0	MS
+19	5007.626879000	TF	p	9961472	mm0	com_64
+13	5000.237121000	mm1	bwo_mm	1348.010584
+13	5000.237121000	mm0	bwi_mm	1348.010584
+13	5007.626879000	mm1	bwo_mm	0.000000
+13	5007.626879000	mm0	bwi_mm	0.000000
+10	5007.628703000	w2	WS	"B"
+10	5007.632824000	w2	WS	"B"
+10	5007.641061000	w2	WS	"perfmodel_post"
+20	5007.641061000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	111	111	0	0.000000	0	0	-1	-1	"-1_-1"
+10	5017.633651000	w2	WS	"B"
+13	4998.708369000	w2	gf	0.000000
+13	5007.641061000	w2	gf	0.000000
+10	5017.636117000	w2	WS	"Po"
+10	5017.638533000	w2	WS	"B"
+11	5017.642710000	w2	WS	C
+12	5017.659371000	w2	WS # handle_end_callback
+10	5017.661921000	w2	WS	"P"
+10	5017.663598000	w2	WS	"Sc"
+10	5017.664567000	w2	WS	"Sl"
+11	5085.401248000	t3443656	US	Su
+13	5085.404194000	sched nsubmitted	1.000000
+13	5085.429264000	sched	nready	1.000000
+9       5085.429264000    pu      p     112
+11	5085.432211000	t3443656	US	Sc
+12	5085.437491000	t3443656	US
+12	5085.437773000	t3443656	US
+13	5085.438758000	sched	nready	0.000000
+13	5085.438758000	sched	nsubmitted	0.000000
+9       5085.438758000    po      p     112
+11	5085.438715000	t3443656	US	Su
+13	5085.439504000	sched nsubmitted	1.000000
+10	5085.440441000	w1	WS	"B"
+10	5085.441254000	w1	WS	"B"
+10	5085.442080000	w1	WS	"Fi"
+10	5085.444906000	w1	WS	"B"
+10	5085.445175000	w1	WS	"B"
+10	5085.446490000	w1	WS	"B"
+12	5085.448458000	t3443656	US
+10	5085.452031000	w1	WS	"perfmodel_preproc"
+20	5085.452031000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	112	112	0	0.000000	0	0	-1	-1	"-1_-1"
+11	5085.463972000	t3443656	US	Su
+13	5085.464491000	sched nsubmitted	2.000000
+12	5085.470233000	t3443656	US
+10	5089.000861000	w1	WS	"B"
+13	4918.756495000	w1	gf	0.000000
+13	5085.452031000	w1	gf	0.000000
+10	5089.003291000	w1	WS	"Po"
+10	5089.006943000	w1	WS	"B"
+13	5089.011552000	sched	nready	1.000000
+9       5089.011552000    pu      p     113
+11	5089.013294000	w1	WS	Sc
+12	5089.015567000	w1	WS # handle_worker_scheduling_pop
+13	5089.017432000	sched	nready	0.000000
+13	5089.017432000	sched	nsubmitted	1.000000
+9       5089.017432000    po      p     113
+10	5089.017695000	w1	WS	"P"
+10	5089.020035000	w1	WS	"Sc"
+10	5089.020092000	t3443728	S	B
+10	5089.020696000	t3443728	S	B
+10	5089.021058000	w1	WS	"Sl"
+10	5089.021251000	w0	WS	"Fi"
+10	5089.026480000	t3443728	S	P
+11	5089.028442000	mm1	MS	Co
+24	5089.028442000	F	p	1572864	mm0	com_65	56dd51e35ff0	"noname"	0	0
+11	5089.039901000	mm1	MS	CoA
+12	5089.059815000	mm1	MS
+12	5090.110592000	mm1	MS
+19	5090.110592000	F	p	1572864	mm1	com_65
+13	5089.028442000	mm0	bwo_mm	1453.462089
+13	5089.028442000	mm1	bwi_mm	1453.462089
+13	5090.110592000	mm0	bwo_mm	0.000000
+13	5090.110592000	mm1	bwi_mm	0.000000
+10	5090.111301000	t3443728	S	B
+10	5090.112905000	t3443728	S	B
+10	5090.118340000	w0	WS	"perfmodel_infer_trt"
+20	5090.118340000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	113	113	0	0.000000	0	0	-1	-1	"-1_-1"
+26	5090.122488000	t3443728	S	E	113
+10	5091.920000000	t3443728	S	B
+10	5091.935503000	w0	WS	"I"
+13	5000.225340000	w0	gf	0.000000
+13	5090.118340000	w0	gf	0.000000
+10	5091.937123000	t3443728	S	Po
+10	5091.939112000	t3443728	S	B
+13	5091.942658000	sched	nready	1.000000
+9       5091.942658000    pu      p     114
+11	5091.946771000	t3443728	S	Sc
+12	5091.949154000	t3443728	S
+10	5091.950678000	t3443728	S	P
+13	5091.950980000	sched	nready	0.000000
+13	5091.950980000	sched	nsubmitted	0.000000
+9       5091.950980000    po      p     114
+10	5091.952194000	w1	WS	"B"
+10	5091.952693000	w1	WS	"B"
+11	5091.952978000	mm0	MS	Co
+24	5091.952978000	TF	p	9961472	mm1	com_66	56dd51e37b30	"noname"	0	0
+10	5091.953241000	w1	WS	"Fi"
+11	5091.957768000	mm0	MS	CoA
+12	5091.969059000	mm0	MS
+10	5091.977886000	t3443728	S	Sc
+10	5091.978772000	t3443728	S	Sl
+10	5091.981680000	w1	WS	"B"
+12	5098.364824000	mm0	MS
+19	5098.364824000	TF	p	9961472	mm0	com_66
+13	5091.952978000	mm1	bwo_mm	1553.604375
+13	5091.952978000	mm0	bwi_mm	1553.604375
+13	5098.364824000	mm1	bwo_mm	0.000000
+13	5098.364824000	mm0	bwi_mm	0.000000
+10	5098.366164000	w1	WS	"B"
+10	5098.369924000	w1	WS	"B"
+10	5098.377411000	w1	WS	"perfmodel_post"
+20	5098.377411000	w1	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	114	114	0	0.000000	0	0	-1	-1	"-1_-1"
+10	5104.274445000	w1	WS	"B"
+13	5089.000861000	w1	gf	0.000000
+13	5098.377411000	w1	gf	0.000000
+10	5104.277113000	w1	WS	"Po"
+10	5104.279419000	w1	WS	"B"
+11	5104.283073000	w1	WS	C
+12	5104.303529000	w1	WS # handle_end_callback
+10	5104.306429000	w1	WS	"P"
+10	5104.309020000	w1	WS	"Sc"
+10	5104.310042000	w1	WS	"Sl"
+11	5169.582619000	t3443656	US	Su
+13	5169.585378000	sched nsubmitted	1.000000
+13	5169.608102000	sched	nready	1.000000
+9       5169.608102000    pu      p     115
+11	5169.611092000	t3443656	US	Sc
+13	5169.614773000	sched	nready	0.000000
+13	5169.614773000	sched	nsubmitted	0.000000
+9       5169.614773000    po      p     115
+10	5169.616366000	w1	WS	"B"
+10	5169.616845000	w1	WS	"B"
+10	5169.617758000	w1	WS	"Fi"
+10	5169.619386000	w1	WS	"B"
+10	5169.619637000	w1	WS	"B"
+10	5169.620715000	w1	WS	"B"
+12	5169.621817000	t3443656	US
+12	5169.622110000	t3443656	US
+11	5169.623140000	t3443656	US	Su
+13	5169.623888000	sched nsubmitted	1.000000
+10	5169.624922000	w1	WS	"perfmodel_preproc"
+20	5169.624922000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	115	115	0	0.000000	0	0	-1	-1	"-1_-1"
+12	5169.633708000	t3443656	US
+11	5169.648184000	t3443656	US	Su
+13	5169.649158000	sched nsubmitted	2.000000
+12	5169.655241000	t3443656	US
+10	5174.153351000	w1	WS	"B"
+13	5104.274445000	w1	gf	0.000000
+13	5169.624922000	w1	gf	0.000000
+10	5174.156400000	w1	WS	"Po"
+10	5174.159711000	w1	WS	"B"
+13	5174.164831000	sched	nready	1.000000
+9       5174.164831000    pu      p     116
+11	5174.166288000	w1	WS	Sc
+12	5174.168518000	w1	WS # handle_worker_scheduling_pop
+13	5174.170253000	sched	nready	0.000000
+13	5174.170253000	sched	nsubmitted	1.000000
+9       5174.170253000    po      p     116
+10	5174.170701000	w1	WS	"P"
+10	5174.172912000	w1	WS	"Sc"
+10	5174.173814000	w1	WS	"Sl"
+10	5174.190683000	t3443728	S	B
+10	5174.191369000	t3443728	S	B
+10	5174.191972000	w0	WS	"Fi"
+10	5174.198218000	t3443728	S	P
+11	5174.199900000	mm1	MS	Co
+24	5174.199900000	F	p	1572864	mm0	com_67	56dd51c8b060	"noname"	0	0
+11	5174.209490000	mm1	MS	CoA
+12	5174.230070000	mm1	MS
+12	5175.352278000	mm1	MS
+19	5175.352278000	F	p	1572864	mm1	com_67
+13	5174.199900000	mm0	bwo_mm	1364.885480
+13	5174.199900000	mm1	bwi_mm	1364.885480
+13	5175.352278000	mm0	bwo_mm	0.000000
+13	5175.352278000	mm1	bwi_mm	0.000000
+10	5175.353427000	t3443728	S	B
+10	5175.355672000	t3443728	S	B
+10	5175.361013000	w0	WS	"perfmodel_infer_trt"
+20	5175.361013000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	116	116	0	0.000000	0	0	-1	-1	"-1_-1"
+26	5175.366564000	t3443728	S	E	116
+10	5177.969338000	t3443728	S	B
+10	5177.986491000	w0	WS	"I"
+13	5091.935503000	w0	gf	0.000000
+13	5175.361013000	w0	gf	0.000000
+10	5177.989186000	t3443728	S	Po
+10	5177.991291000	t3443728	S	B
+13	5177.995159000	sched	nready	1.000000
+9       5177.995159000    pu      p     117
+11	5178.000680000	t3443728	S	Sc
+13	5178.004807000	sched	nready	0.000000
+13	5178.004807000	sched	nsubmitted	0.000000
+9       5178.004807000    po      p     117
+12	5178.005389000	t3443728	S
+10	5178.006901000	w3	WS	"B"
+10	5178.007395000	w3	WS	"B"
+10	5178.007541000	t3443728	S	P
+10	5178.008048000	w3	WS	"Fi"
+10	5178.013565000	w3	WS	"B"
+11	5178.013721000	mm0	MS	Co
+24	5178.013721000	F	p	9961472	mm1	com_68	56dd51c8cba0	"noname"	0	0
+11	5178.021854000	mm0	MS	CoA
+12	5178.037200000	mm0	MS
+10	5178.041396000	t3443728	S	Sc
+10	5178.042307000	t3443728	S	Sl
+12	5185.394194000	mm0	MS
+19	5185.394194000	F	p	9961472	mm0	com_68
+13	5178.013721000	mm1	bwo_mm	1349.706448
+13	5178.013721000	mm0	bwi_mm	1349.706448
+13	5185.394194000	mm1	bwo_mm	0.000000
+13	5185.394194000	mm0	bwi_mm	0.000000
+10	5185.396032000	w3	WS	"B"
+10	5185.399535000	w3	WS	"B"
+10	5185.405965000	w3	WS	"perfmodel_post"
+20	5185.405965000	w3	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	117	117	0	0.000000	0	0	-1	-1	"-1_-1"
+10	5192.302489000	w3	WS	"B"
+13	4904.373385000	w3	gf	0.000000
+13	5185.405965000	w3	gf	0.000000
+10	5192.304632000	w3	WS	"Po"
+10	5192.307427000	w3	WS	"B"
+11	5192.311047000	w3	WS	C
+12	5192.329343000	w3	WS # handle_end_callback
+10	5192.331822000	w3	WS	"P"
+10	5192.334113000	w3	WS	"Sc"
+10	5192.335027000	w3	WS	"Sl"
+11	5239.104064000	t3443656	US	Su
+13	5239.107584000	sched nsubmitted	1.000000
+13	5239.136548000	sched	nready	1.000000
+9       5239.136548000    pu      p     118
+11	5239.139833000	t3443656	US	Sc
+13	5239.150461000	sched	nready	0.000000
+13	5239.150461000	sched	nsubmitted	0.000000
+9       5239.150461000    po      p     118
+12	5239.151581000	t3443656	US
+12	5239.151975000	t3443656	US
+10	5239.152176000	w1	WS	"B"
+10	5239.152950000	w1	WS	"B"
+10	5239.153732000	w1	WS	"Fi"
+11	5239.154015000	t3443656	US	Su
+13	5239.155145000	sched nsubmitted	1.000000
+10	5239.156421000	w1	WS	"B"
+10	5239.156767000	w1	WS	"B"
+10	5239.158327000	w1	WS	"B"
+10	5239.164495000	w1	WS	"perfmodel_preproc"
+12	5239.167477000	t3443656	US
+20	5239.164495000	w1	WS	"perfmodel_preproc"	62914560000	"_V8388608x1"	2d2f5286	0000000000000000	118	118	0	0.000000	0	0	-1	-1	"-1_-1"
+11	5239.181361000	t3443656	US	Su
+13	5239.182153000	sched nsubmitted	2.000000
+12	5239.188653000	t3443656	US
+11	5239.199050000	t3443656	US	WA
+10	5243.566626000	w1	WS	"B"
+13	5174.153351000	w1	gf	0.000000
+13	5239.164495000	w1	gf	0.000000
+10	5243.569301000	w1	WS	"Po"
+10	5243.571479000	w1	WS	"B"
+13	5243.576630000	sched	nready	1.000000
+9       5243.576630000    pu      p     119
+11	5243.577748000	w1	WS	Sc
+12	5243.579736000	w1	WS # handle_worker_scheduling_pop
+13	5243.581041000	sched	nready	0.000000
+13	5243.581041000	sched	nsubmitted	1.000000
+9       5243.581041000    po      p     119
+10	5243.581716000	w1	WS	"P"
+10	5243.583194000	t3443728	S	B
+10	5243.583684000	w1	WS	"Sc"
+10	5243.583773000	t3443728	S	B
+10	5243.584193000	w0	WS	"Fi"
+10	5243.584587000	w1	WS	"Sl"
+10	5243.589769000	t3443728	S	P
+11	5243.591263000	mm1	MS	Co
+24	5243.591263000	F	p	1572864	mm0	com_69	56dd51e35ff0	"noname"	0	0
+11	5243.600572000	mm1	MS	CoA
+12	5243.619204000	mm1	MS
+12	5244.689201000	mm1	MS
+19	5244.689201000	F	p	1572864	mm1	com_69
+13	5243.591263000	mm0	bwo_mm	1432.561766
+13	5243.591263000	mm1	bwi_mm	1432.561766
+13	5244.689201000	mm0	bwo_mm	0.000000
+13	5244.689201000	mm1	bwi_mm	0.000000
+10	5244.691227000	t3443728	S	B
+10	5244.693640000	t3443728	S	B
+10	5244.700424000	w0	WS	"perfmodel_infer_trt"
+20	5244.700424000	w0	WS	"perfmodel_infer_trt"	2490368	"_V393216x4"	885ea09c	0000000000000000	119	119	0	0.000000	0	0	-1	-1	"-1_-1"
+26	5244.706694000	t3443728	S	E	119
+10	5247.875369000	t3443728	S	B
+10	5247.899366000	w0	WS	"I"
+13	5177.986491000	w0	gf	0.000000
+13	5244.700424000	w0	gf	0.000000
+10	5247.901800000	t3443728	S	Po
+10	5247.903908000	t3443728	S	B
+13	5247.909138000	sched	nready	1.000000
+9       5247.909138000    pu      p     120
+11	5247.915883000	t3443728	S	Sc
+12	5247.920328000	t3443728	S
+13	5247.921553000	sched	nready	0.000000
+13	5247.921553000	sched	nsubmitted	0.000000
+9       5247.921553000    po      p     120
+10	5247.922954000	t3443728	S	P
+10	5247.923269000	w2	WS	"B"
+10	5247.923836000	w2	WS	"B"
+10	5247.924419000	w2	WS	"Fi"
+10	5247.928201000	t3443728	S	Sc
+10	5247.929098000	t3443728	S	Sl
+10	5247.929438000	w2	WS	"B"
+11	5247.931111000	mm0	MS	Co
+24	5247.931111000	F	p	9961472	mm1	com_70	56dd51e37b30	"noname"	0	0
+11	5247.939149000	mm0	MS	CoA
+12	5247.959597000	mm0	MS
+12	5254.099563000	mm0	MS
+19	5254.099563000	F	p	9961472	mm0	com_70
+13	5247.931111000	mm1	bwo_mm	1614.906301
+13	5247.931111000	mm0	bwi_mm	1614.906301
+13	5254.099563000	mm1	bwo_mm	0.000000
+13	5254.099563000	mm0	bwi_mm	0.000000
+10	5254.101040000	w2	WS	"B"
+10	5254.104759000	w2	WS	"B"
+10	5254.110094000	w2	WS	"perfmodel_post"
+20	5254.110094000	w2	WS	"perfmodel_post"	2490368	"_V9961472x1"	885ea09c	0000000000000000	120	120	0	0.000000	0	0	-1	-1	"-1_-1"
+10	5263.137790000	w2	WS	"B"
+13	5017.633651000	w2	gf	0.000000
+13	5254.110094000	w2	gf	0.000000
+10	5263.139373000	w2	WS	"Po"
+10	5263.141168000	w2	WS	"B"
+11	5263.149340000	w2	WS	C
+12	5263.162810000	w2	WS # handle_end_callback
+10	5263.167752000	w2	WS	"P"
+10	5263.169201000	w2	WS	"Sc"
+10	5263.169913000	w2	WS	"Sl"
+12	5263.186724000	t3443656	US
+9	5263.249793000	prog_event	p	"stop_profiling"
+10	5312.078902000	t3443728	S	D
+8	5312.082084000	t3443729	T
+8	5312.082130000	t3443735	T
+8	5312.082260000	t3443732	T
+8	5312.082408000	t3443736	T
+8	5312.082479000	t3443733	T
+8	5312.082577000	t3443734	T
+8	5312.082684000	t3443731	T
+8	5312.351027000	t3443730	T
+8	5312.755659000	t3443728	T
+13	2249.268746000	sched	gft	0.000000
+13	2250.672103000	sched	gft	0.000000
+13	2311.049809000	sched	gft	0.000000
+13	2312.334896000	sched	gft	0.000000
+13	2316.569922000	sched	gft	0.000000
+13	2317.835893000	sched	gft	0.000000
+13	2319.312884000	sched	gft	0.000000
+13	2323.752467000	sched	gft	0.000000
+13	2325.748566000	sched	gft	0.000000
+13	2331.555425000	sched	gft	0.000000
+13	2409.499838000	sched	gft	0.000000
+13	2414.703477000	sched	gft	0.000000
+13	2415.833335000	sched	gft	0.000000
+13	2418.260814000	sched	gft	0.000000
+13	2431.445898000	sched	gft	0.000000
+13	2484.045136000	sched	gft	0.000000
+13	2488.121591000	sched	gft	0.000000
+13	2489.264619000	sched	gft	0.000000
+13	2490.950811000	sched	gft	0.000000
+13	2497.199319000	sched	gft	0.000000
+13	2503.400772000	sched	gft	0.000000
+13	2562.675356000	sched	gft	0.000000
+13	2567.206033000	sched	gft	0.000000
+13	2567.234631000	sched	gft	0.000000
+13	2576.599519000	sched	gft	0.000000
+13	2576.622028000	sched	gft	0.000000
+13	2582.179716000	sched	gft	0.000000
+13	2646.110857000	sched	gft	0.000000
+13	2649.137666000	sched	gft	0.000000
+13	2650.275595000	sched	gft	0.000000
+13	2650.634405000	sched	gft	0.000000
+13	2656.845961000	sched	gft	0.000000
+13	2662.081742000	sched	gft	0.000000
+13	2741.457132000	sched	gft	0.000000
+13	2744.455855000	sched	gft	0.000000
+13	2745.563715000	sched	gft	0.000000
+13	2747.875569000	sched	gft	0.000000
+13	2755.152003000	sched	gft	0.000000
+13	2760.727741000	sched	gft	0.000000
+13	2819.108632000	sched	gft	0.000000
+13	2822.188324000	sched	gft	0.000000
+13	2823.306638000	sched	gft	0.000000
+13	2824.521426000	sched	gft	0.000000
+13	2830.896470000	sched	gft	0.000000
+13	2838.075300000	sched	gft	0.000000
+13	2894.890166000	sched	gft	0.000000
+13	2898.792547000	sched	gft	0.000000
+13	2900.832046000	sched	gft	0.000000
+13	2901.645787000	sched	gft	0.000000
+13	2909.932850000	sched	gft	0.000000
+13	2915.911176000	sched	gft	0.000000
+13	2977.521677000	sched	gft	0.000000
+13	2980.916137000	sched	gft	0.000000
+13	2982.055680000	sched	gft	0.000000
+13	2983.236205000	sched	gft	0.000000
+13	2989.463795000	sched	gft	0.000000
+13	2995.263192000	sched	gft	0.000000
+13	3048.809450000	sched	gft	0.000000
+13	3052.805686000	sched	gft	0.000000
+13	3052.825302000	sched	gft	0.000000
+13	3060.976196000	sched	gft	0.000000
+13	3061.003016000	sched	gft	0.000000
+13	3066.758357000	sched	gft	0.000000
+13	3119.959029000	sched	gft	0.000000
+13	3123.335522000	sched	gft	0.000000
+13	3124.488327000	sched	gft	0.000000
+13	3125.844493000	sched	gft	0.000000
+13	3132.018811000	sched	gft	0.000000
+13	3137.667129000	sched	gft	0.000000
+13	3196.911721000	sched	gft	0.000000
+13	3200.134189000	sched	gft	0.000000
+13	3201.288616000	sched	gft	0.000000
+13	3201.674980000	sched	gft	0.000000
+13	3207.866178000	sched	gft	0.000000
+13	3214.995008000	sched	gft	0.000000
+13	3268.551901000	sched	gft	0.000000
+13	3278.071035000	sched	gft	0.000000
+13	3278.093542000	sched	gft	0.000000
+13	3286.724711000	sched	gft	0.000000
+13	3292.186088000	sched	gft	0.000000
+13	3336.612824000	sched	gft	0.000000
+13	3339.768568000	sched	gft	0.000000
+13	3340.996035000	sched	gft	0.000000
+13	3343.309194000	sched	gft	0.000000
+13	3349.531010000	sched	gft	0.000000
+13	3356.998699000	sched	gft	0.000000
+13	3423.228585000	sched	gft	0.000000
+13	3427.638666000	sched	gft	0.000000
+13	3428.940722000	sched	gft	0.000000
+13	3430.420519000	sched	gft	0.000000
+13	3436.654356000	sched	gft	0.000000
+13	3441.854129000	sched	gft	0.000000
+13	3498.763193000	sched	gft	0.000000
+13	3501.675322000	sched	gft	0.000000
+13	3502.790129000	sched	gft	0.000000
+13	3504.373061000	sched	gft	0.000000
+13	3510.651683000	sched	gft	0.000000
+13	3515.870989000	sched	gft	0.000000
+13	3572.063224000	sched	gft	0.000000
+13	3575.110658000	sched	gft	0.000000
+13	3576.354414000	sched	gft	0.000000
+13	3576.816862000	sched	gft	0.000000
+13	3583.059601000	sched	gft	0.000000
+13	3588.560651000	sched	gft	0.000000
+13	3651.319791000	sched	gft	0.000000
+13	3655.179909000	sched	gft	0.000000
+13	3656.361308000	sched	gft	0.000000
+13	3658.161971000	sched	gft	0.000000
+13	3665.671693000	sched	gft	0.000000
+13	3671.568198000	sched	gft	0.000000
+13	3724.676206000	sched	gft	0.000000
+13	3727.794462000	sched	gft	0.000000
+13	3728.940324000	sched	gft	0.000000
+13	3730.530690000	sched	gft	0.000000
+13	3738.236537000	sched	gft	0.000000
+13	3743.399691000	sched	gft	0.000000
+13	3802.085742000	sched	gft	0.000000
+13	3806.505222000	sched	gft	0.000000
+13	3806.533649000	sched	gft	0.000000
+13	3815.523642000	sched	gft	0.000000
+13	3815.546566000	sched	gft	0.000000
+13	3820.630771000	sched	gft	0.000000
+13	3879.223675000	sched	gft	0.000000
+13	3883.450191000	sched	gft	0.000000
+13	3884.571327000	sched	gft	0.000000
+13	3885.979773000	sched	gft	0.000000
+13	3892.417813000	sched	gft	0.000000
+13	3898.170102000	sched	gft	0.000000
+13	3953.591659000	sched	gft	0.000000
+13	3957.583075000	sched	gft	0.000000
+13	3958.719210000	sched	gft	0.000000
+13	3959.919209000	sched	gft	0.000000
+13	3966.138165000	sched	gft	0.000000
+13	3971.540458000	sched	gft	0.000000
+13	4019.417682000	sched	gft	0.000000
+13	4022.443315000	sched	gft	0.000000
+13	4023.548412000	sched	gft	0.000000
+13	4025.482035000	sched	gft	0.000000
+13	4031.770911000	sched	gft	0.000000
+13	4036.648668000	sched	gft	0.000000
+13	4100.906759000	sched	gft	0.000000
+13	4104.929735000	sched	gft	0.000000
+13	4106.059722000	sched	gft	0.000000
+13	4107.223333000	sched	gft	0.000000
+13	4113.455042000	sched	gft	0.000000
+13	4118.579069000	sched	gft	0.000000
+13	4172.999659000	sched	gft	0.000000
+13	4177.134517000	sched	gft	0.000000
+13	4178.296774000	sched	gft	0.000000
+13	4179.923134000	sched	gft	0.000000
+13	4186.698725000	sched	gft	0.000000
+13	4192.507743000	sched	gft	0.000000
+13	4245.130845000	sched	gft	0.000000
+13	4247.985062000	sched	gft	0.000000
+13	4249.104993000	sched	gft	0.000000
+13	4249.553425000	sched	gft	0.000000
+13	4255.857995000	sched	gft	0.000000
+13	4260.826224000	sched	gft	0.000000
+13	4316.660414000	sched	gft	0.000000
+13	4320.497206000	sched	gft	0.000000
+13	4321.631906000	sched	gft	0.000000
+13	4322.977364000	sched	gft	0.000000
+13	4329.257339000	sched	gft	0.000000
+13	4334.454848000	sched	gft	0.000000
+13	4389.449752000	sched	gft	0.000000
+13	4402.268279000	sched	gft	0.000000
+13	4403.386780000	sched	gft	0.000000
+13	4405.887616000	sched	gft	0.000000
+13	4412.083034000	sched	gft	0.000000
+13	4421.606046000	sched	gft	0.000000
+13	4459.037071000	sched	gft	0.000000
+13	4463.945843000	sched	gft	0.000000
+13	4463.974362000	sched	gft	0.000000
+13	4473.682448000	sched	gft	0.000000
+13	4473.705839000	sched	gft	0.000000
+13	4480.358741000	sched	gft	0.000000
+13	4533.971735000	sched	gft	0.000000
+13	4539.006779000	sched	gft	0.000000
+13	4540.160113000	sched	gft	0.000000
+13	4541.532543000	sched	gft	0.000000
+13	4547.856657000	sched	gft	0.000000
+13	4554.484750000	sched	gft	0.000000
+13	4608.459856000	sched	gft	0.000000
+13	4611.962251000	sched	gft	0.000000
+13	4613.174264000	sched	gft	0.000000
+13	4613.923840000	sched	gft	0.000000
+13	4620.213684000	sched	gft	0.000000
+13	4626.149053000	sched	gft	0.000000
+13	4685.976558000	sched	gft	0.000000
+13	4692.269666000	sched	gft	0.000000
+13	4693.390931000	sched	gft	0.000000
+13	4694.164415000	sched	gft	0.000000
+13	4706.591419000	sched	gft	0.000000
+13	4754.468269000	sched	gft	0.000000
+13	4757.292775000	sched	gft	0.000000
+13	4758.493962000	sched	gft	0.000000
+13	4759.165790000	sched	gft	0.000000
+13	4765.414364000	sched	gft	0.000000
+13	4770.735414000	sched	gft	0.000000
+13	4830.967039000	sched	gft	0.000000
+13	4835.523566000	sched	gft	0.000000
+13	4836.649036000	sched	gft	0.000000
+13	4838.441923000	sched	gft	0.000000
+13	4844.717852000	sched	gft	0.000000
+13	4849.934362000	sched	gft	0.000000
+13	4901.435309000	sched	gft	0.000000
+13	4904.373385000	sched	gft	0.000000
+13	4905.534704000	sched	gft	0.000000
+13	4906.669016000	sched	gft	0.000000
+13	4913.112046000	sched	gft	0.000000
+13	4918.756495000	sched	gft	0.000000
+13	4994.505193000	sched	gft	0.000000
+13	4998.708369000	sched	gft	0.000000
+13	4999.823105000	sched	gft	0.000000
+13	5000.225340000	sched	gft	0.000000
+13	5007.641061000	sched	gft	0.000000
+13	5017.633651000	sched	gft	0.000000
+13	5085.452031000	sched	gft	0.000000
+13	5089.000861000	sched	gft	0.000000
+13	5090.118340000	sched	gft	0.000000
+13	5091.935503000	sched	gft	0.000000
+13	5098.377411000	sched	gft	0.000000
+13	5104.274445000	sched	gft	0.000000
+13	5169.624922000	sched	gft	0.000000
+13	5174.153351000	sched	gft	0.000000
+13	5175.361013000	sched	gft	0.000000
+13	5177.986491000	sched	gft	0.000000
+13	5185.405965000	sched	gft	0.000000
+13	5192.302489000	sched	gft	0.000000
+13	5239.164495000	sched	gft	0.000000
+13	5243.566626000	sched	gft	0.000000
+13	5244.700424000	sched	gft	0.000000
+13	5247.899366000	sched	gft	0.000000
+13	5254.110094000	sched	gft	0.000000
+13	5247.899366000	w0	gf	0.000000
+13	5243.566626000	w1	gf	0.000000
+13	5263.137790000	w2	gf	0.000000
+13	5192.302489000	w3	gf	0.000000
+13	2249.268746000	w8	gf	0.000000
+13	5263.137790000	sched	gft	0.000000

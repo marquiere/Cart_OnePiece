@@ -1,0 +1,1 @@
+/home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/build/pipeline_starpu --host 127.0.0.1 --port 2000 --w 800 --h 600 --fps 20 --frames 40 --engine models/dummy.engine --out_w 512 --out_h 256 --cameras 0 --inflight 2 --cpu_workers 8 --print_every 20 --eval_every 40 --display 0

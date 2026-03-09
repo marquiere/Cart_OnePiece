@@ -1,0 +1,2996 @@
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 1
+SubmitOrder: 1
+Priority: 0
+Tag: 0
+WorkerId: 8
+MemoryNode: 0
+SubmitTime: 2237.344560
+ReadyTime: 2237.373790
+StartTime: 2237.408786
+EndTime: 2249.268746
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 2
+SubmitOrder: 2
+Priority: 0
+DependsOn: 1
+DepLabels: task
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2237.437137
+ReadyTime: 2249.279019
+StartTime: 2250.672103
+EndTime: 2311.049809
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 3
+SubmitOrder: 3
+Priority: 0
+DependsOn: 2
+DepLabels: task
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2237.498766
+ReadyTime: 2311.058353
+StartTime: 2317.835893
+EndTime: 2323.752467
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 4
+SubmitOrder: 4
+Priority: 0
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2312.260362
+ReadyTime: 2312.276283
+StartTime: 2312.334896
+EndTime: 2316.569922
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 5
+SubmitOrder: 5
+Priority: 0
+DependsOn: 4
+DepLabels: task
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2312.284255
+ReadyTime: 2316.577157
+StartTime: 2317.836168
+EndTime: 2319.312884
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 6
+SubmitOrder: 6
+Priority: 0
+DependsOn: 5
+DepLabels: task
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 2312.310125
+ReadyTime: 2319.321488
+StartTime: 2325.748566
+EndTime: 2331.555425
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 7
+SubmitOrder: 7
+Priority: 0
+DependsOn: 2
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2409.459640
+ReadyTime: 2409.477824
+StartTime: 2409.499838
+EndTime: 2414.703477
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 8
+SubmitOrder: 8
+Priority: 0
+DependsOn: 7 3
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2409.489904
+ReadyTime: 2414.713504
+StartTime: 2415.833335
+EndTime: 2418.260814
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 9
+SubmitOrder: 9
+Priority: 0
+DependsOn: 8 3
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2409.511019
+ReadyTime: 2418.269532
+StartTime: 2424.494058
+EndTime: 2431.445898
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 10
+SubmitOrder: 10
+Priority: 0
+DependsOn: 5
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2484.003580
+ReadyTime: 2484.024089
+StartTime: 2484.045136
+EndTime: 2488.121591
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 11
+SubmitOrder: 11
+Priority: 0
+DependsOn: 10 6
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2484.039688
+ReadyTime: 2488.129157
+StartTime: 2489.264619
+EndTime: 2490.950811
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 12
+SubmitOrder: 12
+Priority: 0
+DependsOn: 11 6
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2484.063614
+ReadyTime: 2490.957178
+StartTime: 2497.199319
+EndTime: 2503.400772
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 13
+SubmitOrder: 13
+Priority: 0
+DependsOn: 8
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2562.635077
+ReadyTime: 2562.654455
+StartTime: 2562.675356
+EndTime: 2567.206033
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 14
+SubmitOrder: 14
+Priority: 0
+DependsOn: 13 9
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2562.665614
+ReadyTime: 2567.214952
+StartTime: 2567.234631
+EndTime: 2576.599519
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 15
+SubmitOrder: 15
+Priority: 0
+DependsOn: 14 9
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2562.690010
+ReadyTime: 2576.606712
+StartTime: 2576.622028
+EndTime: 2582.179716
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 16
+SubmitOrder: 16
+Priority: 0
+DependsOn: 11
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 2646.072368
+ReadyTime: 2646.091273
+StartTime: 2646.110857
+EndTime: 2649.137666
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 17
+SubmitOrder: 17
+Priority: 0
+DependsOn: 16 12
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2646.104992
+ReadyTime: 2649.147929
+StartTime: 2650.275595
+EndTime: 2650.634405
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 18
+SubmitOrder: 18
+Priority: 0
+DependsOn: 17 12
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 2646.128107
+ReadyTime: 2650.638751
+StartTime: 2656.845961
+EndTime: 2662.081742
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 19
+SubmitOrder: 19
+Priority: 0
+DependsOn: 14
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2741.418813
+ReadyTime: 2741.438704
+StartTime: 2741.457132
+EndTime: 2744.455855
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 20
+SubmitOrder: 20
+Priority: 0
+DependsOn: 19 15
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2741.449731
+ReadyTime: 2744.463104
+StartTime: 2745.563715
+EndTime: 2747.875569
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 21
+SubmitOrder: 21
+Priority: 0
+DependsOn: 20 15
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2741.472442
+ReadyTime: 2747.881931
+StartTime: 2755.152003
+EndTime: 2760.727741
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 22
+SubmitOrder: 22
+Priority: 0
+DependsOn: 17
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2819.064059
+ReadyTime: 2819.082186
+StartTime: 2819.108632
+EndTime: 2822.188324
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 23
+SubmitOrder: 23
+Priority: 0
+DependsOn: 22 18
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2819.094319
+ReadyTime: 2822.195410
+StartTime: 2823.306638
+EndTime: 2824.521426
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 24
+SubmitOrder: 24
+Priority: 0
+DependsOn: 23 18
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2819.115337
+ReadyTime: 2824.526402
+StartTime: 2830.896470
+EndTime: 2838.075300
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 25
+SubmitOrder: 25
+Priority: 0
+DependsOn: 20
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2894.851501
+ReadyTime: 2894.871430
+StartTime: 2894.890166
+EndTime: 2898.792547
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 26
+SubmitOrder: 26
+Priority: 0
+DependsOn: 25 21
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2894.884596
+ReadyTime: 2898.799340
+StartTime: 2900.832046
+EndTime: 2901.645787
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 27
+SubmitOrder: 27
+Priority: 0
+DependsOn: 26 21
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 2894.906684
+ReadyTime: 2901.650821
+StartTime: 2909.932850
+EndTime: 2915.911176
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 28
+SubmitOrder: 28
+Priority: 0
+DependsOn: 23
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2977.485664
+ReadyTime: 2977.504294
+StartTime: 2977.521677
+EndTime: 2980.916137
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 29
+SubmitOrder: 29
+Priority: 0
+DependsOn: 28 24
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 2977.519982
+ReadyTime: 2980.922977
+StartTime: 2982.055680
+EndTime: 2983.236205
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 30
+SubmitOrder: 30
+Priority: 0
+DependsOn: 29 24
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 2977.544814
+ReadyTime: 2983.240684
+StartTime: 2989.463795
+EndTime: 2995.263192
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 31
+SubmitOrder: 31
+Priority: 0
+DependsOn: 26
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3048.773116
+ReadyTime: 3048.791799
+StartTime: 3048.809450
+EndTime: 3052.805686
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 32
+SubmitOrder: 32
+Priority: 0
+DependsOn: 31 27
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3048.804640
+ReadyTime: 3052.812502
+StartTime: 3052.825302
+EndTime: 3060.976196
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 33
+SubmitOrder: 33
+Priority: 0
+DependsOn: 32 27
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3048.826841
+ReadyTime: 3060.984940
+StartTime: 3061.003016
+EndTime: 3066.758357
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 34
+SubmitOrder: 34
+Priority: 0
+DependsOn: 29
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3119.920308
+ReadyTime: 3119.940649
+StartTime: 3119.959029
+EndTime: 3123.335522
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 35
+SubmitOrder: 35
+Priority: 0
+DependsOn: 34 30
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3119.957427
+ReadyTime: 3123.342774
+StartTime: 3124.488327
+EndTime: 3125.844493
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 36
+SubmitOrder: 36
+Priority: 0
+DependsOn: 35 30
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3119.981906
+ReadyTime: 3125.849232
+StartTime: 3132.018811
+EndTime: 3137.667129
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 37
+SubmitOrder: 37
+Priority: 0
+DependsOn: 32
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3196.867292
+ReadyTime: 3196.887044
+StartTime: 3196.911721
+EndTime: 3200.134189
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 38
+SubmitOrder: 38
+Priority: 0
+DependsOn: 37 33
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3196.898281
+ReadyTime: 3200.141825
+StartTime: 3201.288616
+EndTime: 3201.674980
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 39
+SubmitOrder: 39
+Priority: 0
+DependsOn: 38 33
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3196.921255
+ReadyTime: 3201.680210
+StartTime: 3207.866178
+EndTime: 3214.995008
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 40
+SubmitOrder: 40
+Priority: 0
+DependsOn: 35
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3268.513626
+ReadyTime: 3268.533167
+StartTime: 3268.551901
+EndTime: 3278.071035
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 41
+SubmitOrder: 41
+Priority: 0
+DependsOn: 40 36
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3268.545729
+ReadyTime: 3278.078666
+StartTime: 3278.093542
+EndTime: 3286.724711
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 42
+SubmitOrder: 42
+Priority: 0
+DependsOn: 41 36
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3268.568288
+ReadyTime: 3286.732847
+StartTime: 3286.750957
+EndTime: 3292.186088
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 43
+SubmitOrder: 43
+Priority: 0
+DependsOn: 38
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3336.573293
+ReadyTime: 3336.591687
+StartTime: 3336.612824
+EndTime: 3339.768568
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 44
+SubmitOrder: 44
+Priority: 0
+DependsOn: 43 39
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3336.603703
+ReadyTime: 3339.775698
+StartTime: 3340.996035
+EndTime: 3343.309194
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 45
+SubmitOrder: 45
+Priority: 0
+DependsOn: 44 39
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3336.626048
+ReadyTime: 3343.316559
+StartTime: 3349.531010
+EndTime: 3356.998699
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 46
+SubmitOrder: 46
+Priority: 0
+DependsOn: 41
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3423.188910
+ReadyTime: 3423.207439
+StartTime: 3423.228585
+EndTime: 3427.638666
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 47
+SubmitOrder: 47
+Priority: 0
+DependsOn: 46 42
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3423.219771
+ReadyTime: 3427.649647
+StartTime: 3428.940722
+EndTime: 3430.420519
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 48
+SubmitOrder: 48
+Priority: 0
+DependsOn: 47 42
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3423.241806
+ReadyTime: 3430.426823
+StartTime: 3436.654356
+EndTime: 3441.854129
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 49
+SubmitOrder: 49
+Priority: 0
+DependsOn: 44
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3498.728033
+ReadyTime: 3498.746505
+StartTime: 3498.763193
+EndTime: 3501.675322
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 50
+SubmitOrder: 50
+Priority: 0
+DependsOn: 49 45
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3498.757602
+ReadyTime: 3501.682761
+StartTime: 3502.790129
+EndTime: 3504.373061
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 51
+SubmitOrder: 51
+Priority: 0
+DependsOn: 50 45
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3498.779849
+ReadyTime: 3504.378229
+StartTime: 3510.651683
+EndTime: 3515.870989
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 52
+SubmitOrder: 52
+Priority: 0
+DependsOn: 47
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3572.022471
+ReadyTime: 3572.041726
+StartTime: 3572.063224
+EndTime: 3575.110658
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 53
+SubmitOrder: 53
+Priority: 0
+DependsOn: 52 48
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3572.058796
+ReadyTime: 3575.117944
+StartTime: 3576.354414
+EndTime: 3576.816862
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 54
+SubmitOrder: 54
+Priority: 0
+DependsOn: 53 48
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3572.081989
+ReadyTime: 3576.822548
+StartTime: 3583.059601
+EndTime: 3588.560651
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 55
+SubmitOrder: 55
+Priority: 0
+DependsOn: 50
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3651.285090
+ReadyTime: 3651.301802
+StartTime: 3651.319791
+EndTime: 3655.179909
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 56
+SubmitOrder: 56
+Priority: 0
+DependsOn: 55 51
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3651.312540
+ReadyTime: 3655.187800
+StartTime: 3656.361308
+EndTime: 3658.161971
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 57
+SubmitOrder: 57
+Priority: 0
+DependsOn: 56 51
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3651.332267
+ReadyTime: 3658.167926
+StartTime: 3665.671693
+EndTime: 3671.568198
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 58
+SubmitOrder: 58
+Priority: 0
+DependsOn: 53
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3724.639806
+ReadyTime: 3724.658483
+StartTime: 3724.676206
+EndTime: 3727.794462
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 59
+SubmitOrder: 59
+Priority: 0
+DependsOn: 58 54
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3724.674131
+ReadyTime: 3727.803565
+StartTime: 3728.940324
+EndTime: 3730.530690
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 60
+SubmitOrder: 60
+Priority: 0
+DependsOn: 59 54
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3724.696432
+ReadyTime: 3730.537268
+StartTime: 3738.236537
+EndTime: 3743.399691
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 61
+SubmitOrder: 61
+Priority: 0
+DependsOn: 56
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3802.048425
+ReadyTime: 3802.066560
+StartTime: 3802.085742
+EndTime: 3806.505222
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 62
+SubmitOrder: 62
+Priority: 0
+DependsOn: 61 57
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3802.078530
+ReadyTime: 3806.514765
+StartTime: 3806.533649
+EndTime: 3815.523642
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 63
+SubmitOrder: 63
+Priority: 0
+DependsOn: 62 57
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 3802.098850
+ReadyTime: 3815.530923
+StartTime: 3815.546566
+EndTime: 3820.630771
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 64
+SubmitOrder: 64
+Priority: 0
+DependsOn: 59
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3879.184697
+ReadyTime: 3879.204153
+StartTime: 3879.223675
+EndTime: 3883.450191
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 65
+SubmitOrder: 65
+Priority: 0
+DependsOn: 64 60
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3879.216299
+ReadyTime: 3883.458608
+StartTime: 3884.571327
+EndTime: 3885.979773
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 66
+SubmitOrder: 66
+Priority: 0
+DependsOn: 65 60
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 3879.237623
+ReadyTime: 3885.984719
+StartTime: 3892.417813
+EndTime: 3898.170102
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 67
+SubmitOrder: 67
+Priority: 0
+DependsOn: 62
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3953.550914
+ReadyTime: 3953.569734
+StartTime: 3953.591659
+EndTime: 3957.583075
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 68
+SubmitOrder: 68
+Priority: 0
+DependsOn: 67 63
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 3953.581579
+ReadyTime: 3957.590981
+StartTime: 3958.719210
+EndTime: 3959.919209
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 69
+SubmitOrder: 69
+Priority: 0
+DependsOn: 68 63
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 3953.605819
+ReadyTime: 3959.923847
+StartTime: 3966.138165
+EndTime: 3971.540458
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 70
+SubmitOrder: 70
+Priority: 0
+DependsOn: 65
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4019.375353
+ReadyTime: 4019.394525
+StartTime: 4019.417682
+EndTime: 4022.443315
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 71
+SubmitOrder: 71
+Priority: 0
+DependsOn: 70 66
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4019.408610
+ReadyTime: 4022.450069
+StartTime: 4023.548412
+EndTime: 4025.482035
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 72
+SubmitOrder: 72
+Priority: 0
+DependsOn: 71 66
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4019.433034
+ReadyTime: 4025.488014
+StartTime: 4031.770911
+EndTime: 4036.648668
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 73
+SubmitOrder: 73
+Priority: 0
+DependsOn: 68
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4100.862916
+ReadyTime: 4100.882996
+StartTime: 4100.906759
+EndTime: 4104.929735
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 74
+SubmitOrder: 74
+Priority: 0
+DependsOn: 73 69
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4100.898688
+ReadyTime: 4104.939950
+StartTime: 4106.059722
+EndTime: 4107.223333
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 75
+SubmitOrder: 75
+Priority: 0
+DependsOn: 74 69
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4100.925216
+ReadyTime: 4107.228438
+StartTime: 4113.455042
+EndTime: 4118.579069
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 76
+SubmitOrder: 76
+Priority: 0
+DependsOn: 71
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4172.960915
+ReadyTime: 4172.978543
+StartTime: 4172.999659
+EndTime: 4177.134517
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 77
+SubmitOrder: 77
+Priority: 0
+DependsOn: 76 72
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4172.993220
+ReadyTime: 4177.148904
+StartTime: 4178.296774
+EndTime: 4179.923134
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 78
+SubmitOrder: 78
+Priority: 0
+DependsOn: 77 72
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4173.018447
+ReadyTime: 4179.929205
+StartTime: 4186.698725
+EndTime: 4192.507743
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 79
+SubmitOrder: 79
+Priority: 0
+DependsOn: 74
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4245.095568
+ReadyTime: 4245.113518
+StartTime: 4245.130845
+EndTime: 4247.985062
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 80
+SubmitOrder: 80
+Priority: 0
+DependsOn: 79 75
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4245.124964
+ReadyTime: 4247.991870
+StartTime: 4249.104993
+EndTime: 4249.553425
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 81
+SubmitOrder: 81
+Priority: 0
+DependsOn: 80 75
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4245.152255
+ReadyTime: 4249.557697
+StartTime: 4255.857995
+EndTime: 4260.826224
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 82
+SubmitOrder: 82
+Priority: 0
+DependsOn: 77
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4316.621716
+ReadyTime: 4316.639231
+StartTime: 4316.660414
+EndTime: 4320.497206
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 83
+SubmitOrder: 83
+Priority: 0
+DependsOn: 82 78
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4316.651404
+ReadyTime: 4320.506402
+StartTime: 4321.631906
+EndTime: 4322.977364
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 84
+SubmitOrder: 84
+Priority: 0
+DependsOn: 83 78
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4316.672470
+ReadyTime: 4322.983251
+StartTime: 4329.257339
+EndTime: 4334.454848
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 85
+SubmitOrder: 85
+Priority: 0
+DependsOn: 80
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4389.413921
+ReadyTime: 4389.433631
+StartTime: 4389.449752
+EndTime: 4402.268279
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 86
+SubmitOrder: 86
+Priority: 0
+DependsOn: 85 81
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4389.444730
+ReadyTime: 4402.275690
+StartTime: 4403.386780
+EndTime: 4405.887616
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 87
+SubmitOrder: 87
+Priority: 0
+DependsOn: 86 81
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4389.466219
+ReadyTime: 4405.892666
+StartTime: 4412.083034
+EndTime: 4421.606046
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 88
+SubmitOrder: 88
+Priority: 0
+DependsOn: 83
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4458.997004
+ReadyTime: 4459.015864
+StartTime: 4459.037071
+EndTime: 4463.945843
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 89
+SubmitOrder: 89
+Priority: 0
+DependsOn: 88 84
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4459.030326
+ReadyTime: 4463.956785
+StartTime: 4463.974362
+EndTime: 4473.682448
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 90
+SubmitOrder: 90
+Priority: 0
+DependsOn: 89 84
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4459.052320
+ReadyTime: 4473.690308
+StartTime: 4473.705839
+EndTime: 4480.358741
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 91
+SubmitOrder: 91
+Priority: 0
+DependsOn: 86
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4533.933741
+ReadyTime: 4533.952342
+StartTime: 4533.971735
+EndTime: 4539.006779
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 92
+SubmitOrder: 92
+Priority: 0
+DependsOn: 91 87
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4533.967033
+ReadyTime: 4539.017067
+StartTime: 4540.160113
+EndTime: 4541.532543
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 93
+SubmitOrder: 93
+Priority: 0
+DependsOn: 92 87
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4533.988352
+ReadyTime: 4541.537648
+StartTime: 4547.856657
+EndTime: 4554.484750
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 94
+SubmitOrder: 94
+Priority: 0
+DependsOn: 89
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4608.423007
+ReadyTime: 4608.442647
+StartTime: 4608.459856
+EndTime: 4611.962251
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 95
+SubmitOrder: 95
+Priority: 0
+DependsOn: 94 90
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4608.452800
+ReadyTime: 4611.971445
+StartTime: 4613.174264
+EndTime: 4613.923840
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 96
+SubmitOrder: 96
+Priority: 0
+DependsOn: 95 90
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4608.472287
+ReadyTime: 4613.931554
+StartTime: 4620.213684
+EndTime: 4626.149053
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 97
+SubmitOrder: 97
+Priority: 0
+DependsOn: 92
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4685.939773
+ReadyTime: 4685.959039
+StartTime: 4685.976558
+EndTime: 4692.269666
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 98
+SubmitOrder: 98
+Priority: 0
+DependsOn: 97 93
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4685.975512
+ReadyTime: 4692.279307
+StartTime: 4693.390931
+EndTime: 4694.164415
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 99
+SubmitOrder: 99
+Priority: 0
+DependsOn: 98 93
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4686.000730
+ReadyTime: 4694.170047
+StartTime: 4700.567871
+EndTime: 4706.591419
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 100
+SubmitOrder: 100
+Priority: 0
+DependsOn: 95
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4754.433431
+ReadyTime: 4754.451995
+StartTime: 4754.468269
+EndTime: 4757.292775
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 101
+SubmitOrder: 101
+Priority: 0
+DependsOn: 100 96
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4754.464113
+ReadyTime: 4757.299069
+StartTime: 4758.493962
+EndTime: 4759.165790
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 102
+SubmitOrder: 102
+Priority: 0
+DependsOn: 101 96
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4754.485512
+ReadyTime: 4759.170509
+StartTime: 4765.414364
+EndTime: 4770.735414
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 103
+SubmitOrder: 103
+Priority: 0
+DependsOn: 98
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4830.930153
+ReadyTime: 4830.949703
+StartTime: 4830.967039
+EndTime: 4835.523566
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 104
+SubmitOrder: 104
+Priority: 0
+DependsOn: 103 99
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4830.961449
+ReadyTime: 4835.531927
+StartTime: 4836.649036
+EndTime: 4838.441923
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 105
+SubmitOrder: 105
+Priority: 0
+DependsOn: 104 99
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4830.982995
+ReadyTime: 4838.451078
+StartTime: 4844.717852
+EndTime: 4849.934362
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 106
+SubmitOrder: 106
+Priority: 0
+DependsOn: 101
+DepLabels: ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 4901.396797
+ReadyTime: 4901.416415
+StartTime: 4901.435309
+EndTime: 4904.373385
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 107
+SubmitOrder: 107
+Priority: 0
+DependsOn: 106 102
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4901.429388
+ReadyTime: 4904.379930
+StartTime: 4905.534704
+EndTime: 4906.669016
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 108
+SubmitOrder: 108
+Priority: 0
+DependsOn: 107 102
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 4901.452164
+ReadyTime: 4906.675403
+StartTime: 4913.112046
+EndTime: 4918.756495
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 109
+SubmitOrder: 109
+Priority: 0
+DependsOn: 104
+DepLabels: ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4994.461907
+ReadyTime: 4994.483278
+StartTime: 4994.505193
+EndTime: 4998.708369
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 110
+SubmitOrder: 110
+Priority: 0
+DependsOn: 109 105
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 4994.496026
+ReadyTime: 4998.718758
+StartTime: 4999.823105
+EndTime: 5000.225340
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 111
+SubmitOrder: 111
+Priority: 0
+DependsOn: 110 105
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 4994.517964
+ReadyTime: 5000.230508
+StartTime: 5007.641061
+EndTime: 5017.633651
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 112
+SubmitOrder: 112
+Priority: 0
+DependsOn: 107
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 5085.407815
+ReadyTime: 5085.429264
+StartTime: 5085.452031
+EndTime: 5089.000861
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 113
+SubmitOrder: 113
+Priority: 0
+DependsOn: 112 108
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 5085.442220
+ReadyTime: 5089.011552
+StartTime: 5090.118340
+EndTime: 5091.935503
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 114
+SubmitOrder: 114
+Priority: 0
+DependsOn: 113 108
+DepLabels: task ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 5085.465994
+ReadyTime: 5091.942658
+StartTime: 5098.377411
+EndTime: 5104.274445
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 115
+SubmitOrder: 115
+Priority: 0
+DependsOn: 110
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 5169.589032
+ReadyTime: 5169.608102
+StartTime: 5169.624922
+EndTime: 5174.153351
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51c89520 56dd51c8b060
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 116
+SubmitOrder: 116
+Priority: 0
+DependsOn: 115 111
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 5169.626703
+ReadyTime: 5174.164831
+StartTime: 5175.361013
+EndTime: 5177.986491
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51c8b060 56dd51c8cba0
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 117
+SubmitOrder: 117
+Priority: 0
+DependsOn: 116 111
+DepLabels: task ghost
+Tag: 0
+WorkerId: 3
+MemoryNode: 0
+SubmitTime: 5169.650504
+ReadyTime: 5177.995159
+StartTime: 5185.405965
+EndTime: 5192.302489
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51c8cba0 56dd51c8e6e0
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+
+Name: perfmodel_preproc
+Model: perfmodel_preproc
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1084
+JobId: 118
+SubmitOrder: 118
+Priority: 0
+DependsOn: 113
+DepLabels: ghost
+Tag: 0
+WorkerId: 1
+MemoryNode: 0
+SubmitTime: 5239.113830
+ReadyTime: 5239.136548
+StartTime: 5239.164495
+EndTime: 5243.566626
+Footprint: 2d2f5286
+Parameters:  V8388608x1
+Handles: 56dd51e344b0 56dd51e35ff0
+Modes: R W
+Sizes: 8388608 1572864
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03 2.612068e+03
+
+Name: perfmodel_infer_trt
+Model: perfmodel_infer_trt
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1096
+JobId: 119
+SubmitOrder: 119
+Priority: 0
+DependsOn: 118 114
+DepLabels: task ghost
+Tag: 0
+WorkerId: 0
+MemoryNode: 1
+SubmitTime: 5239.158673
+ReadyTime: 5243.576630
+StartTime: 5244.700424
+EndTime: 5247.899366
+Footprint: 885ea09c
+Parameters:  V393216x4
+Handles: 56dd51e35ff0 56dd51e37b30
+Modes: R W
+Sizes: 1572864 9961472
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: 1.435525e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03 8.164813e+03
+
+Name: perfmodel_post
+Model: perfmodel_post
+File: /home/eric/Cart_OnePiece/Cart-OnePiece_Antigravity_C++/starpu_adv_pipeline_client/apps/pipeline_starpu.cpp
+Line: 1119
+JobId: 120
+SubmitOrder: 120
+Priority: 0
+DependsOn: 119 114
+DepLabels: task ghost
+Tag: 0
+WorkerId: 2
+MemoryNode: 0
+SubmitTime: 5239.183651
+ReadyTime: 5247.909138
+StartTime: 5254.110094
+EndTime: 5263.137790
+Footprint: 885ea09c
+Parameters:  V9961472x1
+Handles: 56dd51e37b30 56dd51e39670
+Modes: R W
+Sizes: 9961472 131072
+NumaNodes: -1 -1
+MPIRank: -1
+EstimatedTime: inf 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03 3.279558e+03
+

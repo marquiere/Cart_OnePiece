@@ -1,0 +1,2 @@
+/sys/class/powercap/intel-rapl:0/energy_uj:PERMISSION_DENIED
+/sys/class/powercap/intel-rapl:0:0/energy_uj:PERMISSION_DENIED
