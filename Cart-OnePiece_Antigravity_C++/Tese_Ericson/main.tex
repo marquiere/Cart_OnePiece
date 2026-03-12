@@ -1,0 +1,300 @@
+\documentclass[a4paper,brazil,ruledheader,normaltoc,capchap,twoside,openany]{include/abnt}
+\usepackage[a4paper,left=3cm,right=2cm,top=3cm,bottom=2cm]{geometry}
+\usepackage{newclude}
+\usepackage{pdflscape}
+\usepackage[T1]{fontenc}
+\usepackage{ae} 
+\usepackage[utf8x]{inputenc}
+\usepackage[printonlyused]{include/acronym}
+\usepackage{multirow}
+\usepackage[alf,no-abnt-option-file]{include/abntcite}
+\renewcommand{\emph}{\textsc}
+\usepackage{multibib}
+\usepackage[brazil]{babel}
+\usepackage{include/abnt-PPGInf-PUCMG}
+\usepackage[pdftex]{graphicx}
+\usepackage{epstopdf}
+\usepackage{float}
+\usepackage[symbol]{footmisc}
+\usepackage[all]{xy}
+\usepackage{url}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[portuguese,linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage{algorithmic}
+\usepackage{listings}
+\setlength{\algomargin}{1em}
+\usepackage{setspace}
+\usepackage{rotating}
+\usepackage{pstricks}
+\usepackage{color}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{ifthen}
+\usepackage[size=normalsize,labelfont=bf,textfont={bf},labelsep=endash]{caption}
+\captionsetup[subfloat]{labelfont=bf,textfont={bf}}
+\usepackage{paralist}
+\usepackage[none]{hyphenat} % O texto não usará hifenização com esse pacote
+\usepackage{placeins}
+%\usepackage{adjustbox}
+%\usepackage{pdfpages}
+\usepackage{silence}
+\WarningFilter{caption}{Unsupported}
+\WarningFilter{caption}{Unused}
+\WarningsOff
+
+\usepackage{pdfpages}
+\usepackage{comment}
+%Pacote para utilizar notas no texto. Para a versão final, basta passar o parâmetro "disable" no \todo[] que o PDF será criado sem as notas.
+\usepackage[textwidth=1.7cm]{todonotes}
+\setlength{\marginparwidth}{1.6cm}
+\newcounter{todocounter}
+%\newcommand{\smalltodo}[2][]
+%{\todo[caption={#2}, #1]
+%{\begin{spacing}{0.5}#2\end{spacing}}}
+\newcommand{\note}[2][]
+%COMANDO PARA AS NOTAS APARECEREM NA MARGEM DO TEXTO
+%{\todo[caption={#2}, size=\tiny, #1,color=green!40]{\renewcommand{\baselinestretch}{0.5}\thetodocounter: #2\par}}
+%COMANDO PARA AS NOTAS APARECEREM NO CORPO DO TEXTO
+{\stepcounter{todocounter}\todo[caption={#2}, size=\small, inline, #1,color=green!40]{\renewcommand{\baselinestretch}{0.5}\thetodocounter: #2\par}}
+%{\stepcounter{todocounter}\todo[caption={#2}, size=\small, inline, #1,color=green!40,disable]{\renewcommand{\baselinestretch}{0.5}\thetodocounter: #2\par}}
+
+%\usepackage{xcolor}
+%\newcommand\note[1]{\textcolor{red}{#1}}
+%\renewcommand\note[1]{}
+%\newcommand
+
+%\usepackage[draft]{changes}
+%\usepackage[final]{changes}
+%\definechangesauthor[color=blue]{Pedro}
+%\definechangesauthor[color=red]{Mark}
+%%% Alternative definition to have the remarks
+%%% in the margins instead of footnotes
+%\usepackage[textwidth=1.7cm]{todonotes}
+%\setlength{\marginparwidth}{1.7cm}
+%\makeatletter
+%\setremarkmarkup{\todo[color=Changes@Color#1!20,size=\tiny]{#1: #2}}
+%\makeatother
+%% Rather hacky definition of a plain remark/note
+%% by riding on \added
+%\newcommand{\note}[2][]{\added[#1,remark={#2}]{}}
+
+
+\captionsetup{figurewithin=none}
+\captionsetup{tablewithin=none}
+\setlength{\LTcapwidth}{\textwidth}
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+
+%\floatstyle{plaintop}
+%\newfloat{grafico}{H}{loq}
+%\restylefloat*{grafico}
+%\floatname{grafico}{Gráfico}
+
+\usepackage{subfig}
+%\newsubfloat[position=bottom,listofformat=subsimple]{grafico}
+\newsavebox{\leftfig}
+\newsavebox{\rightfig}
+
+\floatstyle{plaintop}
+\newfloat{quadro}
+\restylefloat{quadro}
+\floatname{quadro}{Quadro} 
+
+\makeatletter
+%\renewcommand{\ALG@name}{Algoritmo}
+%\renewcommand{\listalgorithmname}{Lista de Algoritmos}
+
+\lstset{extendedchars=\true, % permite acentos
+ inputencoding=utf8x,
+ literate={\$}{{\$}}1,
+ commentstyle=\it, % deixa os comentários em itálico
+ stringstyle=\bf, % não lembro o que faz, mas está funcionando
+ belowcaptionskip=5pt, % não lembro o que faz, mas está funcionando
+ numbers=left, % coloca a numeração na esquerda
+ stepnumber=1, % passos da numeração
+ firstnumber=1, % primeira linha
+ numberstyle=\tiny, % tamanho da fonte da numeração
+ breaklines=true, % permitir quebra de linha
+ frame=tb, % borda em cima e em baixo
+ basicstyle=\footnotesize, % estilo básico
+ stringstyle=\ttfamily, % não lembro o que faz, mas está funcionando
+ showstringspaces=false, % não mostrar os espaços
+ mathescape, % não lembro o que faz, mas está funcionando
+ tabsize=3 % tamanho da tabulação
+}
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Lista de Códigos}
+\citeoption{abnt-etal-cite=1, abnt-and-type=e}
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+
+\graphicspath{{./imagens/}}
+
+\begin{document}
+\sloppy
+% Para forçar que elementos pré-textuais (da capa até o sumário) sejam impressos no anverso da folha
+\setboolean{@twoside}{false}
+
+\autor{Ericson Marquiere Reis Silva}
+
+\titulo{\uppercase{Cart-OnePiece - A Tool for Dataset Generation, Workload Characterization, and Task Scheduling Benchmarking for Autonomous Driving Vehicles}}
+
+\orientador[Advisor:]{Prof. Dr. Henrique Cota de Freitas}
+%\coorientador[Co-orientadora:]{Profa. Dra. Ana Maria Pereira Cardoso}
+
+%\area{Ciência da Computação}
+
+\comentario{Thesis proposal presented to the Graduate Program in Informatics at the Pontifícia Universidade Católica de Minas Gerais, as a partial requirement to obtain the qualification of
+the title of Doctor in Informatics.}
+
+\instituicao{Doutorado em Informática \par Instituto de Informática \par Pontifícia Universidade Católica de Minas Gerais}
+
+\local{Belo Horizonte}
+
+\data{2024}
+
+\capa
+
+% Para forçar que a ficha catalográfica seja impressa no verso da folha de aprovação
+\setboolean{@twoside}{true}
+
+\folhaderosto
+
+%\include{pre-texto/ficha-catalografica}
+
+% Para forçar que elementos pré-textuais (da capa até o sumário) sejam impressos no anverso da folha
+\setboolean{@twoside}{false}
+
+%\include{pre-texto/folha-aprovacao}
+%\include{pre-texto/dedicatoria}
+%\include{pre-texto/agradecimentos}
+%\include{pre-texto/epigrafe}
+%\include{pre-texto/resumo}
+\include{pre-texto/abstract}
+
+\makeatletter
+\renewcommand\numberline[1]{
+	\leftskip 0em
+	\rightskip 1.6em
+	\parfillskip -\rightskip
+	\parindent 0em
+	\@tempdima 2.0em
+	\vspace{0em} \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+	FIGURA \normalfont #1 -- }
+\makeatother
+
+% Lista de figuras
+ \listoffigures
+% \clearpage
+
+\makeatletter
+\renewcommand\numberline[1]{
+	\leftskip 0em
+	\rightskip 1.6em
+	\parfillskip -\rightskip
+	\parindent 0em
+	\@tempdima 2.0em
+	\vspace{0em} \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+	TABELA \normalfont #1 -- }
+\makeatother
+
+% \listoftables
+% \clearpage
+
+\makeatletter
+\renewcommand\numberline[1]{
+	\leftskip 2em
+	\rightskip 1.6em
+	\let\belowcaptionskip\abovecaptionskip
+	%\parfillskip -\rightskip
+	\parindent 0em
+	\@tempdima 2.0em
+	\vspace{-3em} \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+	QUADRO \normalfont #1 -- }
+\makeatother
+
+% \listof{quadro}{Lista de Quadros}
+% \clearpage
+
+%\makeatletter
+%\renewcommand\numberline[1]{
+%	\leftskip 0em
+%	\rightskip 1.6em
+%	\let\belowcaptionskip\abovecaptionskip
+%	\parfillskip -\rightskip
+%	\parindent 0em
+%	\@tempdima 2.0em
+%	\vspace{-3em} \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+%	GRÁFICO \normalfont #1 -- }
+%\makeatother
+
+% Lista de graficos
+%\listof{grafico}{Lista de Gráficos}
+
+%\input{pre-texto/lista-siglas.tex}
+
+\makeatletter
+\renewcommand\numberline[1]{#1\hspace{0.8em}}
+\makeatother
+
+% Altera para espaçamento simples a partir daqui
+\singlespacing
+
+\renewcommand{\contentsname}{Summary}
+% Sumário
+\tableofcontents
+
+% Altera para espaçamento 1,5 a partir daqui
+\onehalfspacing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TEXTUAIS %%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Para forçar que elementos textuais e pós-textuais sejam impressos no anverso e verso das folhas
+\setboolean{@twoside}{true}
+% Para forçar que o capítulo de introdução comece no anverso
+\setboolean{@openright}{true}
+
+% Altere o número da página para o correto. Conte todas as páginas até a página do primeiro capítulo frente e verso, menos a capa. A ficha catalográfica fica no verso da folha de rosto.
+\setcounter{page}{5}
+
+% Capítulos
+\include{texto/1-introducao}
+\include{texto/2-background}
+\include{texto/3-arte}
+%\include{texto/2.2-arquiteturas}
+%\include{texto/3-metodologia}
+%\include{texto/4-proposta}
+\include{texto/5-conclusoes}
+\include{texto/6-schedule}
+%\include{texto/8conclusao}
+% O * no include faz com que o texto do arquivo seja incluído na mesma página, e não na próxima. O setboolean evita isso também, evitando que o texto incluído vá para o anverso.
+%\setboolean{@openright}{false}
+%\include*{texto/5resultadosA}
+%\include*{texto/5resultadosB}
+%\include*{texto/5resultadosC}
+%\setboolean{@openright}{true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% PÓS-TEXTUAIS %%%%%%%%%%%%%%%%%%%%%%%%%%
+% Bibliografia no arquivo 'Dissertacao.bib'
+% Alterar o título das referências para somente 'Referências'
+%%%%%%%%%%%% NÃO SE ESQUEÇA DE ACERTAR AS REFERÊNCIAS!!! %%%%%%%%%%%%
+\renewcommand{\bibname}{Referências}
+\bibliographystyle{include/abnt-alf}
+\bibliography{ref}
+
+% Para forçar que os apêndices e anexos comecem no anverso
+%\setboolean{@openright}{true}
+\setboolean{@twoside}{false}
+
+%\apendice
+%\begin{apendice}
+%\include{pos-texto/questionario}
+%\end{apendice}
+\appendix
+\include{pos-texto/anexo}
+
+\end{document}

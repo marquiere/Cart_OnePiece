@@ -1,0 +1,16 @@
+\begin{abstract}
+\vspace{0.4cm}
+\onehalfspacing
+
+%\noindent 
+The advancement of autonomous driving vehicles (ADVs) critically depends on efficient task scheduling within their heterogeneous processing systems to handle complex computational workloads in real time. Existing task scheduling methods, primarily designed for homogeneous or single-core systems, are inadequate for the multi-core, heterogeneous architectures of modern ADVs, leading to suboptimal performance and increased energy consumption.
+
+To try to solve this challenge, this work proposes a novel smart task scheduling strategy employing reinforcement learning to optimize the allocation of computational tasks in ADVs. By modeling these tasks as a Directed Acyclic Graph, the proposed approach will try to learn optimal scheduling decisions based on real-time system metrics such as task execution times, resource requirements, dependencies, and current system load.
+
+To evaluate the proposed strategy, an integrated test environment has been developed by combining the CARLA simulator with the StarPU runtime system, enabling the simulation of realistic ADV scenarios, such as the processing of sensor data and execution of perception algorithms in real time. This integration enabled the possibility of using StarPU's capability to define custom scheduling policies, allowing the reinforcement learning model to be smoothly incorporated into the scheduling framework and enabling direct control over task placement and resource allocation across ADV heterogeneous computing resources composed of CPUs and GPUs. 
+
+Preliminary testing of existing scheduling strategies provided by StarPU has validated the feasibility of integration and provided insights into the performance characteristics of traditional scheduling algorithms in the simulated ADV environment.
+
+\vspace*{.50cm}
+\noindent Keywords: Autonomous Driving Vehicles. Heterogeneous Computing. Task Scheduling. Reinforcement Learning. \\
+\end{abstract}

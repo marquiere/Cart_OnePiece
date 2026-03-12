@@ -1,0 +1,22 @@
+\begin{resumo}
+\vspace{0.4cm}
+\onehalfspacing
+
+\noindent 
+O aumento de desempenho de processadores é um desafio que cresce a cada dia, principalmente com as preocupações relacionadas à eficiência energética.
+O uso de arquiteturas com nível de paralelismo cada vez maior para atender a alta demanda de processamento de dados é uma realidade, logo, processadores \textit{manycore} têm sido alvo de constantes propostas no que tange aos sistemas de interconexão em chip.
+Algumas dessas plataformas \textit{manycore} consideram estratégias como agrupamentos de núcleos e redes-em-chip, que ofertam escalabilidade, possibilitando a inclusão de vários núcleos em um mesmo chip.
+
+Por outro lado, há a necessidade de sistemas de memória suficientemente robustos para suportar o armazenamento para processamento do grande volume de dados.
+Essa robustez do sistema de memória é fundamental para que os vários núcleos da arquitetura possam acessá-la, uma vez que problemas como contenção, latência de acesso e coerência podem ocorrer.
+As arquiteturas \textit{manycore} tem contemplado sistemas de memória distribuídos, normalmente compartilhados entre um grupo de núcleos.
+Esse modelo arquitetural resolve alguns dos problemas mencionados, mas outros permanecem, relacionados ao acesso justo à essas unidades distribuídas de memória, com o uso adequado da rede-em-chip, para os diversos núcleos.
+
+Diante desses problemas, a presente proposta contempla o projeto de uma arquitetura parametrizável para controle de acesso justo às memórias em chip de processadores \textit{manycores}, que seja baseada em aprendizado de máquina.
+Em linhas gerais, a arquitetura de controle tem um algoritmo de aprendizado de máquina implementado em hardware (e.g., K-Means ou Redes Neurais Artificiais), que recebe como dados de entrada informações do estado da arquitetura, e apresenta como saída sinais de controle para o sistema de memória e a rede-em-chip.
+Tais sinais modificam, por exemplo, a estratégia de alocação de dados em memória e a estratégia de roteamento da rede-em-chip.
+Para a construção do protótipo de arquitetura de controle proposta, uma exploração do espaço de projeto será realizada, em conjunto com ferramentas de desenvolvimento para simulação e descrição de hardware com foco em FPGA, considerando a presença do sistema de memórias distribuído e redes-em-chip, para aumentar o desempenho da arquitetura.
+
+\vspace*{.50cm}
+\noindent \textbf{Palavras-chave:} \textit{Manycores}. Redes-em-chip. Memória compartilhada e distribuída. Arquitetura parametrizável. FPGA. Aprendizado de máquina.\\
+\end{resumo}

@@ -1,0 +1,378 @@
+\chapter{Background} \label{background}
+\vspace{-1.9cm}
+
+
+
+%Based on these previous assumptions this chapter aims to review the state-of-the-art advances in autonomous vehicles development both in academia and industry. First, it was shown the recent attempts of providing autonomous vehicles services by some companies. Then an overview of the autonomous vehicles regarding its overall aspects is presented focusing on what is related to this thesis proposal. Finally, some related work is shown to differentiate what is available so far regarding Operational Systems and Framework and what is proposed on this thesis  
+
+\section{Autonomous Vehicles} 
+\label{sec:autonomous-vehicles}
+
+The development of modern autonomous driving vehicles (ADV) was supported by two main technological advances. The first was in object recognition using neural networks, which could be seen first in the ImageNet Large Scale Visual Recognition Challenge 2012 (ILSVRC2012), in which the winners set a new standard achieving a recognition error rate of 15, 3\% versus 26, 2\% from the second-best contestant and improving the mark from the last competition in 1.7\% \cite{Krizhevsky2017}. The next years competition showed a remarkably error rate improvement reaching 2.251\% by the winning team of the last challenge that took place in 2017 \cite{hu2018}.
+
+%The increase in computer processing power and the design of specific hardware and software solutions for autonomous vehicles was the second milestone that shaped what is the actual state of the art in the research field. In order to support the previous statement, it could be cited the release of the Nvidia Drive Computing Platform \cite{NvidiaDrive} specific for ADV applications and the open source library for machine learning TensorFlow \cite{TensorFlow}, both in 2015, that are largely used in the ADV prototypes nowadays.
+%It was forecast that from 2020 we would enter in a mixed era were the traditional vehicles would coexist with the autonomous ones and that from 2040 the traditional vehicles would even be forbidden to be out on the streets \cite{Liu2017c}.
+
+The increase in computer processing power, along with the development of specialized hardware and software solutions for autonomous vehicles, has significantly influenced this research field. Notable examples include the release of the Nvidia Drive Computing Platform \cite{NvidiaDrive}, specifically designed for autonomous driving applications, and the open-source machine learning library TensorFlow \cite{TensorFlow}, both in 2015. These technologies have become widely adopted in autonomous vehicle prototypes today. It was predicted that, starting from 2020, we would enter a transitional era where traditional vehicles would co-exist with autonomous ones, and by 2040, traditional vehicles might even be banned from public roads \cite{Liu2017c}.
+
+It turned out to be true as in 2018 the Baidu auto company Apollo started mass production and deployed its autonomous minibus to run in geofenced areas in China \cite{Apollo}. In addition, the Chinese company Pony.ai has begun its self-driving taxi service in the city of Irvine \cite{Pony}. Google Company Waymo is offering a free ride in its upcoming autonomous taxi service in Phoenix East Valley \cite{waymo} both in the USA. Furthermore, during the COVID-19 outbreak in 2020, the Cruise General Motors branch of autonomous vehicles has made more than 50 thousand contactless deliveries of meals in San Francisco to vulnerable communities using its self-driving fleet \cite{Cruise}. %Also in the delivering business, international pizza brand Domino's has partnership with ADV developer Nuro to provide pizza delivery through autonomous vehicles. Its so called self-driving delivery is being tested in the city of Houston in the United States \cite{Dominos}.
+
+\subsection{Autonomous Levels}
+
+The Society of Automotive Engineers (SAE) has defined six automation levels for the ADV in its Surface Vehicle Recommended Practice \cite{SAE} that can be seen on figure 1. The most sophisticate vehicle that is available on the market for the general public reaches the automation level 3 \cite{Belcarz2018}. It can only operate autonomously in a few number
+of situations and requires from the driver the same attention that is required from a no autonomy level 0 vehicle, as he can be requested to assume the directions at any time. The ultimate objective is to reach level five, which is a fully automated vehicle. That means that the vehicle would have the ability to fully understand the environment in all weather conditions and to navigate from one destination to another without human intervention \cite{Lin2018}. It could be seen in the pilot projects mentioned in the previous section that tests the feasibility of the ADV applied in mass scale, what will cause a revolution on the transportation systems.
+
+
+\begin{figure}[H]
+  \setlength{\abovecaptionskip}{0pt} \setlength{\belowcaptionskip}{0pt}
+  \caption{\MakeUppercase{Vehicle Automation Levels}}
+  \centering
+  \includegraphics[width=1\textwidth]{levels automation.jpg}
+  \captionsetup{justification=centering}
+  \captionfont{\small{\textbf{\\Source: \cite{SAE}}}}  
+  \label{fig:routerExemplo}
+\end{figure}
+
+
+
+\subsection{Hardware Architecture}
+
+\begin{figure}[ht]
+  \centering
+  
+  % Caption setup for this specific figure
+  \captionsetup{
+     labelfont={bf,large},       % label (e.g., "Figure 1:") in bold and large
+     textfont={bf,large},        % caption text in bold and large
+     justification=raggedright,  % left-align the caption
+     singlelinecheck=off         % force left alignment even for short captions
+  }
+  
+  \caption{\MakeUppercase{ADV generic hardware architecture}}
+  \label{fig:hardware}
+  \includegraphics[width=\textwidth, keepaspectratio]{Prancheta 5 (2).png} 
+   \captionfont{\small{\textbf{\\Source: \cite{Silva2023}}}}  
+\end{figure}
+
+ Figure \ref{fig:hardware} shows the modern hardware architecture of an autonomous vehicle. Sensors are connected through a network to one or more computers. Ethernet and CAN are the most used network protocols for connecting sensors. Usually, the CAN network has the sensors that are provided by the vehicle manufacturer by default, while the Ethernet network is used to insert the new sensors in it \cite{Kessler2019}. In addition, the usb protocol can also be used to connect cameras \cite{Munir2018} or Lidar \cite{Broggi2015} to the computing system.
+
+The ADV computing system could be divided into two parts. The high-performance computers are the components of the architecture where the most computational intense tasks are performed which are sensing, localization, and planning. It involves challenges like point cloud and convolutional neural network (CNN) processing within the time window required for safe and correct actions of the ADV prototype. The real time computer is responsible for the control functions of the vehicle: acceleration, brake and steering. As the name says, it performs real time actions that are critical for the correct response for the commands sent by the high-performance computers. 
+
+The connection between the high processing computer and the real time computer is implemented using Gigabit Ethernet while the connection between the real time computer and the vehicle control system is done using the CAN network.\cite{tang2018}
+
+With the consolidated hardware architecture the choice of high performance computers falls onto high end computers available at the market. The family of Intel I7 processor was found in quite a few ADV prototypes \cite{Kessler2019}
+\cite{Betz2019}
+\cite{Marin-Plaza2019}
+\cite{Reke2020}.
+This also brought the development of computers specific designed to autonomous application. There are two leading companies in this development. For the real time computer, the Nvidia Drive Series \cite{NvidiaDrive} provides hardware and software to support the ADV development. For the control system, the Dspace Micro Autobox \cite{dSpace} is a computer with a real time processing system that provides the necessary time constraints for the correct vehicle control. 
+
+\subsection{Software Architecture}
+
+
+\begin{figure}[ht]
+  \centering
+  
+  % Caption setup for this specific figure
+  \captionsetup{
+     labelfont={bf,large},       % label (e.g., "Figure 1:") in bold and large
+     textfont={bf,large},        % caption text in bold and large
+     justification=raggedright,  % left-align the caption
+     singlelinecheck=off         % force left alignment even for short captions
+  }
+  
+  \caption{\MakeUppercase{ADV generic software architecture}}
+  \label{fig:software}
+  \includegraphics[width=\textwidth, keepaspectratio]{Prancheta 1 (1).png} 
+  \captionfont{\small{\textbf{\\Source: \cite{Silva2023}}}}
+\end{figure}
+
+ The generic software architecture for ADV is represented in Figure \ref{fig:software}. That is an architecture for an autonomous vehicle with all the functionalities expected of it so it can be deployed in the real world. \cite{Zhou2019}. The processing system, as mentioned above, is made up of one or more computers. Although there are various computer configurations, the operational system and middleware are practically an unanimous choice among researchers being based on Linux distributions and Robot Operating Systems(ROS). %These will be covered with more details later in this Thesis along with other approaches
+ 
+ In addition, the are libraries developed specific for machine learning applications applied in ADV development. In particular OpenCV and TensorFlow. OpenCV is an open source computer vision library that can handle images and videos \cite{jain2018} and is most used in ADV for image collection and processing. TensorFlow is a library that allows one to build and train a deep learning model \cite{chaitra2020} and is mostly used to classify images captured by the ADV. The OpenCV is progressing in its machine learning functionalities, but developers prefer to build the deep learning model on TensorFlow and import it to be applied by the OpenCV. TensorFlow, that is designed by Google, has gain such a momentum that Tensor Processors Unit (TPU) started to be developed specific to accelerate TensorFlow library operations. \cite{TensorFlow}
+
+
+\subsection{Sensor Set}
+
+There are six main sensors necessary to build an autonomous vehicle. These are required to sense the vehicle surroundings and send information to the computing system. Following each sensor will be explained.
+
+The Lidar (light detection and ranging) is an important sensor that can be used for perception and localization. It produces point cloud data that can be processed to map the environment and locate the ADV and to detect objects and measure their distance \cite{Kato2015}.  It can be processed in popular libraries such as OpenCV. That sensor is the barrier to popularizing the ADV due to its high cost, which can reach \$75,000 dollars \cite{Lin2018}.
+
+The camera is also applied to localization and perception. Various types of cameras applied to ADV were found that ranged from static and moving cameras, monochrome and color cameras, stereo cameras, spherical cameras, and smart cameras. The ones applied to autonomous vehicles are very powerful cameras that could get up to 4416 x 1242 \cite{Karaman2017}, which is higher than the full Hd resolution commonly seen in television transmissions.
+
+The radar is used for obstacle detection in the area surrounding the vehicle in short, medium and long range as part of the perception system \cite{Tas2018a}. It provides precise range and velocity measurements compared to cameras at the cost of less accurate classification capabilities \cite{Kunz2015}. Thus, it is often used together with other sensors such as a Lidar, cameras and GNSS system.
+
+Ultrasonic is an ultra-low range sensor, up to 5 meters detection range, that supports the vision system in low speed tasks such as parking \cite{Zong2018}. Today, these ultrasonic sensors are manufactured in vehicles and its information can be acquired through vehicle CAN buses.
+
+The Global Navigation Satellite System (GNSS), composed of regional systems around the world (GPS, Galileo, Glonass, Compass), provides global ADV localization at an update frequency of 10Hz and a precision of 6 meters, which is not enough for real-time applications \cite{Liu2019}.  GNSS precision can be improved by using the real-time kinematic (RTK) system that corrects the GNSS information and reduces precision to centimeters \cite{Buyval2019}. 
+
+To improve the update rate of the GNSS systems, the inertial navigation system (INS) is also combined with the GNSS signals. The INS uses the signal provided by another sensor, called an inertial measurement unit (IMU). However, its accuracy degrades over time, which does not allow its use alone. Therefore, the combination of RTK, GNSS, and INS systems would provide an accurate vehicle location in real time \cite{Liu2019}.
+
+\subsection{Simulators}
+Testing and development have increasingly relied on simulation environments to address the limitations and risks associated with real-world road tests. Traditional road tests require significant time and resources and involve high costs and potential safety risks, particularly when testing extreme driving conditions or edge cases. To overcome these challenges, a variety of simulators have been developed to provide a cost-effective, safe, and efficient way to validate ADV performance in diverse scenarios \cite{Zhang2024}.
+
+Simulation environments allow for efficient testing of ADVs under controlled and repeatable conditions. These environments can replicate diverse scenarios, such as various weather conditions, unexpected obstacles, or complex traffic conditions, which would be impractical or unsafe to recreate in the real world. They also enable the collection of substantial volumes of training data, which is crucial for machine learning models used in autonomous systems. \cite{Zhou2022}. Furthermore, simulators provide advantages for academic researchers and developers with limited access to a physical testing infrastructure. Open-source simulators, in particular, have lowered the barrier to entry for those without access to expensive hardware, fueling collaboration and innovation within the research community \cite{Li2024}.
+
+Although simulators provide immense benefits for testing ADV systems, they are not without limitations. Issues such as sensor emulation fidelity, vehicle dynamics precision, and realistic representation of traffic participants can affect the transferability of simulator-trained models to real-world applications \cite{Li2024}. In addition, the construction of virtual maps and environments remains labor intensive, limiting the scalability of simulations.
+
+The research community recognizes three types of simulations \cite{Rosique2019}: live, virtual, and constructive simulations. Each type differs according to the level of realism and the interaction with actual hardware components.
+
+\begin{itemize}
+\item \textbf{Live Simulations}: Live simulation is an operational test involving real components, such as vehicles and sensors, used in an environment that closely resembles real-world conditions. It is the closest type of simulation to real use, involving actual forces and equipment to assess which systems have been damaged or how they respond under realistic conditions.
+\item \textbf{Virtual Simulations}: These simulations, also referred to as \textit{X-in-the-loop}, involve testing a complete system or its components using a stimulus generated by a computer or through other artificial means. Virtual simulations are ideal for software-in-the-loop testing, where autonomous driving software can be evaluated in a controlled environment before deploying on physical hardware.
+\item \textbf{Constructive Simulations}: Constructive simulations are entirely computer-based and do not involve any physical components. They represent a system or multiple systems virtually and can be used to test how these systems react to different inputs. Constructive simulations are valuable for modeling complex scenarios, such as interactions between multiple components, without the need for expensive physical setups.
+\end{itemize}
+
+%\subsubsection{CARLA simulator}
+
+%CARLA (Car Learning to Act) is an open-source simulation platform designed to facilitate the development, testing, and validation of autonomous driving systems \cite{Dosovitskiy2017}. Provides an urban environment where researchers can simulate complex driving conditions, including changes in weather, pedestrian movements, and vehicle behaviors. Built on Unreal Engine 4, CARLA offers high-fidelity 3D environments, making it suitable for academic research and industry applications. %\cite{CARLA}
+
+%CARLA's sensor suite, which includes cameras, LIDAR, radar, and GPS, allows developers to simulate a wide range of real-world conditions. This supports the testing of perception, localization, and control algorithms. Moreover, CARLA offers flexible API support, enabling integration with Python and C++ for logical interaction with autonomous driving stacks. The platform is also highly customizable, allowing users to modify the environment, sensor settings, and traffic scenarios, creating a rich testing ground for autonomous systems.
+
+
+
+
+\subsection{Datasets}
+
+The development of autonomous driving vehicles (ADV) is fundamentally based on robust perception and decision systems capable of understanding highly dynamic and complex environments \cite{feng2020}. The effectiveness of these systems is directly proportional to the amount and quality of data used for their training and validation. Without extensive and high-quality datasets, the ability of ADVs to generalize across diverse scenarios remains severely limited.
+
+An autonomous driving vehicle (ADV) dataset is a structured collection of sensor data recorded from real or simulated driving environments, used to train, validate, and benchmark perception and decision-making algorithms. These datasets typically include multimodal sensor inputs, such as RGB or grayscale camera images, LiDAR point clouds, radar signals, and GPS/IMU measurements for accurate localization.
+
+In addition to raw sensor data, they often contain ground-truth annotations, including object detection labels such as bounding boxes and 3D bounding volumes, semantic segmentation maps, lane markings, and tracking information across frames. Some datasets also provide map data, traffic signal states, and environmental metadata such as weather and time of day.
+
+It is estimated that achieving a safety level comparable to human drivers would require driving billions of kilometers under varied conditions, a task that is practically impossible only through real-world tests \cite{angeletti2023}. This constraint has led to the widespread adoption of publicly available datasets and simulation-based synthetic data generation to accelerate development while maintaining safety and cost efficiency.
+
+%Recognizing the need for scale and diversity, Waymo Open Dataset (WOD) was introduced. WOD provides over 1150 scenes, each spanning 20 seconds, collected across different cities such as San Francisco, Phoenix, and Mountain View. It offers more than 12 million 3D LiDAR bounding box annotations and 9.9 million camera labels \cite{sun2020}.
+
+%The WOMD-LiDAR dataset expands motion forecasting research by providing raw LiDAR data for more than 100,000 scenes, addressing limitations of previous datasets that only offered abstracted representations like bounding boxes \cite{chen2024}.  An extensive number of other open datasets in the real world prior to 2019 can be found in the survey by \cite{kang2019} and a more up-to-date review of available datasets can be found in \cite{liu2021} and \cite{liu2024}.
+
+Real-world data collection can be expensive, time-consuming and challenging to scale \cite{feng2020}. Furthermore, real-world datasets often suffer from a long-tail distribution of scenarios, where rare but critical events such as accidents and unusual weather conditions are rarely presented \cite{song2024}. Gathering more data and corner cases is becoming more critical than inventing new deep neural network architectures. Collecting such data in the real world can be dangerous or infeasible. 
+
+Therefore, synthetic datasets generated from 3D game engines, offer a cost-effective and scalable alternative, allowing researchers to create customized scenarios and accelerate their research results. However, this introduces a new set of challenges: ensuring that synthetic data accurately reflect the complexities of the real world, including sensor noise, object textures, and physical dynamics.
+
+
+\subsection{WorkLoad}
+Autonomous vehicles are relying on complex computer systems to perceive their surroundings, plan their actions, and control the vehicle. The computational demands of these systems, often referred to as workload, are a critical factor in ensuring the safe and efficient operation of ADVs. Understanding and characterizing this workload is essential to optimize resource allocation, manage power consumption, and guarantee real-time performance. Accurately estimating the performance of perception systems requires models that consider available resources. 
+
+These workloads are typically heterogeneous, involving a mix of tasks such as data acquisition, image preprocessing, neural network inference, and multisensor fusion, all of which must operate under strict real-time constraints. The performance of such systems is not solely dependent on algorithmic accuracy, but also on the ability to process data efficiently across different hardware architectures, including CPUs, GPUs, and specialized accelerators \cite{Tang2022CharacterizationEdge}.
+
+The dynamic nature of driving environments introduces significant variability in workload. Factors such as traffic density, weather conditions, and the complexity of the surrounding environment can all impact the computational demands of ADV systems. 
+
+For example, driving in heavy traffic or adverse weather conditions requires more intensive processing of sensor data to accurately detect and track other vehicles and obstacles. Such variabilities may also contribute to burst computation and memory access, potentially leading to increased tail latency and impacting safety \cite{Liu2023COLA:Systems}
+
+Characterizing the workload involves understanding the types of data being processed and the nature of the algorithms being used. As ADV applications are mainly focused on detection, recognition, and prediction, workloads often fall into the domains of computer vision, machine learning, and deep learning \cite{wang2018}.
+
+Therefore, one of the main challenges in this domain lies in defining consistent performance indicators to compare algorithms in varying datasets and hardware setups \cite{Kowalczyk2022EfficientVerification}. Furthermore, recent studies highlight that preprocessing stages, such as image decoding, resizing, and sensor calibration, are often overlooked, despite contributing significantly to overall latency \cite{Bachkaniwala2024Lotus:Profiling}.
+
+Effective workload management is essential to maintain the performance and safety of autonomous vehicles. This involves techniques such as dynamic task scheduling, resource allocation, and adaptive algorithm selection. By carefully characterizing and managing the workload, it is possible to optimize the performance of ADV systems, ensure timely responses to critical events, and ultimately achieve higher levels of driving automation.
+
+%%%%%%%%
+%\section{Operational Systems and Framework} \label{memorias}
+
+%Most of the developed solutions to deal with the complexity of managing all the hardware involved in the ADV range from using operating systems or frameworks. However, it has been seen that there was not a preferred choice or consolidation on that and the manufacturers and researches keep developing new frameworks and operating systems for autonomous applications.
+
+%An Operating System (OS) is a set of programs that controls the interactions between the complex system hardware and the user applications. It acts as a translator between the hardware and the user \cite{holcombe2020}. An OS to act as a computer interface creating an abstraction from the machine language used to control a computers hardware and to manage resources available in a machine like memory and processor execution time \cite{stallings2018} 
+
+
+%MIddleware is a software technology that abstracts the low level details of a system from the user application. It allows modular connection of distributed software \cite{astley2001}. It can be used in distributed heterogeneous systems putting together different pieces of software, from different applications, and delivering it to the variety of hardware available on the system. It simplifies software development especially in systems with many services and tight interaction between them \cite{Liu2019}.
+
+%The big difference between them is that middleware run on top of an operating system relying on it to access machine resources. It is a preferred choice to avoid the burden of developing a OS from scratch but bring extra software layers that could bring down the whole system efficiency.
+
+
+%\subsection{Real Time Operating Systems}
+%A real time response within time constraints is a key aspect of an autonomous vehicle system. For this purpose a real time operating system (RTOS) is one of the choices to manage the vehicle hardware system. The RTOS is characterized as having time as a key parameter. That means that it is deterministic as it performs operations within a predefined time interval \cite{stankovic2004}.
+
+%Generic operating systems have the processes competing for processor time and resources within the CPU. In a RTOS the execution of determined process is determined by external interruptions or fixed time intervals. For a deterministic system the processing time and system resources must be enough so that it can respond to any request in the determined period of time \cite{stallings2018}
+
+%In addition, the real-time systems are divided into hard and soft. The soft real-time systems are the ones that a missing deadline would not cause any permanent damage to the system. On the other hand, in the hard real-time system any missing dead line would cause permanent damage to the system. RTOS are also applied into embedded operating systems that are designed to control a specific device like vehicles, phones or TVs \cite{tanenbaum2015}.
+
+
+%\subsection{Autonomous Vehicles Framework}
+%The rise of autonomous vehicles technology make it clear the necessity to deal with the specific aspects of its hardware. Called supercomputers on wheels, ADV software has been evolving from embedded software running on a RTOS to a complete middleware with many software components, libraries and modules \cite{velasco2020}. Many sensors and complex logic and algorithm needed to be processed. Some already known in the robotic electronics field and some only applied in the ADV itself. Avoiding making a new SO from scratch, developers opted to make a middleware to run on the top of an operating system to deal with the ADV system hardware and algorithms.
+
+%Autonomous vehicles middlewares tend to be modular and to follow patterns in the future due to the development of the artificial intelligence applied on it and the autonomous vehicles architecture consolidation \cite{Li2018}. The next years will serve the purpose to test the vehicles middlewares and to make clear all its necessary functionalities Nowadays, the middleware modules are perception, planning, localization, data fusion and control.
+\section{Heterogeneous Computing Systems}
+Heterogeneous computing involves the use of multiple types of processor, each optimized for different tasks, within the same system. The primary goal of this architecture is to achieve high performance while maintaining power efficiency. In heterogeneous systems, CPUs are often combined with other specialized processing units, such as GPUs or FPGAs, to take advantage of the strengths of each type of hardware. \cite{Zahran2019}.
+
+From a hardware perspective, heterogeneous systems may include differences in memory systems, interconnection networks, and processor capabilities. The use of different memory technologies, such as DRAM and non-volatile memory, as well as differences in cache hierarchy and access times, contribute to the complexity and heterogeneity of such systems. This variety in hardware components allows flexibility in optimizing specific tasks for performance or energy efficiency, but also introduces challenges in programming and workload distribution \cite{Zahran2019}.
+
+GPUs have become widely used as coprocessors in many embedded systems to speed up general-purpose applications. Their multithreaded architecture and high-bandwidth memory make them especially suitable for data-parallel tasks. Using GPUs, many embedded systems can achieve both high performance and improved energy efficiency. For instance, GPUs can effectively handle operations such as matrix factorization, multidimensional FFTs, and convolutions, which are frequently required in signal processing, imaging, and video applications. \cite{li2021}
+
+The integration of CPUs and GPUs is particularly popular due to the complementary nature of these processors; CPUs perform better at serial task execution, while GPUs are ideal for parallel workloads, such as machine learning and computer vision \cite{Han2021}. By applying new programming models, such as CUDA and OpenCL, developers can effectively create highly data-parallel tasks that take full advantage of GPU capabilities. In the context of autonomous vehicles, GPUs can be used to accelerate tasks such as training and inference of neural networks, which are essential to processing visual and sensor data in real-time environments \cite{Hazarika2020}.
+
+\subsection{Programming libraries for Heterogeneous Computing Systems}
+
+Programming libraries for heterogeneous systems can be categorized into explicit and directive-based models. Directive-based models, such as OpenMP and OpenACC, use annotations to guide compilers in task allocation, making it easier for developers to utilize multiple processing units without extensive code rewriting. The compiler handles the details of mapping code to different processors, allowing greater flexibility. Explicit models, such as OpenCL and CUDA, require developers to manually manage the task distribution between processors, offering more control but requiring deeper hardware understanding \cite{Terzo2019}.
+
+These programming libraries aim to simplify the distribution and allocation of workloads, allowing developers to focus on application development rather than hardware management \cite{Brandejsky2022}. In addition, it provides a homogeneous view of the computing environment, while also allowing the developer to make low-level optimizations as necessary. Ensuring portability is critical in heterogeneous computing, as applications need to run efficiently across a range of hardware configurations. Strategies for achieving portability include high-level abstractions, low-level details, runtime management, and on-the-fly code modification using techniques such as continuous compilation or binary optimization \cite{Zahran2019}.
+
+Managing communication overhead between the CPU and accelerators is a key challenge. Techniques like streaming help reduce this overhead by overlapping data transfer with computation, improving system throughput \cite{Fang2020}. There are several programming models. In the following, we will concisely describe the most popular ones.
+
+\begin{itemize}
+    \item \textbf{CUDA (Compute Unified Device Architecture)}:  is a programming platform developed by NVIDIA to allow developers to utilize the GPU's processing power for general-purpose computing. CUDA helps developers specify which parts of the code are executed on the GPU, providing detailed control over memory management and task execution on NVIDIA GPUs. This model is particularly useful for accelerating workloads that require intensive computation, such as scientific simulations, deep learning, and image processing.
+    \item \textbf{OpenCL (Open Computing Language)}: serves as an open standard for programming on various types of processor, including CPUs, GPUs, and FPGAs. OpenCL enables developers to write portable code that can run on different types of processing unit, making it a versatile option for heterogeneous computing. The explicit management of different devices in OpenCL allows developers to fine-tune their programs for performance across different hardware platforms.
+
+    \item \textbf {OpenMP 4.0 }: is an extension of the OpenMP standard that includes features to target devices such as GPUs and multi-core CPUs. It allows developers to explicitly specify how data and computation should be handled between the host and accelerators. OpenMP 4.0 provides a comprehensive set of directives, such as target, teams, and distribute, to manage the offloading of tasks to GPUs, giving developers greater control over how computations are distributed and executed on different devices.
+
+    \item \textbf {OpenACC (Open Accelerators)}:  was introduced as a standard for simplifying programming on heterogeneous architectures, including multi-core CPUs and GPUs, using a directive-based approach. OpenACC allows developers to annotate their code with pragmas, such as \#pragma acc kernels, to specify which sections should be offloaded to an accelerator. This helps automate the handling of parallel regions, data transfers, and synchronization, making it a user-friendly option for parallelizing applications without major code restructuring.
+
+    
+    \item \textbf{SYCL}: Built on top of OpenCL, SYCL provides a higher-level, C++ like interface for single-source programming. Developers can write code for both the host (e.g., CPU) and devices (e.g., GPUs) within the same source file. SYCL simplifies the integration of different processing units while maintaining portability and offering performance optimization options.
+    
+    \item \textbf{HIP (Heterogeneous-Compute Interface for Portability)}: Developed by AMD, HIP facilitates portability between CUDA applications and AMD hardware. It provides an interface that is largely compatible with CUDA, allowing developers to write code that runs on both AMD and NVIDIA GPUs. This cross-platform flexibility is crucial for applications that need to operate efficiently across different GPU vendors.
+
+    \item \textbf {TensorFlow}: is an open-source platform for machine learning, designed to operate across heterogeneous computing environments. By supporting computations on various hardware such as CPUs, GPUs, FPGAs, TPUs, edge devices, microcontrollers, it enables developers to deploy models in diverse settings, optimizing scalability and performance. TensorFlow's robust deployment capabilities, exemplified by TensorFlow Serving, allow models to run at production scale on advanced processors like TPUs. By internally handling the complexities of task allocation and resource management, TensorFlow abstracts the intricacies of heterogeneous hardware, ensuring efficient utilization of multiple processing units for both training and inference, and allowing developers to focus on model development without concerning themselves with hardware specifics.
+
+%\item \textbf {StarPU} (Ficar no final com um pouco mais de texto) is a task programming library that facilitates programming for heterogeneous systems by defining tasks and managing dependencies, which are then automatically scheduled across available processing units like CPUs, GPUs, and other accelerators. This dynamic scheduling supports optimal resource utilization and efficient load balancing. Unlike directive-based models, StarPU offers explicit control over task definitions while managing resource complexity at runtime.
+    
+\end{itemize}
+
+\section{Task Scheduling}
+\label{sec:task-scheduling}
+A Task is a combination of sub-tasks or threads that execute a specific computing objective such as reading sensor data or processing a steering action. Choosing the more efficient task processing sequence based on the necessary resources required from each task is a challenging job for developers. The complexity level gets even higher when dealing with a heterogeneous multiprocessor embedded system such as the ADV. In this case, it is necessary not only to organize a task queue but also to decide which processing unity would be best suitable for each task. In ADV some tasks have better performance using a specific type of processing unity \cite{Liu2017}. 
+
+The scheduler is responsible for scheduling and assigning tasks to processors. It implements an scheduling algorithm that provides a schedule for the system task set that must be feasible and schedulable. This translates into meeting all the time constraints of the system and producing a valid schedule for a set of system tasks. In a real time system the scheduling algorithm must be optimal meaning having both characteristics described above.
+
+In addition, there are static schedulers that are inflexible on handling changes in workloads with fixed rules, and dynamic schedulers that can identify tasks workload changes to take online decisions on the best schedule for that moment. There is no best choice, and the applied system must be evaluated to make the best decision on which way to go. Real time embedded systems could be either predictable or not, which has a direct interference in the scheduling strategy to be chosen. \cite{yang2020}
+
+
+For autonomous vehicles, some level of efficiency must be achieved in organizing the autonomous vehicle processing tasks. The task miss ratio must be kept to a minimum level to avoid accidents due to non processed data. The total execution time and utilization of hardware resources must be kept at a minimum to reduce energy consumption and keep vehicle autonomy at maximum levels.
+
+\subsection{Basic Concepts}
+A process or task \cite{chakraborty2024} generally goes through phases of CPU bursts (computation) and I/O bursts (waiting for input/output operations). Task scheduling is about optimizing the use of the CPU during these bursts to ensure that no CPU resources are wasted while a task waits for I/O operations to complete. Interactive tasks tend to have shorter CPU bursts and more frequent I/O, such as a word processor waiting for user input, while compute-intensive tasks have longer CPU bursts, spending more time executing computations, like a video transcoder.
+
+The goal of task scheduling is to maximize CPU utilization (keeping the CPU as busy as possible, ideally between 40\% for lightly loaded systems to 90\% for heavily loaded systems) and throughput (the number of processes completed per unit time) while minimizing waiting time (time spent waiting in the ready queue), response time (time from submission until the first response) and turnaround time (total time from submission to completion of a process)\cite{silberschatz2018}. Different CPU scheduling algorithms have distinct properties, and the choice of algorithm may favor certain types of processes. It is also important to consider the variance in response time, especially for interactive systems, where predictable response times are often preferred to minimizing average response times.
+
+There are two types of scheduling methods: preemptive and non-preemptive scheduling. In non-preemptive scheduling, a running task retains control of the CPU until it either terminates or moves to a waiting state. In preemptive scheduling, the operating system can forcefully remove a task from the CPU when a higher priority task needs to be executed or when a time slice dedicated to that task expires, which is crucial for maintaining good response times for interactive tasks \cite{krzyzanowski2015}.
+
+To achieve effective scheduling, a scheduler manages tasks that are ready to execute and decides the next task to allocate to the CPU. The ready queue stores tasks waiting to be executed, while waiting queues manage tasks blocked by I/O operations. The scheduling algorithm used determines the performance characteristics of a system, with goals such as fairness, efficiency, and minimal overhead \cite{silberschatz2018}.
+
+Schedulers can be classified into different types: long-term, medium-term, and short-term schedulers. The long-term scheduler decides which tasks should be brought into the ready queue, ensuring a good mix of I/O-bound and CPU-bound tasks to achieve optimal CPU utilization. The short-term scheduler selects from the ready queue which tasks should be executed next, making rapid decisions to keep the CPU busy. The medium-term scheduler is responsible for managing tasks that are swapped out of memory to reduce the degree of multi-programming, often used to optimize memory utilization \cite{chakraborty2024}.
+
+\subsection{Traditional Scheduling Algorithms}
+
+Scheduling algorithms are central to how operating systems manage CPU resources among multiple tasks. Over the years, various scheduling algorithms have been developed, each with unique characteristics that make them well suited for particular scenarios and types of workload. These algorithms aim to optimize resource utilization, minimize waiting time, and ensure fairness across tasks. Schedulers often have to balance between being fair, ensuring every process has an opportunity to execute, and efficient, keeping the CPU as busy as possible. Below follow some of the traditional scheduling algorithms.
+
+\textbf{First-Come, First-Served (FCFS)} is the simplest type of CPU scheduling algorithm. In FCFS, processes are executed in the order in which they arrive in the ready queue. This non-preemptive algorithm ensures that the task that requests the CPU first gets it first. However, FCFS can cause the convoy effect, where shorter tasks have to wait for a long-running task to complete, resulting in an increased average waiting time and poor CPU utilization, especially in systems with mixed workloads \cite{silberschatz2018, tanenbaum2015}.
+
+\textbf{Round Robin (RR)} scheduling is a preemptive algorithm that assigns a fixed time quantum to each task in the ready queue. Each task is executed for the duration of the time slice, after which it is preempted and placed at the back of the queue if it is not yet complete. RR is particularly effective for time-sharing and interactive systems, as it ensures that all tasks receive equal CPU time, thus improving responsiveness. However, the choice of the time quantum is critical, as a small quantum can lead to a high context-switching overhead, while a large quantum reduces the benefits of preemption \cite{silberschatz2018,padallan2023}.
+
+\textbf{Shortest Job First (SJF)} scheduling selects the task with the shortest next CPU burst. SJF can be either preemptive or non-preemptive and is considered optimal for minimizing average waiting time. However, SJF requires knowledge of the duration of future CPU bursts, which is difficult to estimate in practice. Despite this limitation, it is effective in environments where the nature of tasks is predictable. One drawback of SJF is the potential for starvation, where longer tasks may never be scheduled if shorter tasks keep coming. \cite{tanenbaum2015, padallan2023}.
+
+\textbf{Priority Scheduling} assigns priorities to tasks and allocates CPU to the tasks with the highest priority. This algorithm can be preemptive or non-preemptive, depending on whether a higher priority task can preempt the current task. It is often used in systems that need to distinguish between more important and less important tasks. One of the key challenges of this algorithm is starvation, where low priority tasks may be indefinitely delayed. To mitigate this, aging can be applied to gradually increase the priority of waiting tasks \cite{chakraborty2024, tanenbaum2015}.
+
+\textbf{Multilevel Queue Scheduling} divides tasks into different queues based on characteristics such as priority or type. Each queue may use a different scheduling algorithm and have a specific priority level. For example, interactive tasks might be assigned to a high priority queue using Round Robin, while batch tasks are handled in a lower priority queue with FCFS. This approach provides flexibility in effectively managing different types of workload, ensuring that high priority tasks receive more immediate CPU attention \cite{silberschatz2018,tanenbaum2015}.
+
+
+\subsection{Real-Time Task Scheduling}
+
+Real-time task scheduling is critical in systems where tasks must meet strict timing requirements. Real-time systems are computing environments where the correctness of operations depends not only on logical results but also on the time at which these results are produced. These systems must respond to input or events within strict deadlines, ensuring deterministic behavior \cite{Burns2009}.
+
+These systems are classified into hard real-time systems and soft real-time systems. Hard real-time systems require absolute adherence to deadlines; missing a deadline is considered a critical failure. Examples include flight control systems and medical life support systems. In contrast, soft real-time systems are those where meeting deadlines is important but occasional deadline misses are tolerable,although losing some system performance. Multimedia streaming applications and online transaction systems are typical examples of soft real-time systems. \cite{Buttazzo2020}
+
+According to \cite{tanenbaum2015} and \cite{pandit2013}, the main characteristics of real-time systems are determinism, reliability, responsiveness, concurrency, and fault tolerance. Determinism refers to predictable system behavior, with responses occurring within defined time bounds. Reliability is another characteristic, and often real-time systems have mechanisms to mitigate and minimize the impact of failures in their operation. Responsiveness is crucial, requiring the system to respond quickly to external events or incoming data, especially in embedded control systems where timing is critical. Managing multiple tasks simultaneously requires effective handling of concurrency, and techniques such as priority inheritance protocols are used to avoid priority inversion issues during concurrent task execution. Fault tolerance is the ability of the system to continue operation, possibly at a reduced level, rather than failing completely when some part of the system fails.
+
+
+Real-time task scheduling algorithms are developed to ensure that all tasks meet their deadlines, maintaining the system's reliability and predictability. Unlike traditional systems, which prioritize throughput and CPU utilization, real-time systems focus on ensuring that tasks are completed within their deadlines. Applications include embedded systems, industrial automation, robotics, and other scenarios in which failure to meet time requirements can have catastrophic outcomes. The following are the most common algorithms found in the literature \cite{abdullah2023real, pandit2013, davis2011, silberschatz2018, Buttazzo2020}.
+
+
+\textbf{Rate-Monotonic Scheduling (RMS)} is a static priority scheduling algorithm used for periodic tasks in real-time systems. In RMS, tasks with shorter periods are assigned higher priorities based on the assumption that tasks that require more frequent execution should be prioritized to meet their deadlines. RMS is optimal for fixed-priority scheduling of periodic, independent tasks with known execution times. However, it may become inefficient if the task priorities are not assigned properly or if the system is heavily loaded.
+
+
+\textbf{Earliest-Deadline-First (EDF)} is a dynamic priority scheduling algorithm in which the task with the closest deadline is given the highest priority. EDF is optimal for maximizing CPU utilization, as it always selects the task closest to its deadline. This algorithm is widely used in real-time systems due to its flexibility in managing tasks with varying deadlines. Unlike RMS, EDF can handle higher CPU utilization and adapt to changes in task deadlines, making it suitable for complex real-time environments.
+
+
+\textbf{Fixed-Priority Scheduling with Preemption} assigns static priorities to tasks, with the scheduler always selecting the highest priority task for execution. Preemption allows a higher priority task to interrupt a lower priority one, ensuring that critical tasks meet their deadlines. Although preemption introduces overhead due to context switches, it is necessary to guarantee deadlines for high priority tasks. This method is similar to priority scheduling in traditional systems, but is adapted for real-time requirements where timing is crucial.
+
+
+\textbf{Event-Driven Scheduling} is utilized in systems where tasks are triggered by specific events. Tasks are activated by external or internal stimuli, such as sensor inputs or data availability. This scheduling approach is suitable for systems that must react promptly to external events, ensuring that critical situations are addressed without unnecessary delays. It is ideal for embedded systems and industrial applications where immediate response is essential.
+
+\subsection{Heterogeneous System Task Scheduling}
+
+Task scheduling in heterogeneous computing systems is essential to efficiently utilize diverse processing units, such as CPUs, GPUs, and other specialized accelerators. These systems provide a powerful solution to perform computationally intensive tasks that require different types of processing capabilities. The objective of heterogeneous task scheduling is to allocate tasks to the appropriate processors to minimize the overall execution time (makespan) while ensuring efficient utilization of resources \cite{Fan2016}.  Cloud platforms, such as Amazon AWS and Microsoft Azure, utilize task scheduling algorithms to effectively manage resource allocation and ensure quality of service (QoS) for users \cite{Yiheng2024}.
+
+Heterogeneous computing systems consist of various processors with different capabilities, which introduce challenges such as varying processor speeds, distinct architectural characteristics, and communication overhead. Efficient scheduling of tasks in these systems is key to achieving high performance, especially for complex applications represented by Directed Acyclic Graphs (DAGs), where the nodes represent tasks, and the edges represent dependencies between tasks \cite{Amalarethinam2015}. 
+
+Heuristic scheduling methods are one of the primary approaches for handling task allocation in heterogeneous systems. These methods rely on rule-based heuristics or human experience to make scheduling decisions. Heuristic-based scheduling can be further classified into list scheduling, clustering-based, and task duplication methods\cite{AlEbrahim2017,Fan2016}.
+
+List scheduling involves constructing a task queue sorted by priority, where tasks are sequentially allocated to processors that can execute them at the earliest possible time. This approach is relatively simple to implement and is widely used due to its low time complexity and effectiveness in heterogeneous systems. In clustering-based scheduling, tasks that communicate frequently are grouped into clusters, which are then assigned to the same processor to minimize communication overhead. This approach aims to reduce the inter-processor communication cost, therefore improving the efficiency of task execution in heterogeneous environments. 
+
+Task duplication scheduling aims to duplicate predecessor tasks across different processors to avoid communication delays. This approach is beneficial when the communication cost is high, as duplicating tasks can reduce the overall makespan and improve the system performance.
+
+Dynamic scheduling methods make scheduling decisions at runtime, adapting to changes in the system environment, such as varying processor loads or task arrival times. This approach is suitable for environments where task characteristics and processor availability cannot be determined in advance. Dynamic scheduling methods are particularly useful for heterogeneous systems, where processors may have different performance characteristics and need to adapt based on real-time conditions \cite{Xie2019}. 
+
+The metrics used to evaluate effectiveness of scheduling methods in heterogeneous systems are minimizing makespan, used to evaluate scheduling in all types of system, and the specific metrics for heterogeneous multiprocessing systems that are load balancing across all available processors and energy efficiency, especially in large-scale systems.
+
+Scheduling in heterogeneous systems faces several challenges. The presence of diverse processing units with different architectures and computational capabilities makes task scheduling complex. Allocating the right task to the appropriate processing unit requires careful consideration of the processors characteristics and the tasks requirements \cite{AlEbrahim2017}. Additionally, the communication cost between different processing units can significantly impact performance, particularly in tasks with high interdependency. Minimizing this overhead is essential to achieve efficiency in heterogeneous systems \cite{Amalarethinam2015}.
+
+Based on a review of various references \cite{Amalarethinam2015,Xie2019, Alam2018, AlEbrahim2017, chen2017, singh2016}, the following scheduling algorithms and heuristics are among the most commonly used in heterogeneous computing systems:
+
+\textbf{Heterogeneous Earliest Finish Time (HEFT)}  assigns tasks to processors by evaluating their execution costs, and prioritizes tasks based on a rank that accounts for both computation and communication costs. HEFT is known for achieving good trade-offs between makespan and resource utilization, making it suitable for diverse application scenarios.
+
+\textbf{Critical Path on a Processor (CPOP)} is an extension of the critical path method specifically designed for heterogeneous systems. It selects the processor that minimizes the total completion time of tasks along the critical path. This algorithm is effective in optimizing task allocation, particularly for applications where task dependencies play a significant role in performance.
+
+\textbf{Min-Min and Max-Min} are heuristic scheduling strategies that are often used in heterogeneous systems. The Min-Min strategy selects the task that can be completed the earliest and assigns it to the processor that minimizes its completion time. Max-Min, on the other hand, assigns the longest task first to avoid situations where large tasks are delayed excessively. Both algorithms are simple to implement and can be effective for different workloads depending on the task size distribution.
+
+\textbf{Genetic Algorithms (GA)} are a popular choice for task scheduling due to their ability to handle complex multi-objective optimization problems. GAs simulate natural evolution processes to find optimal or near-optimal scheduling solutions, making them suitable for scenarios with complex dependencies and resource heterogeneity.
+
+\textbf{Dynamic Voltage and Frequency Scaling (DVFS)} is a method used to reduce the energy consumption of the system. By adjusting the voltage and frequency of the processing units based on the task's requirements, DVFS helps to balance the trade-off between performance and energy efficiency, which is particularly important in power-constrained environments.
+
+\subsection{Machine Learn Based Task Scheduling}
+
+Machine Learning (ML) based task scheduling represents a significant evolution in how tasks are assigned to computing resources, especially in heterogeneous and distributed systems. Traditional scheduling methods, such as heuristics and meta-heuristics, often struggle with the complexities inherent in these environments, such as the variability of resources, unpredictable workloads, and strict quality of service (QoS) requirements. Machine learning offers a promising alternative due to its ability to learn optimal policies from experience, which is especially useful in complex and dynamic systems\cite{Zhou2024} . 
+
+Machine learning approaches to scheduling can be broadly divided into supervised learning, unsupervised learning, and reinforcement learning. Among these, reinforcement learning and, more specifically, Deep Reinforcement Learning (DRL) have gained considerable application for task scheduling in distributed systems. It combines deep learning ability to model complex relationships with reinforcement learning decision-making processes, enabling systems to learn optimal scheduling strategies without explicit programming for every possible scenario \cite{jalali2024}.
+
+DRL is particularly well suited for real-time decision-making, as it involves an agent interacting with an environment, taking actions, and receiving feedback to learn optimal strategies. In the context of task scheduling, this means determining which task should be allocated to which resource at what time, based on a reward function that aims to optimize specific metrics such as minimizing makespan, reducing energy consumption, or maximizing resource utilization. The agent iteratively improves its scheduling policy by maximizing cumulative rewards over time.
+
+For example, DRL based schedulers have been applied in cloud computing environments to efficiently allocate resources in response to changing workloads. These schedulers often outperform traditional methods like round-robin or first-fit by dynamically adjusting to the system's state, providing a more efficient and adaptable solution. One common use of DRL is to manage virtual machine (VM) migrations and workload balancing to enhance resource utilization while ensuring low energy consumption \cite{srikanth2023}.
+
+Machine learning-based scheduling approaches face several challenges. The exploration and exploitation trade-off remains a key difficulty in reinforcement learning-based methods. This trade-off involves balancing the exploration of new strategies to improve scheduling policies with the exploitation of known effective strategies to maximize immediate rewards. In distributed systems, achieving this balance is essential to avoid suboptimal performance \cite{jalali2024}.
+
+Moreover, scalability is a critical concern, especially for large-scale distributed systems where the number of tasks and resources can grow rapidly. Future research in ML-based scheduling aims to develop more scalable DRL algorithms that can handle the increased complexity and size of distributed environments effectively. Another avenue for improvement is the incorporation of transfer learning to reduce the learning curve by using the knowledge gained from similar scheduling environments \cite{Zhou2024}. Some common scheduling algorithms and strategies that use a machine learning-based approach are as follows.
+
+
+\textbf{Q-Learning (QN) and Deep Q-Learning Networks (DQN)}: Q-Learning is a model-free reinforcement learning (RL) algorithm used in task scheduling for its ability to adapt to uncertain environments and dynamically allocate resources. It has been applied in cloud computing environments, where tasks must be efficiently distributed among virtual machines. However, Q-Learning can face challenges in large state-action spaces, which can lead to performance degradation \cite{Shobak2023}. Deep Q-Learning Networks (DQN) correct these limitations by combining deep learning with Q-Learning, enabling the use of deep neural networks to approximate the action-value function. DQN allows for better scalability and has been used for optimizing resource allocation in cloud environments and cyber-physical systems. Improvements such as Double DQN (DDQN) help mitigate issues such as overestimation bias \cite{jalali2024,kayhan2023}.
+
+\textbf{Policy Gradient} is a reinforcement learning method that directly optimizes the scheduling policy by adjusting the parameters, using gradient descent, to maximize the expected reward. The main advantage of policy gradient approaches is their ability to work well with continuous action spaces and directly influence scheduling decisions. In contrast, the update of the parameters tends to be slow. \cite{Lu2023}.
+
+\textbf{Actor-Critic} are another reinforcement learning approach that merges both policy optimization and value function approximation. The actor decides what actions to take, while the critic evaluates these actions, providing feedback that helps stabilize learning. Actor-Critic methods are well-suited for dynamic task scheduling in environments that require real-time adjustments, such as heterogeneous cloud computing platforms. They have been applied to improve the accuracy of decision making and ensure optimal utilization of resources in distributed settings \cite{kayhan2023}.
+
+\textbf{Support Vector Machines (SVM)} are supervised learning algorithms that are often used for classification and regression tasks related to resource allocation. They have been applied in scenarios where prediction of workload and classification of resources are required to support effective scheduling. \cite{satyanarayana2018}.
+
+\textbf{Energy-Aware Scheduling with Reinforcement Learning} are used in cyber-physical systems (CPS) to create energy-aware scheduling algorithms. These algorithms dynamically adjust task allocation based on the system's current energy usage, ensuring that energy consumption is minimized while maintaining system performance. This is particularly crucial in CPS, where resource constraints are significant, and efficient task scheduling directly impacts the reliability and sustainability of the system \cite{Shobak2023}.
+
+\subsection{StarPU: A Runtime System for Heterogeneous Platforms}
+
+StarPU is a unified runtime system designed to simplify task scheduling in heterogeneous multi-core architectures. It integrates CPUs, GPUs, and other accelerators into a unified programming model that hides hardware complexities, allowing developers to focus on high-level application logic rather than low-level resource management \cite{augonnet2011}.
+
+StarPU provides a high-level programming interface that can efficiently handle tasks on various heterogeneous computing units. It allows developers to submit tasks without specifying the particular hardware that should execute them, enabling automatic resource allocation and scheduling based on system conditions. This functionality is especially useful for applications that involve dynamic workloads, such as scientific simulations and linear algebra computations, which can benefit from parallel execution on CPUs, GPUs and FPGAs\cite{Denis2024}.
+
+StarPU offers several features that would help scheduling tasks in high-performance applications:
+
+\begin{itemize}
+    \item \textbf{Automatic Task Scheduling}: The runtime system dynamically schedules tasks based on the current state of the system and the characteristics of the tasks. This automation reduces the responsibility of developers to manually manage task execution and resource allocation.
+
+    \item \textbf{Asynchronous Execution}: Support for asynchronous task submissions that allows for overlapping computation and communication, thus maximizing resource utilization.
+
+    \item \textbf{Profiling and Tracing Tools}: StarPU provides extensive tools for performance analysis, enabling developers to trace task executions, monitor resource usage, and identify performance bottlenecks. These insights are essential for optimizing applications and achieving better scalability.
+
+    \item \textbf{Support for Multiple Implementations}: StarPU allows developers to implement multiple versions of the same task optimized for different architectures. The runtime system dynamically selects the best implementation based on resource availability, workload, and system conditions, making it ideal for heterogeneous computing environments.
+\end{itemize}
+
+In the StarPU framework, tasks are encapsulated as codelets, which are reusable units of computation that can be executed on any compatible processing unit. Developers define codelets along with their associated data dependencies and submit them to the runtime system. StarPU then manages execution order, data transfers, and resource allocation, hiding low-level details from the developer. It adopts a task-based parallelism model in which codelets are dispatched as tasks organized in a DAG that helps to express dependencies between tasks. 
+
+
+StarPU's scheduler is designed to achieve a balance between execution efficiency and resource utilization. It offers a range of interesting predefined scheduling strategies, such as Heterogeneous Earliest Finish Time, Work Stealing, Priority-Based, and Greedy schedulers. Using a scheduling strategy that could be predefined or self-made by the user, StarPU continuously monitors the state of the system and task execution metrics and adapts to workload variations in order to balance the computational load across all available resources. 
+
+The efficiency of StarPU is further enhanced by its optimization of data transfers. By intelligently managing when and where data is moved, the runtime system reduces communication overhead and exploits data locality. These optimizations contribute to better scalability, allowing applications to perform effectively in single-node systems and large-scale clusters \cite{thibault2018}.
+
+%Furthermore, StarPU also supports integration with tracing systems to monitor and understand runtime behavior. Tracing is crucial for identifying performance bottlenecks and optimizing task distribution across heterogeneous resources. The system provides minimal overhead tracing capabilities to collect detailed information on task execution, memory transfers, and system performance \cite{Denis2024}.
+
+
+
+
+%\input{texto/2.1-correlatos}
+%\input{texto/2.2-processadores}
+
+
+%%%%%%

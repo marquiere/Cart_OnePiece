@@ -1,0 +1,218 @@
+\chapter{Introduction} \label{intro} 
+\vspace{-1.9cm}
+
+
+ %The Autonomous Driving Vehicle (ADV) is almost a reality and is considered the next big innovation in the upcoming years \cite{Rosenzweig2015}. All major automakers and research groups all over the world are researching that and showing their results in competitions or published articles \cite{Rosenzweig2015} \cite{Behere2015} \cite{Kato2015} \cite{Broggi2015}.
+
+% Introduction
+ Autonomous driving vehicles (ADV) are transitioning from the realm of prototypes and testing to real-world deployment. In 2024, approximately 26,560 ADVs were operational throughout the world, and some projections estimate it to reach 125,660 by 2030 worldwide \cite{gds2024}, reflecting a continuous adoption curve driven by technological and regulatory advances. 
+ 
+ In addition, reports shows that with government support, China has an even more audacious intention to have 100,000 self-driving vehicles, the so-called Robotaxi, on the road by 2030 \cite{patentpc2025}. Cruise reported more than 3.5 million miles driven autonomously by the end of 2023, reflecting extensive testing and AI learning from real-world scenarios, making ADVs more reliable \cite{patentpc2025}. These milestones demonstrate the move beyond pilot programs toward real world use of the ADV technology.
+ 
+ %Benefits
+  %Massive reduction of problems such as traffic congestion, accidents, parking space, vehicle insurance, and increased vehicle sharing possibilities are some of the advantages expected from the implementation of ADV \cite{Bimbraw2015} that aims to provide comfortable, efficient, and safe driving for all. Fausten et al. \cite{Fausten2015} and Bartl and Rosenzweig \cite{Rosenzweig2015} put the advantages in numbers stating that we could achieve 80\% improvement in traffic throughput, 23\% to 39\% of fuel economy, increase in 50\% of senior citizens mobility, 90\% reduction of traffic accidents and reduction to only 15\% of the actual car fleet.
+
+%Chalenge
+Despite the rapid increase in the adoption curve for autonomous vehicles, the development pipeline is far from optimal. Real-world deployment is often driven more by capital than efficiency. We could use as an example the development of DeepSeek that could do more with less challenging big established companies in the AI world \cite{authorsourceability2025}. This shows that although the development and deployment of the ADV prototype is a high-cost task that mainly big companies are taking \cite{silva2024} there is still plenty of room for the research community to contribute if more efficient and cost-effective tools are provided. %In addition, it suggests a need for more focused data-driven research aimed at identifying and resolving specific bottlenecks, improving algorithmic accuracy and real-world applicability and safety of ADV systems. 
+ 
+ %Complexity
+ Multiple technologies are combined in ADV, making it a complex distributed information technology system \cite{Traub2017}. Consequently, any deficiency in data reliability, interruption in data acquisition, or error in algorithmic processing can lead to suboptimal or unsafe behavior, posing significant risks to passenger and pedestrian safety \cite{Zhao2024}. A controlled environment where the main aspects of the ADV could be tested would ease the research efforts. 
+
+ %core solution
+This simulation-based testbed mitigates the high cost and low reusability of physical tests by providing a low overhead, adaptable platform for exhaustive scenario evaluation and algorithm refinement \cite{Cao2024AutomaticPreScan, Jeon2024ImplementationAlgorithms}. The core of this simulated environment would be a realistic space where the data collected, vehicle behavior, and mechanics from different scenarios would approach the quality of data acquired from real world driving.
+
+%challengeDataset
+Real-world autonomous driving datasets face significant limitations in scalability, diversity, and complexity of annotation. Although large datasets with simple annotations, such as bound boxes or drivable areas, are increasingly common, more intricate tasks, such as instance segmentation, object tracking, or multitask learning, remain restricted to small niche datasets due to the high cost and difficulty of labeling \cite{Yu_2020_CVPR}.
+
+%SolutionDataset
+To overcome these limitations, synthetic datasets generated from 3D simulation platforms are being used. This new approach has shown promising results in training deep neural networks for perception tasks and is already integrated into proprietary workflows by major industry players \cite{Jang2022Carfree:Simulator}.  These enable scalable, cost-effective and highly controllable data generation, including rare corner cases, diverse weather, and varied lighting, without the burden of manual annotation.
+
+%Challenge characterization
+In the context of autonomous driving, the characterization of the workload is essential to ensure that it can operate within real-time constraints while maintaining reliability and safety. These systems perform a wide range of computation-intensive tasks, such as object detection, sensor fusion, and path planning, under strict latency thresholds \cite{Liu2023COLA:Systems}. However, one of the most persistent challenges is defining appropriate performance indicators that allow a fair and consistent evaluation of ADV performance \cite{Kowalczyk2022EfficientVerification}. %Without standardized metrics, comparing different solutions becomes ambiguous, undermining reproducibility and system optimization.
+
+%SolutionBenchmarks
+Benchmarking efforts such as CAVBench \cite{wang2018} and \cite{Jambotkar2021AdaptiveImprovement} help address this by offering domain-specific evaluation criteria tailored to common workloads in ADV, but further refinement is needed to cover aspects such as scheduling policies and resource utilization.
+
+%Challenger Task scheduling
+Efficient task scheduling is essential for ADV to achieve real-time system requirements with minimal use of available processing resources \cite{amarnath2021}. Without an optimized task scheduling system, ADVs could experience delays in processing data, making decisions, or controlling actuators, which could lead to unsafe situations\cite{Balasekaran2021}. The reduction in task miss ratio and overall execution time, together with the better use of hardware resources, are the main points to explore \cite{Balasekaran2021}. 
+ 
+ %The final product will be a combination of results in research and development in several fields \cite{Kato2015}. Hardware, sensors, software stack, and computing units capable of matching the requirements of the upcoming ADV are a topic of discussion among researchers \cite{Liu2017} \cite{Munir2018} \cite{Jo2015} \cite{Ziegler2014} \cite{Kato2015}.
+ 
+ %sensors(???)
+ %Although the sensors applied to the ADV are in constant development, the type of sensors necessary for it to work autonomously are well known. It ranges between Lidar, Camera, Radar, Ultrasonic, GNSS/RTK and INS/IMU. The solution provided by major companies such as Apollo, Nvidia, and Google and by academic research groups \cite{Tas2018a}
+%\cite{Belcarz2018}
+%\cite{Kessler2019}
+%\cite{Betz2019} shows that all sensors are necessary and must be placed throughout the vehicle to provide a complete detection feature.
+
+%Architecture(???)
+%The computing unit follows the same pattern as the ADV sensor set. It is already clear that one or more high performance computing systems are necessary to process sensing, location, and planning algorithms, and a real-time computing system is necessary for control. The main desired characteristics of it would be a fast pipeline to process sensor data within a time constraint, an auto-failure recovery strategy, and the capacity to perform all computations with low energy consumption \cite{Liu2019}. The trend is that as the computing power grows, all the necessary processing power for the ADV would be available in one single machine.
+
+% Challenges
+%However, it was not clear the best combination of processor technology and software stack for an ADV. Although it is well defined that perception, localization, planning and control algorithms together with the sensors data fusion are the necessary pieces of software to be processed in an ADV computing system, the research community still struggles to define the software stack to process it and what processor technologies is more efficient for each task. Graphic Processing Unit (GPU), Field Programmable Gate Array (FPGA), Digital Signal Processor (DSP), and Application Specific Integrated Circuits (ASIC) are the processing technologies used to accelerate ADV applications.
+
+%Heterogeneous system lack of consensus
+%GPU have the best processing performance, however, higher power consumption while DPS and FPGA consume much less power while delivering less processing performance. The ASICs range in the middle, having fair use of power and designed specifically for some ADV applications that incorporate the TPU to accelerate TensorFlow operations \cite{liu2020}. Many researchers and companies provided solutions integrating all these processing technologies in a System on a Chip (SOC) \cite{NvidiaDrive} \cite{chishiro2019} \cite{Oh2019} \cite{Liu2019}, forming a heterogeneous computing system, which would allow the selection of which ADV task would be processed in each processing unit. However, there is no consensus on the best combination of processing units that would suit ADV applications, since each launched solution has a different combination of it.
+
+%Software Stack Challenges
+%In the same way, the software stack is not unanimous in controlling this heterogeneous computing unit and also in processing the ADV tasks. The combination of the Linux operating system and ROS middleware was the main software solution for many ADV prototypes \cite{Betz2019} \cite{Marin-Plaza2019} \cite{valera2019design}. However, to build a commercial product with a high level of safety and quality, this combination was shown to be insufficient to achieve such standards \cite{valigi2018}. The ROS has evolved to ROS2 to try to tap the problems from its predecessor. In the same way, using the experience from ROS, other developers tried to find an optimal software system for the ADV. 
+
+%Middleware and Real Time Requirements
+%The development of system-specific middleware, such as Apolo Cyber RT \cite{Apollo}, Autosar \cite{AUTOSAR} or a complete package like the NVIDIA Drive \cite{NvidiaDrive} was the newest solution on the market for the ADV software stack. Nevertheless, to support this, a hard real-time embedded operating system is required. The solutions are a real-time extension of Linux and a custom-made embedded operating system. The Linux option usually achieves only soft real-time performance, which is insufficient for an ADV deployment \cite{chishiro2019}. 
+
+%Application specific OS
+%The best solution is to design an application specific embedded operating system. Nvidia Drive OS \cite{NvidiaDrive} is part of the Nvidia Drive package and is an example of this kind of solution. An important part is that cameras that usually are handled by the middleware part are managed at the OS level. The same goes for some ADV algorithm accelerators like CUDA and TensorRT. It can be argued that other sensors and even more software packages could be handled by the OS software level. Nevertheless, it is still an open research with much to cover.
+
+%It is believed that improving the task scheduling policy for autonomous vehicles could improve system performance and energy consumption. That could optimize the ADV hardware and software system sufficiently to achieve safe driving, allowing it to be commercially deployed in the real world. The reduction in task miss ratio and overall execution time, together with the better use of hardware resources, are the main points to explore \cite{balasekaran2021}. 
+
+%By having multiple complex tasks running on a heterogeneous system at the SO level, it is important to decide the efficient way to distribute and process all these autonomous driving tasks. The best processing unity must be matched to the most suitable task at a specific period of time. Traditional SO and middleware were written to manage a less complex system with only one or few processors. When applied to multicore and manycore systems, it showed a lower performance. That is a great barrier nowadays and a new research field, as such complex systems as ADV, did not exist before \cite{qi2020}. 
+
+%Artificial intelligence techniques offer promising solutions to improve task scheduling strategies in heterogeneous computing systems \cite{mao2016}. By learning from system behavior and adapting to changing conditions, AI can provide adaptive and intelligent scheduling solutions that outperform traditional static scheduling approaches. Machine learning algorithms can predict task execution times, resource availability, and system workloads to optimize scheduling decisions \cite{Shobak2023}. However, existing methods may have limitations in scalability, adaptability, or computational overhead, necessitating further research.
+
+
+%Based on the exposed before this thesis explores the possibilities of a development of an open operating system or the modification or improvement of an existing one for autonomous driving vehicles.  It proposes to find the best solution for the OS main components that are the Interrupt Handler, Task Scheduler and Memory Manager algorithms. 
+
+%Based on the previously discussed, this thesis explores the possibilities of the development of smart task scheduling strategies applied to autonomous vehicles using artificial intelligence. The research seeks to optimize ADV systems to achieve safe driving capabilities suitable for commercial deployment. The proposed strategies will focus on reducing task miss ratios, minimizing execution times, and improving hardware resource utilization.The next sessions will describe the problem, initial assumptions, objectives, and specific contributions that are expected from this thesis.
+
+%%%%%%%%%%%%%%%%%%%
+\section{Problem} \label{intro:problema}
+
+%Dataset
+There are many real data and synthetic datasets available as can be seen in \cite{liu2024} but regarding the synthetic ones they are made up of few sensors that do not reflect the reality of the most up-to-date ADV architectures that integrate multiple heterogeneous sensors. In addition, the tools available to generate synthetic datasets such as \cite{Nesti2024CARLA-GeAR:Models} do not provide the user with the flexibility to change the setup of the ADV sensor in the simulation, allowing researchers to include and exclude sensors according to the objective of the study.
+
+%Benchmarking and Characterization
+Defining appropriate performance indicators that allow for a fair and consistent evaluation of ADV performance is a challenge \cite{Kowalczyk2022EfficientVerification}. Without standardized metrics, comparing different solutions becomes ambiguous, undermining reproducibility and system optimization. Benchmarking efforts such as CAVBench \cite{wang2018} and \cite{Jambotkar2021AdaptiveImprovement} help address this by offering domain-specific evaluation criteria tailored to common workloads in ADV, but further refinement is needed to cover aspects such as scheduling policies and resource utilization.
+
+%Schedulying
+Existing task scheduling approaches in an ADV environment often face challenges, such as rigid, platform-specific implementations that lack flexibility. Moreover, theoretical scheduling models are often validated only in constrained environments, and the high overhead of edge computing or complex reinforcement learning models makes them unsuitable for real-world applications. Furthermore, there is no flexible tool that would connect a task scheduling framework to the simulation environment to seamlessly test different on-the-shelf strategies as well as the self-developed ones providing easy-to-see metrics for evaluation.
+
+%Tool
+A complete study of the ADV system would require the connection of the data to be studied with the scheduling methodology applied, and the metrics collected to be evaluated against a reference standard data that could come from a reference benchmark. A tool that would connect all of these and would allow researchers to configure the simulation, with an easy interface, giving a thorough menu of choices does not exist, making challenging the setup of the whole ADV environment of study and the application of changes after the environment has been configured for a specific ADV simulation situation.
+
+
+
+
+%The ADV is a complex distributed information technology system that requires a software stack to process heavy IA algorithms and manage a huge amount of data and the necessary hardware and sensors embedded on it. However, it is still not a reality due to the difficulty in achieving a failure proof system as 1\% failure could lead to fatal accidents and huge losses. In addition, the external infrastructure of roads is still evolving to support the ADV but is still not ready.
+
+%It has not yet been defined what the best mix of processing technology for a heterogeneous SoC that would efficiently handle all the ADV IA algorithms. Each developer tends to focus on his specialty like GPUs or FPGAs but there is a few  research in the literature to find the optimal solution \cite{chishiro2019} \cite{Liu2017} mixing all technologies in one die. Thus, the correct distribution of ADV algorithms for each processing type is still unknown and needs to be studied.
+
+%In addition, the software stack has also not been defined to handle the problems mentioned before. The well-known combination of ROS middleware plus Linux OS, often used in robot applications, has not been proven to be efficient enough to safely handle an ADV within time and security constraints \cite{tang2018,Zhang2018}. This led to a search for a new solution that is still not well defined by the literature ranging between middleware and OS. 
+
+%Furthermore, the combination of heterogeneous hardware and software stack will require an efficient task management method to be applied. The existing methods were created for single or homogeneous processing systems and are less efficient for multicore heterogeneous processing units and are not suitable for high complexity task management \cite{balasekaran2021}. It degrades the efficiency of an ADV by increasing energy consumption and affecting the overall performance of the system. 
+
+
+
+  
+              
+
+%%%%%%%%%%%%%%%%%%%
+\section{Objectives} \label{objetivos}
+
+
+
+%The available solutions for ADV software system found in the literature shows a complex software stack with many layers that impacts on the efficiency and processing time of the ADV. To remove software layers, the reduction or removal of the middleware stack bringing many functions to the OS level could be the optimal solution. Sensors and Specific IA algorithms could be processed at the OS level reducing the interprocess communication overhead. Thus, it is believed that an embedded operating system with a tailored task distribution and scheduling policy would improve the overall system performance. That OS would be ready for heterogeneous processing system and able to distribute the workload among the processor units. Also many sensing hardware could be processed at the OS level.
+
+%The main objective is to design a smart task control strategy that could be applied in the available heterogeneous autonomous vehicle software system to improve system efficiency. This strategy would learn the characteristics of the processors available in the autonomous system and automatically dispatch the ADV workload to the available and more suitable processing unity. To fulfill this goal, it was planned to select an up-to-date simulation software and a task scheduling capable framework to develop a test bed for the implementation proposed in this thesis. In order to achieve this objective, the following specific objectives were considered:
+
+The main objective is to unify the study of key aspects of the ADV development in one environment by exploring the synthetic data generation and analyses, together with workload characterization and benchmarking by the use of task-oriented programming and scheduling policies. 
+
+The purpose is to create a novel approach to study ADV by integrating the simulation environment together with the scheduling and characterization framework, providing the research community with an easy-to-use interface taking advantage of the latest advances in computing processing power available. To achieve the main objective, we have defined the following specific objectives.
+
+\begin{itemize}
+	\item[a)] Review the state-of-the-art to identify research efforts in ADV development and prototyping, simulation, task scheduling, workload characterization, and benchmarking. 
+    \item[b)] Review the ADV simulators and task scheduling frameworks and choose the most suitable for the application in this work.
+    \item[c)] Create a test-bed by integrating the ADV simulator with the task scheduling and benchmarking framework.
+	\item[d)] Organized the ADV code pipeline into tasks applying task-programming techniques.
+	\item[e)] Design an easy-to-use interface comprising the creation of the ego vehicle and the dataset, the choices of simulation parameters and the selection of the scheduling policy, testing metrics and benchmark comparison.
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Hypothesis} \label{intro:hipoteses}
+The advancement of ADVs is critically dependent on the efficient processing of complex tasks in heterogeneous computing systems. These systems must handle heavy AI algorithms and manage large amounts of data from various sensors, requiring an optimized software stack and hardware architecture. Despite significant research efforts, several challenges persist in this domain.
+
+Simulation can be a strong factor to help the development of ADV, making research more affordable for everyone. Mimicking real-life ADV in a simulated environment will all sensors and physics related to it could enable a generation of datasets as good as the ones with data collected from real sensors, making it possible to simulate corner cases not feasible to explore in the real world. 
+
+Many efforts were made to create synthetic dataset, but none presented an efficient flexible method to generate data covering the whole pipeline connecting the ego-vehicles status from sensing all the way to processing information.
+
+Workload characterization and task scheduling are two very important topics studied in ADV. However, they are often studied separately. Most of the setups to study task scheduling are rigid and algorithm-specific and do not allow the application of different policies connected to the ADV processing system without a significant amount of changes and configuration. 
+
+In addition, to have a strong understanding of the ADV workload, a thorough instrumentation and a complete menu of measurement is necessary. That could be easily applied in a virtual world compared to the real world. It would help to characterize the ADV workload and generate several benchmarking options. With what was exposed before, our main hypothesis is:
+
+An integrated approach to generate sintecit datADV datasets.......
+
+%Existing task scheduling methods, designed primarily for single-core or homogeneous systems, are not optimized for multi-core heterogeneous systems, leading to degraded system performance and increased energy consumption \cite{balasekaran2021}.
+
+%Artificial intelligence and more specific machine learning algorithms offer promising solutions to improve task scheduling strategies in heterogeneous computing systems. AI can learn from system behavior and adapt to changing conditions, providing adaptive and intelligent scheduling solutions that outperform traditional static approaches \cite{mao2016}. However, the integration of AI-based smart task scheduling specifically within the context of ADVs remains relatively unexplored. Although some research focuses on the use of artificial intelligence for a specific group of tasks in heterogeneous systems, the potential to apply these techniques to optimize the entire task scheduling process in ADVs has not been extensively studied. With these open issues and the State of The Art, our main hypothesis follows:\\
+
+
+
+%\textbullet\ %The application of machine learning techniques in the design of a smart task scheduling algorithm for autonomous vehicles will result in a method capable of significantly improving system performance and energy efficiency. This will contribute to making ADV systems more scalable and reliable, opening up new possibilities for safer and more efficient autonomous driving technologies suitable for commercial deployment.
+
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Contributions} \label{contrib_projeto}
+The main contribution in this thesis is to present a novel integration approach to the study of ADV called Cart-OnePiece. It integrates dataset generation, workload characterization and benchmarking, and task scheduling, providing complete ADV analysis and providing solid data for the user. 
+
+It aims to connect different aspects of autonomous vehicles that are often studied apart and bring the simulation analyses closer to what happens in the real world autonomous vehicles in a flexible way. To achieve this goal, a set of partial contributions is expected to be provided as follows.
+
+%Another contribution is a low cost prototype that could be used for testing the ADV software stack. With the experience gained developing that, a prototype development standard could be proposed for ADV research and test. With the experience acquired with the previous contributions a task control and distribution system could be developed what is the main contribution of this thesis. This task policy could be tested against well known task control policies using benchmarks to testify the improvements that this new proposed policy could bring for the ADV software system. That fills a gap in the state-of-the-art regarding ADV software enhancement for better system overall performance with reduction of the energy consumption. \cite{augonnet2011}
+
+%\textbf{1. Development of a Smart Task Scheduling Algorithm Utilizing Machine Learning:}
+%We intend to propose an AI-based task scheduling algorithm specifically designed for ADV applications. Using machine learning techniques, the algorithm would learn the characteristics of various processing units within a heterogeneous system and intelligently assigns tasks to the most suitable processors. This dynamic scheduling approach aims to reduce task miss ratios, minimize execution times, and improve overall utilization of hardware resources.
+
+\textbullet\ Development of an integrated test environment that combines the ADV simulation software and the task scheduling and characterization framework. This test environment enables the simulation of real-world ADV scenarios and workloads, providing a platform for testing and validating different task scheduling policies under various conditions, as well as allowing several computational information to be measured from the computing system in different driving scenarios and different moments of the simulation.
+
+\textbullet\ Extended synthetic dataset creation from raw sensor data to processed data linked with computing metrics information. This aims to ease the process of creating datasets and making annotations by automating it. It could link the data usually provided by ADV datasets such as raw screenshots from cameras and processed data with detected objects with information such as processing power and CPU usage in that specific situation in the simulation. Moreover, it would allow for the exploration of corner cases usually not explored in a real life situation due to hardware limitation and environmental hazard.
+
+\textbullet\ A complete interface to configure the simulation with the user required settings. This provides an interface for ego vehicle creation allowing one to choose the type and sensors used in it. It also allows for dataset collection by choosing options such as raw or processed data, duration of simulation, and algorithms that are applied to the data to be processed. In addition, a menu of choices for the tasks scheduling policies and metrics to be measured is also available in this user interface.
+
+It would be difficult to cover all aspects of the ADV simulation, so the CArt-OnePiece script is public available for researchers to use the tool and improve it as necessary. This would allow the community to apply their own designed algorithms, self-made scheduling policies, and also a custom dataset with configuration that could not be available in the default script.
+
+
+%To evaluate the proposed scheduling algorithm, a test environment was assembled by integrating CARLA, an advanced autonomous vehicle simulator, with StarPU, a task scheduling framework capable of modeling heterogeneous computing environments. This test environment enables the simulation of real-world ADV scenarios and workloads, providing a platform for testing and validating different task scheduling strategies under various conditions.
+
+%\textbf{3. Comprehensive Analysis and Comparison with State-of-the-Art Scheduling Methods:}
+
+%Extensive experiments will be conducted to compare the performance of the proposed smart task scheduling algorithm with existing state-of-the-art task control systems. Using standard benchmarks and measurement techniques, we want to assess metrics such as system throughput, energy consumption, task completion times, and reliability. This analysis would provides empirical evidence of the advantages and potential limitations of our approach.
+
+%\textbf{4. Insights into Optimal Task Distribution in Heterogeneous ADV Systems:}
+
+%Through this research, it was expected to gain valuable information on how different ADV tasks, such as perception, localization, planning, and control algorithms, can be better distributed between various processing units in a heterogeneous system. These findings contribute to a better understanding of the interaction between software tasks and hardware capabilities in ADV.
+
+%\textbf{5. Recommendations for Enhancing the Efficiency and Scalability of the ADV System:}
+
+%Based on the results of this study, recommendations and best practices for the implementation of intelligent task scheduling in ADVs could be provided. These guidelines aim to help developers and researchers improve system efficiency, scalability, and energy consumption, thus contributing to the advancement of safer and more reliable autonomous driving technologies suitable for commercial deployment.
+
+%\textbf{6. Contribution to the Field of Real-Time Systems and AI Integration:}
+
+%By exploring the integration of artificial intelligence into real-time task scheduling for safety-critical systems, this thesis aims to contribute to the broader field of real-time systems and AI. This work aims to demonstrate how AI can be applied effectively to improve the performance of complex and heterogeneous computing systems beyond traditional methods.
+
+%%%%%%%%%%%%%
+\section{Rationale} \label{intro:justificativa}
+
+%Despite substantial progress, several critical challenges remain in making autonomous driving vehicles available for widespread commercial use. The key among these challenges is the efficient integration of software and hardware components in ADV systems to ensure safe and reliable driving. Given the highly complex nature of ADV systems, which rely on a combination of various sensors, algorithms, and computational technologies, there is an urgent need to develop intelligent solutions that optimize task scheduling within these heterogeneous systems.
+
+
+%This thesis addresses these challenges by exploring the use of artificial intelligence to develop a smart task scheduling algorithm for ADVs. The reason behind this approach lies in the limitations of existing task scheduling strategies, which are predominantly designed for homogeneous or single-core systems and are insufficient for managing the complexity of modern ADV systems. Current solutions, which combine GPUs, FPGAs, DSPs, and ASICs, lack a unified strategy to optimize task distribution in these units. By developing an AI-driven task scheduler, this research seeks to bridge this gap and offer a more efficient solution that can improve overall system reliability, reduce execution time, and reduce energy consumption.
+
+%In addition, it is important to note that much of the current research and development in the field of autonomous driving is being conducted by large companies, often in closed environments, which limits the opportunities for the broader research community to contribute. The creation of a test environment as part of this thesis will provide an open platform that researchers can use to develop and evaluate new approaches for ADV systems. This will democratize research on autonomous driving, allowing smaller research groups and academic institutions to explore innovative solutions without being limited by the resources of large corporations.
+
+ %Furthermore, the insights gained from the development of a smart task scheduling algorithm for ADVs will contribute to the entire field of task scheduling in heterogeneous systems, without restriction to the field of autonomous vehicles. These advances can be applied to other complex domains, leading to improved efficiency and scalability in heterogeneous computing environments in various industries.
+
+
+
+%%%%%%%%%%%%%%%%%%%
+\section{Project Outline} \label{intro:organizacao}
+
+The remaining of this thesis is organized in the following chapters:
+
+\begin{itemize}
+    \item Chapter 2 provides a background with an overview of ADVs, including automation levels, hardware and software architectures, and key sensors such as LiDAR and cameras. Discusses the role of ADV simulators, focusing on the CARLA simulator, and explores heterogeneous computing systems and task scheduling methods, including traditional and AI-based approaches, concluding with related work for task scheduling in ADV.
+    \item Chapter 3 outlines the methodology adopted and the steps to develop a smart task scheduling strategy for ADV.
+    \item Chapter 4 and 5 summarize the work done so far and present a schedule for the next steps to conclude this thesis.
+\end{itemize}
+
+
+

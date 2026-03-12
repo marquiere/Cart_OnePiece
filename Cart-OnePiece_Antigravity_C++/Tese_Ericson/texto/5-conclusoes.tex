@@ -1,0 +1,11 @@
+\chapter{Conclusion} \label{conclusoes}
+\vspace{-1.9cm}
+
+The advancement of autonomous driving vehicles has immense potential to revolutionize transportation by improving safety, efficiency, and accessibility. However, the complexity of integrating sophisticated software algorithms with heterogeneous hardware systems presents significant challenges. Traditional task scheduling methods, designed primarily for homogeneous or single-core processors, are insufficient for managing the diverse computational demands of modern ADVs. 
+
+This thesis proposal aims to develop a smart task scheduling strategy for heterogeneous processing platforms in autonomous vehicles, with a focus on improving system performance, reducing energy consumption, and achieving safe driving suitable for commercial deployment. By modeling the ADV's computational tasks as a directed acyclic graph and employing a reinforcement learning algorithm for scheduling decisions, the proposed approach aims to dynamically learn and adapt to system behaviors. 
+
+The methodology involved the creation of an integrated test environment that combines the CARLA simulator with the StarPU runtime system. This setup enables realistic simulation of ADV scenarios and provides a platform to implement and evaluate the proposed scheduling strategy. By utilizing StarPU's feature to define custom scheduling policies, the reinforcement learning model can be smoothly integrated into the simulation environment, allowing for dynamic task placement and resource allocation across CPUs and GPUs. Preliminary results showed the feasibility of this integration with the application of different scheduling strategies prefedined in the StarPU runtime system directly into the CARLA simulation.
+
+The next chapter shows the schedule with a brief explanation of the work in development and the next steps to complete the development of the proposed smart task scheduling strategy.
+
