@@ -2,90 +2,28 @@
 % O que é ser parametrizável? Muitas vezes alguém faz um projeto de descrição de hardware em vhdl para uma NoC 4x4 de forma rígida. Ou seja, se você quiser sintetizar uma NoC 8x8, você vai ter que editar e refazer vários dos vhdls do projeto. É literalmente um reprojeto. 
 % Se a descrição fosse parametrizável, haveria um arquivo de variáveis, onde por exemplo, teria uma que diria o tamanho da NoC=4. Você iria lá, alteraria para 8, e não faria mais nada. Ao fazer a nova síntese, o hardware seria 8x8. Ou seja, o projeto foi feito com uso de variáveis/parâmetros para que uma nova síntese não implique em novo projeto de hardware.
 
-\chapter{Proposta de arquitetura parametrizável baseada em aprendizado de máquina} \label{proposta}
+\chapter{The Cart-OnePiece Framework Overview} \label{ch:framework}
 \vspace{-1.9cm}
-% para acesso a memórias em chip em processadores manycore com eficiência em energia
 
-A proposta teórica de arquitetura que ofereça maior eficiência energética em um processador manycore com NoC e memórias distribuídas compreende a inserção de um ou mais módulos controladores na arquitetura.
-Esses módulos controladores baseiam-se em aprendizado de máquina, recebendo como entrada um conjunto de informações da arquitetura e do uso dos seus componentes.
-Como saída, o módulo deve modificar o comportamento dos componentes da NoC e do sistema de memória, enviando sinais de controle para esses dispositivos.
-Uma visão geral de como essa arquitetura pode ser implementada é apresentada na Figura~\ref{fig:prop1}.
-Trata-se de uma arquitetura parametrizável, assim, o projetista pode definir todos os parâmetros disponíveis em tempo de descrição do hardware, e a arquitetura será sintetizada seguindo esses parâmetros.
-Como exemplo de elementos parametrizáveis, tem-se a topologia da NoC de dados, a quantidade de elementos de processamento em cada cluster, o tamanho das unidades de memória, dentre outros.
+\section{System Architecture and Perception Pipeline} \label{sec:system_pipeline}
 
+The Cart-OnePiece framework is structured as a comprehensive environment designed for synthetic dataset generation, Advanced Autonomous Driving (ADV) workload characterization, and the evaluation of custom task scheduling policies. To achieve these goals, the architecture is built around an asynchronous sensor processing pipeline that closely couples the CARLA simulator \cite{Dosovitskiy2017} with the StarPU runtime system and the NVIDIA TensorRT inference engine. This integration allows the extraction of high-frequency sensor data, its computation across heterogeneous resources, and the observation of the system's performance under distinct scheduling constraints.
 
-\begin{figure}[H]
-  \setlength{\abovecaptionskip}{0pt} \setlength{\belowcaptionskip}{0pt}
-  \caption{Exemplo de arquitetura com o módulo de controle proposto}
+A high-level overview of the framework's operational pipeline is presented in Figure~\ref{fig:framework_pipeline}. The system operates on a client-server model where the CARLA server acts as the primary workload generator, simulating the physics, traffic, and environmental conditions of the urban scenario while rendering the virtual world from the perspective of the ego-vehicle. On the client side, a C++ application implemented on top of the StarPU library dictates the asynchronous extraction and processing of these sensor streams.
+
+\begin{figure}[hbt!]
   \centering
-  \includegraphics[width=0.85\textwidth]{prop1.pdf}
-  \captionsetup{justification=centering}
-  \captionfont{\small{\textbf{\\Fonte: Elaborado pelo autor}}}  
-  \label{fig:prop1}
+  \includegraphics[width=\textwidth]{Figure2.png}
+  \caption{Overview of the Cart-OnePiece framework and the autonomous driving perception pipeline.}
+  \label{fig:framework_pipeline}
 \end{figure}
 
-O exemplo da figura apresenta uma arquitetura manycore, composta de 16 \textit{clusters} de computação ($CCs$), organizados e interconectados por uma NoC de dados, com topologia em malha.
-Além dos \textit{clusters} de computação, foram adicionados dois controladores da arquitetura ($CAs$), nas extremidades, interconectados por outra NoC de controle.
-O controlador da arquitetura implementa o algoritmo de aprendizado de máquina, e utiliza a NoC de controle para receber as informações de uso dos componentes, e enviar os sinais de controle para as modificações necessárias nos dispositivos da NoC de dados ou dos \textit{clusters} de computação.
-O uso de uma NoC de controle permite que os sinais de controle sejam enviados aos roteadores sem criar gargalos na NoC de dados, que ficam disponíveis para o tráfego dos pacotes de dados.
-As informações sobre a arquitetura são fixas no controlador da arquitetura, uma vez que os parâmetros que determinam essas informações serão definidos em tempo de síntese.
+The core of the execution flows through a continuous perception pipeline composed of consecutive computational stages. In the initial phase, multiple virtual cameras attached to the simulated vehicle output raw visual data (typically in RGBA format) and their corresponding semantic segmentation ground truth. Rather than blocking the main execution thread to process these images immediately, the StarPU runtime is tasked with managing these operations asynchronously, mapping them dynamically to the available CPU workers and GPU resources.
 
-A Figura~\ref{fig:prop2} demonstra, de maneira superficial, a interconexão entre um cluster de computação e um controlador de arquitetura. 
-A NoC de controle tem comportamento bi-direcional, isto é, é usada para receber e enviar informações entre os componentes e o controlador da arquitetura.
-O cluster de computação é composto de $n$ elementos de processamento ($EPs$), cuja quantidade é definida por parâmetros.
-Uma memória scratchpad é compartilhada pelos elementos de processamento, e uma rede de interconexão interna conecta os componentes dentro de cada cluster.
+Once the raw data is captured, a preprocessing stage converts the images from the simulator's native BGRA format into the NCHW tensor layout required by deep learning engines, normalizing the pixel values simultaneously. This stage is highly parallelizable and is primarily distributed among the host CPU cores. Following the preprocessing, the normalized tensors are dispatched to the inference stage. Here, the TensorRT library, accelerated via CUDA, processes the data using pre-compiled models, such as ResNet50 or DeepLabV3, predicting the semantic masks of the scene.
 
-\begin{figure}[H]
-  \setlength{\abovecaptionskip}{0pt} \setlength{\belowcaptionskip}{0pt}
-  \caption{Comunicação entre o controlador e o cluster de computação}
-  \centering
-  \includegraphics[width=0.85\textwidth]{prop2.pdf}
-  \captionsetup{justification=centering}
-  \captionfont{\small{\textbf{\\Fonte: Elaborado pelo autor}}}  
-  \label{fig:prop2}
-\end{figure}
+The resulting semantic predictions are then evaluated against the synchronously captured ground truth in a metric calculation stage, which computes the Mean Intersection over Union (mIoU) and pixel accuracy. To ensure that the computational trace is accurately registered without interfering with the workload execution, the pipeline relies on the APEX profiling tool and StarPU's internal FxT tracing mechanisms, which record the latency, memory utilization, and structural task dependencies of each frame.
 
-Na figura, os sinais de controle podem modificar o comportamento dos roteadores.
-Com isso, tem-se um esquema de roteamento adaptativo, baseado no monitoramento do uso dos links de interconexão.
-As decisões de roteamento, se tomadas da maneira correta, aumentam a vazão de dados na rede, diminuindo congestão e uso dos \textit{buffers} em roteadores.
-Os sinais também atingem as interfaces de rede, entre os roteadores e os \textit{clusters} de computação.
-Como é papel da interface de rede traduzir a informação do cluster em pacote de redes, os sinais de controle podem modificar essa tradução, a fim de alterar, por exemplo, o destino de um pacote, em uma situação acesso remoto à memória de outro cluster.
-
-Dentro do cluster de computação, os sinais de controle podem reorganizar a utilização da memória scratchpad, distribuindo dinamicamente o espaço de endereçamento entre os núcleos, e alocando também espaço para um cluster remoto utilizar.
-Em etapas futuras do projeto, pretende-se avaliar se o mecanismo de controle terá tempo de resposta rápido o suficiente para não produzir um gargalo na computação pelos elementos de processamento.
-A seguir, apresenta-se o algoritmo de aprendizado de máquina inicialmente proposto para o projeto do controlador de arquitetura.
-
-
-
-\section{Algoritmo de aprendizado de máquina para controle da arquitetura}
-
-Aprendizado de máquina tem sido discutido amplamente na comunidade científica para diversos propósitos.
-Como demonstrado na Seção~\ref{estadodaarte:correlatos}, alguns trabalhos empregaram aprendizado de máquina no domínio de arquitetura de computadores, resolvendo problemas como balanceamento de carga e roteamento dinâmico.
-A proposta desse projeto é ter um mecanismo de controle de uma arquitetura manycore, com NoC e sistema de memória distribuído, que utilize algoritmos de aprendizado de máquina, a fim de obter uma alocação de dados otimizada, melhor vazão de dados na NoC, e consequentemente, maior eficiência energética.
-
-O uso de linguagens de descrição permite que algoritmos implementados em linguagens de programação também possam ser implementados em hardware reconfigurável.
-Partindo desse princípio, algoritmos de aprendizado de máquina implementados em software, também podem ser desenvolvidos em hardware, e para um FPGA.
-Sendo assim, o algoritmo K-Means foi escolhido para projeto e experimentação de um primeiro protótipo do controlador da arquitetura proposta, com o intuito de identificação dos obstáculos de projeto, além da avaliação de desempenho e eficiência energética.
-O K-means é um algoritmo usado em mineração de dados para particionamento de dados em grupos, ou \textit{clusters}, de acordo com a similaridade entre eles.
-Uma heurística para algoritmo trabalha com $n$ pontos com $d$ dimensões espaciais, que são agrupados em $k$ \textit{clusters}, adotando como critério de similaridade a distância Euclidiana entre os pontos e os centros de cada cluster,
-chamados de centroides.
-
-Dado o conjunto de $n$ pontos (observações) e as $d$ dimensões (atributos), define-se a quantidade $k$ de \textit{clusters} que serão gerados.
-Em seguida, é feita a inicialização dos centroides, a partir de pontos estratégicos (normalmente aleatórios).
-Na etapa seguinte é calculada a distância euclidiana entre cada ponto com cada centroide, vinculando o ponto ao centroide mais próximo.
-Por fim, os valores de cada centroide são atualizados, calculando-se a média de todos os pontos mapeados para o centroide verificado.
-Os dois últimos passos se repetem até que os valores dos centroides se mantenham constantes ou até que se atinja um número pré-determinado de iterações.
-Após a finalização das iterações, o mapeamento final dos dados em cada cluster é produzido.
-
-O controlador de arquitetura implementa o algoritmo K-Means, com adaptações para reduzir a complexidade natural do algoritmo.
-Um uso desse algoritmo pelo controlador está relacionado ao mapeamento de dados nos \textit{clusters} de computação.
-Como entrada, o controlador recebe informações dos acessos aos dados em memória pelas \textit{threads} em execução nos \textit{clusters}.
-Um mapeamento adequado colocaria os dados nas scratchpads do cluster em que as \textit{threads} que mais acessam esses dados estão, explorando o princípio de localidade.
-Da mesma maneira, o mapeamento das \textit{threads}, considerando o acesso remoto, poderia ser elaborado com base na análise do tráfego na NoC.
-Essa abordagem já foi verificada de maneira estática por \citeonline{kmeansCintia}.
-
-É digno de nota que o algoritmo K-means não é o único possível para implementação do controlador de arquitetura.
-Alguns problemas podem ser identificados, como a sensibilidade à inicialização aleatória de centroides no algoritmo.
-Como alternativa, podem ser utilizadas as redes neurais artificiais, como por exemplo, um mapa auto-organizado, do inglês \textit{Self-Organizing Map} (SOM)~\cite{som}, que também propõe a organização dimensional de dados em \textit{clusters}, dependendo da forma como eles se relacionam.
+This architectural design not only provides a flexible testbed for characterizing the ADV workload but also exposes a mechanism to control the depth of in-flight tasks and constrain resource mappings. By keeping the different processing stages decoupled through the StarPU runtime, the Cart-OnePiece framework enables a direct evaluation of how different scheduling policies impact the end-to-end latency and the efficiency of heterogeneous component utilization.
 
 
